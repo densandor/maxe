@@ -10,11 +10,11 @@
         exchange="MARKET"               
     
 
-        halfSpread="0.01"               
+        halfSpread="0.05"               
         depth="1"              
         p="0.5"                         
         
-        priceStep="0.1"                 
+        priceStep="0.1"
         timeStep="1000"
         init="100"                      
         lb="50"                         
@@ -28,6 +28,12 @@
         a="99.8"                          
         b="100.2"                         
         tradeUnit="1"                   
+        />
+	
+	<L1LogAgent
+        name="LOGGER_L1"
+        exchange="MARKET"
+        outputFile="L1Log.csv"
         />
 
     <TradeLogAgent                      

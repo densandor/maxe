@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Simulation start="0" duration="10001">
+    <ExchangeAgent                      
+        name="MARKET"
+        algorithm="PriceTime"           
+        />
+    
+    <RandomAgent
+        name="TRADER_RANDOM"
+        exchange="MARKET"
+
+        p_buy="0.5"
+        quantity="1"
+        interval="1000"
+        />
+	
+	<L1LogAgent
+        name="LOGGER_L1"
+        exchange="MARKET"
+        outputFile="L1Log.csv"
+        />
+
+    <TradeLogAgent                      
+        name="LOGGER_TRADE"
+        exchange="MARKET"
+        />
+</Simulation>
