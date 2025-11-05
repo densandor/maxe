@@ -1,6 +1,6 @@
 from thesimulator import *
 
-class RandomAgent:
+class BuyingAgent:
     def configure(self, params):
         # save locally the configuration params passed so that they are properly typed
         self.exchange = str(params['exchange'])

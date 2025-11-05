@@ -26,13 +26,13 @@ class RandomAgent:
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", EmptyPayload())
             return
         if type == "RESPONSE_RETRIEVE_L1":
-            print("%s:  Received L1 data" % (self.name()))
+            print("%s:  Received L1 data: %r" % (self.name(), payload))
             # payload.bestAskPrice and payload.bestBidPrice are Money objects
             bestAsk = getattr(payload, 'bestAskPrice', None)
             bestBid = getattr(payload, 'bestBidPrice', None)
 
             # choose side 50/50
-            if random.random() < 0.5:
+            if random.random() < self.p_buy:
                 print("%s:  Buying" % (self.name()))
                 direction = OrderDirection.Buy
                 # if no best ask available, place market order

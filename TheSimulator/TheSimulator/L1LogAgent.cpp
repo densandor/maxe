@@ -59,7 +59,7 @@ Timestamp L1LogAgent::computeNextAggregation(Timestamp current) const {
 
 void L1LogAgent::logData(std::shared_ptr<RetrieveL1ResponsePayload> pptr) {
 	m_outputFile << std::to_string(pptr->time) << "," << pptr->bestBidPrice.toCentString() << "," << pptr->bestAskPrice.toCentString() << std::endl;
-	// std::cout << std::to_string(pptr->time) << ": BID " << pptr->bestBidPrice.toCentString() << " ASK " << pptr->bestAskPrice.toCentString() << " SPREAD " << ((Money)(pptr->bestAskPrice - pptr->bestBidPrice)).toCentString() << std::endl;
+	std::cout << std::to_string(pptr->time) << ": BID " << pptr->bestBidPrice.toCentString() << " ASK " << pptr->bestAskPrice.toCentString() << " SPREAD " << ((Money)(pptr->bestAskPrice - pptr->bestBidPrice)).toCentString() << std::endl;
 }
 
 #include "ParameterStorage.h"
