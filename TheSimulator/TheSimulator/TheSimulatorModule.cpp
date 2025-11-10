@@ -154,7 +154,7 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 		;
 
 	py::class_<RetrieveL1ResponsePayload, MessagePayload, std::shared_ptr<RetrieveL1ResponsePayload>>(m, "RetrieveL1ResponsePayload")
-		.def(py::init<Timestamp, Money, Volume, Volume, Money, Volume, Volume>())
+		.def(py::init<Timestamp, Money, Volume, Volume, Money, Volume, Volume, Money>())
 		.def_readwrite("time", &RetrieveL1ResponsePayload::time)
 		.def_readwrite("bestAskPrice", &RetrieveL1ResponsePayload::bestAskPrice)
 		.def_readwrite("bestAskVolume", &RetrieveL1ResponsePayload::bestAskVolume)
@@ -162,6 +162,7 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 		.def_readwrite("bestBidPrice", &RetrieveL1ResponsePayload::bestBidPrice)
 		.def_readwrite("bestBidVolume", &RetrieveL1ResponsePayload::bestBidVolume)
 		.def_readwrite("bidTotalVolume", &RetrieveL1ResponsePayload::bidTotalVolume)
+		.def_readwrite("lastTradePrice", &RetrieveL1ResponsePayload::lastTradePrice)
 		;
 
 	py::class_<SubscribeEventTradeByOrderPayload, MessagePayload, std::shared_ptr<SubscribeEventTradeByOrderPayload>>(m, "SubscribeEventTradeByOrderPayload")

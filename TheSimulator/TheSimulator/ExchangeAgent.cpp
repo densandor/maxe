@@ -94,6 +94,8 @@ void ExchangeAgent::receiveMessage(const MessagePtr& msg) {
 			});
 		}
 
+		retpptr->lastTradePrice = m_bookPtr->lastTradePrice();
+
 		respondToMessage(msg, retpptr);
 	} else if (msg->type == "RETRIEVE_BOOK_ASK") {
 		auto pptr = std::dynamic_pointer_cast<RetrieveBookPayload>(msg->payload);

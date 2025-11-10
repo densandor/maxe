@@ -5,13 +5,15 @@
         algorithm="PriceTime"           
         />
     
-    <StarterAgent
-        name="TRADER_STARTER_0"
+    <SetupAgent
+        name="SETUP_AGENT"
         exchange="MARKET"
 
-        price="100.0"
-        p_buy="0.5"
-        quantity="1"
+        setupTime="0"
+        bidVolume="1"
+        askVolume="1"
+        bidPrice="10000"
+        askPrice="10000"
         />
     
     <RandomAgent
@@ -20,7 +22,7 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="100"
+        interval="1000"
         />
 
     <RandomAgent
@@ -29,7 +31,7 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="100"
+        interval="1000"
         />
 
     <RandomAgent
@@ -38,7 +40,7 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="100"
+        interval="1000"
         />
 
     <RandomAgent
@@ -47,7 +49,7 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="100"
+        interval="1000"
         />
 
     <RandomAgent
@@ -56,26 +58,17 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="100"
-        />
-
-    <RandomAgent
-        name="TRADER_RANDOM_5"
-        exchange="MARKET"
-
-        p_buy="0.5"
-        quantity="1"
-        interval="100"
+        interval="1000"
         />
 	
 	<L1LogAgent
-        name="LOGGER_L1"
+        name="L1_LOGGER"
         exchange="MARKET"
         outputFile="L1Log.csv"
         />
 
     <TradeLogAgent                      
-        name="LOGGER_TRADE_1"
+        name="TRADE_LOGGER"
         exchange="MARKET"
         />
 </Simulation>

@@ -47,6 +47,8 @@ public:
 	const OrderContainer<TickContainer>& buyQueue() const { return m_buyQueue; }
 	const OrderContainer<TickContainer>& sellQueue() const { return m_sellQueue; }
 
+	Money lastTradePrice() const { return m_lastTradePrice; };
+
 	void printHuman() const override;
 	void printCSV() const override;
 	void printHuman(unsigned int depth) const;
@@ -79,6 +81,8 @@ private:
 	OrderFactoryPtr m_orderRecordPtr;
 	TradeFactoryPtr m_tradeRecordPtr;
 	TradeLoggingCallback m_tradeLoggingCallback;
+
+	Money m_lastTradePrice;
 	
 	template <class CIteratorType>
 	void dumpHumanLOB(CIteratorType begin, CIteratorType end, unsigned int depth) const;

@@ -28,6 +28,8 @@ class RandomAgent:
         if type == "RESPONSE_RETRIEVE_L1":
             bestAsk = float(payload.bestAskPrice.toCentString())
             bestBid = float(payload.bestBidPrice.toCentString())
+            lastTradePrice = float(payload.lastTradePrice.toCentString())
+            print(lastTradePrice)
             # choose side 50/50
             if random.random() < self.p_buy:
                 print("%s:  Buying" % (self.name()))

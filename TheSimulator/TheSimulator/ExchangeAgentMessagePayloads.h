@@ -98,9 +98,11 @@ struct RetrieveL1ResponsePayload : public MessagePayload {
 	Volume bestBidVolume;
 	Volume bidTotalVolume;
 
+	Money lastTradePrice;
+
 	RetrieveL1ResponsePayload() = default;
-	RetrieveL1ResponsePayload(Timestamp time, Money bestAskPrice, Volume bestAskVolume, Volume askTotalVolume, Money bestBidPrice, Volume bestBidVolume, Volume bidTotalVolume)
-		: time(time), bestAskPrice(bestAskPrice), bestAskVolume(bestAskVolume), askTotalVolume(askTotalVolume), bestBidPrice(bestBidPrice), bestBidVolume(bestBidVolume), bidTotalVolume(bidTotalVolume) { }
+	RetrieveL1ResponsePayload(Timestamp time, Money bestAskPrice, Volume bestAskVolume, Volume askTotalVolume, Money bestBidPrice, Volume bestBidVolume, Volume bidTotalVolume, Money lastTradePrice)
+		: time(time), bestAskPrice(bestAskPrice), bestAskVolume(bestAskVolume), askTotalVolume(askTotalVolume), bestBidPrice(bestBidPrice), bestBidVolume(bestBidVolume), bidTotalVolume(bidTotalVolume), lastTradePrice(lastTradePrice) { }
 };
 
 struct SubscribeEventTradeByOrderPayload : public MessagePayload {

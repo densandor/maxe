@@ -178,6 +178,7 @@ void Book::unregisterLimitOrder(const LimitOrderPtr& order) {
 
 void Book::logTrade(OrderDirection direction, OrderID aggressorId, OrderID restingId, Volume volume, Money execPrice) {
 	TradePtr tradePtr = tradeFactory()->makeRecord(TIMESTAMP_INVALID, direction, aggressorId, restingId, volume, execPrice);
+	m_lastTradePrice = execPrice;
 	m_tradeLoggingCallback(tradePtr);
 }
 
