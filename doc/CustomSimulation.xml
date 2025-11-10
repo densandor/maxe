@@ -15,12 +15,57 @@
         />
     
     <RandomAgent
-        name="TRADER_RANDOM"
+        name="TRADER_RANDOM_0"
         exchange="MARKET"
 
         p_buy="0.5"
         quantity="1"
-        interval="1000"
+        interval="100"
+        />
+
+    <RandomAgent
+        name="TRADER_RANDOM_1"
+        exchange="MARKET"
+
+        p_buy="0.5"
+        quantity="1"
+        interval="100"
+        />
+
+    <RandomAgent
+        name="TRADER_RANDOM_2"
+        exchange="MARKET"
+
+        p_buy="0.5"
+        quantity="1"
+        interval="100"
+        />
+
+    <RandomAgent
+        name="TRADER_RANDOM_3"
+        exchange="MARKET"
+
+        p_buy="0.5"
+        quantity="1"
+        interval="100"
+        />
+
+    <RandomAgent
+        name="TRADER_RANDOM_4"
+        exchange="MARKET"
+
+        p_buy="0.5"
+        quantity="1"
+        interval="100"
+        />
+
+    <RandomAgent
+        name="TRADER_RANDOM_5"
+        exchange="MARKET"
+
+        p_buy="0.5"
+        quantity="1"
+        interval="100"
         />
 	
 	<L1LogAgent
@@ -30,7 +75,7 @@
         />
 
     <TradeLogAgent                      
-        name="LOGGER_TRADE"
+        name="LOGGER_TRADE_1"
         exchange="MARKET"
         />
 </Simulation>

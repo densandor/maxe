@@ -20,9 +20,9 @@ spread = df["ask"] - df["bid"]
 
 # plot (time in milliseconds)
 plt.figure(figsize=(12, 6))
-# plt.plot(df["time_ms"], df["ask"], label="ask", color="tab:green")
-# plt.plot(df["time_ms"], df["bid"], label="bid", color="tab:red")
-plt.plot(df["time_ms"], spread)
+plt.plot(df["time_ms"], df["ask"], label="ask", color="tab:green")
+plt.plot(df["time_ms"], df["bid"], label="bid", color="tab:red")
+# plt.plot(df["time_ms"], spread)
 plt.xlabel("Time (ms)")
 plt.ylabel("Price")
 plt.title("Ask and Bid Prices")
