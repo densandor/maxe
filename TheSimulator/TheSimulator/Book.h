@@ -47,7 +47,7 @@ public:
 	const OrderContainer<TickContainer>& buyQueue() const { return m_buyQueue; }
 	const OrderContainer<TickContainer>& sellQueue() const { return m_sellQueue; }
 
-	Money lastTradePrice() const { return m_lastTradePrice; };
+	Money lastTradePrice() const { return m_lastTradePrice; }
 
 	void printHuman() const override;
 	void printCSV() const override;

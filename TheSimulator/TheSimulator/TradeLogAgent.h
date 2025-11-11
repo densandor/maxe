@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Agent.h"
+#include <fstream>
 
 class TradeLogAgent : public Agent {
 public:
@@ -13,4 +14,5 @@ public:
 	void receiveMessage(const MessagePtr& msg) override;
 private:
 	std::string m_exchange;
+	std::ofstream m_outputFile;
 };

@@ -23,6 +23,13 @@ void TradeLogAgent::receiveMessage(const MessagePtr& messagePtr) {
 		std::cout << name() << ": ";
 		trade.printHuman();
 		std::cout << std::endl;
+
+		// write CSV row: time, price (use Money::toCentString like L1LogAgent)
+        if (m_outputFile.is_open()) {
+            // adjust field access if Trade uses different member names/getters
+            m_outputFile << std::to_string(trade.timestamp()) << "," << trade.price().toCentString() << std::endl;
+            m_outputFile.flush();
+        }
 	}
 }
 
@@ -35,4 +42,14 @@ void TradeLogAgent::configure(const pugi::xml_node& node, const std::string& con
 	if (!(att = node.attribute("exchange")).empty()) {
 		m_exchange = simulation()->parameters().processString(att.as_string());
 	}
+
+	if (!(att = node.attribute("outputFile")).empty()) {
+        m_outputFile.open(simulation()->parameters().processString(att.as_string()));
+        if (m_outputFile.is_open()) {
+            // header: minimal (time,price)
+            m_outputFile << "time,price\n";
+        } else {
+            std::cerr << name() << ": Failed to open trade CSV file: " << att.as_string() << std::endl;
+        }
+    }
 }

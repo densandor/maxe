@@ -8,18 +8,16 @@ class RandomAgent:
         self.p_buy = float(params['p_buy'])
         self.quantity = int(params['quantity'])
         self.interval = int(params['interval'])
-        
-    
+        self.offset = int(params.get('offset', 1))
+
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
-
+    
         if type == "EVENT_SIMULATION_START":
-            print("%s:  Starting" % (self.name()))
             # Schedule the first wakeup
-            simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
+            simulation.dispatchMessage(currentTimestamp, self.offset, self.name(), self.name(), "WAKE_UP", EmptyPayload())
             return
         if type == "WAKE_UP":
-            print("%s:  Waking up & requesting L1 data" % (self.name()))
             # Schedule the next wakeup
             simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
             # Request L1 data from the exchange
@@ -29,35 +27,31 @@ class RandomAgent:
             bestAsk = float(payload.bestAskPrice.toCentString())
             bestBid = float(payload.bestBidPrice.toCentString())
             lastTradePrice = float(payload.lastTradePrice.toCentString())
-            print(lastTradePrice)
-            # choose side 50/50
+
+            # Choose side 50/50
             if random.random() < self.p_buy:
-                print("%s:  Buying" % (self.name()))
                 direction = OrderDirection.Buy
-                # if no best ask available, place market order
-                if bestAsk == 0:
-                    print("%s:  No best ask" % (self.name()))
-                    simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, self.quantity))
-                    return
-
-                # random price up to 1% from best ask
-                u = random.uniform(-1,1) * 0.01
-                planned_price = bestAsk * (1.0 + u)
-
-                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.quantity, Money(planned_price)))
+                print(f"{self.name()}: BUY", end='')
             else:
-                print("%s:  Selling" % (self.name()))
                 direction = OrderDirection.Sell
-                # if no best bid available, place market order
-                if bestBid == 0:
-                    print("%s:  No best bid" % (self.name()))
-                    simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, self.quantity))
-                    return
+                print(f"{self.name()}: SELL", end='')
 
-                # random price up to 1% away from best bid
-                u = random.uniform(-1,1) * 0.01
-                planned_price = bestBid * (1.0 + u)
-
+            # Choose order type 95% limit, 5% market
+            if random.random() < 0.05 and ((direction == OrderDirection.Buy and bestAsk > 0) or (direction == OrderDirection.Sell and bestBid > 0)):
+                print(" MARKET")
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, self.quantity))
+            else:
+                delta = random.uniform(-1,1) * 0.01
+                
+                planned_price = lastTradePrice * (1.0 + delta)
+                print(f" (planned: {planned_price:.2f})", end='')
+                if direction == OrderDirection.Buy and (planned_price > bestAsk) and bestAsk > 0:
+                    planned_price = bestAsk
+                    print(f" new planned: {planned_price:.2f}", end='')
+                elif direction == OrderDirection.Sell and (planned_price < bestBid) and bestBid > 0:
+                    planned_price = bestBid
+                    print(f" new planned: {planned_price:.2f}", end='')
+                print(f" LIMIT @ {planned_price:.2f}")
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.quantity, Money(planned_price)))
             return
     

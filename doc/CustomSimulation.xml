@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Simulation start="0" duration="10001">
+<Simulation start="0" duration="1001">
     <ExchangeAgent                      
         name="MARKET"
         algorithm="PriceTime"           
@@ -22,7 +22,8 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="1000"
+        interval="20"
+        offset="1"
         />
 
     <RandomAgent
@@ -31,7 +32,8 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="1000"
+        interval="20"
+        offset="2"
         />
 
     <RandomAgent
@@ -40,7 +42,8 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="1000"
+        interval="20"
+        offset="3"
         />
 
     <RandomAgent
@@ -49,7 +52,8 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="1000"
+        interval="20"
+        offset="4"
         />
 
     <RandomAgent
@@ -58,7 +62,8 @@
 
         p_buy="0.5"
         quantity="1"
-        interval="1000"
+        interval="20"
+        offset="5"
         />
 	
 	<L1LogAgent
@@ -70,5 +75,6 @@
     <TradeLogAgent                      
         name="TRADE_LOGGER"
         exchange="MARKET"
+        outputFile="TradeLog.csv"
         />
 </Simulation>
