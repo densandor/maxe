@@ -22,6 +22,7 @@ public:
 	inline Timestamp timestamp() const { return m_timestamp; }
 	inline void setTimestamp(Timestamp timestamp) { m_timestamp = timestamp; }
 	inline OrderID aggressingOrderID() const { return m_aggressingOrderID; }
+	inline OrderDirection direction() const { return m_direction; }
 	inline OrderID restingOrderID() const { return m_restingOrderID; }
 	inline Volume volume() const { return m_volume; }
 	inline Money price() const { return m_price; }
