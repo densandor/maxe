@@ -69,12 +69,12 @@
 	<L1LogAgent
         name="L1_LOGGER"
         exchange="MARKET"
-        outputFile="L1Log.csv"
+        outputFile="../logs/L1Log.csv"
         />
 
     <TradeLogAgent                      
         name="TRADE_LOGGER"
         exchange="MARKET"
-        outputFile="TradeLog.csv"
+        outputFile="../logs/TradeLog.csv"
         />
 </Simulation>

@@ -9,7 +9,6 @@
         name="TRADER_MARKET_MAKER"      
         exchange="MARKET"               
     
-
         halfSpread="0.05"               
         depth="1"              
         p="0.5"                         
@@ -33,12 +32,13 @@
 	<L1LogAgent
         name="LOGGER_L1"
         exchange="MARKET"
-        outputFile="L1Log.csv"
+        outputFile="../logs/L1Log.csv"
         />
 
     <TradeLogAgent                      
         name="LOGGER_TRADE"
         exchange="MARKET"
+        outputFile="../logs/L1Log.csv"
         />
 
     <PrintingAgent

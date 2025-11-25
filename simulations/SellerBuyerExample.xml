@@ -15,13 +15,13 @@
     <BuyingAgent
         name="AGENT_BUYER"
         exchange="EXCHANGE"
-
         quantity="100"
         />
     
     <TradeLogAgent
         name="LOGGER_TRADES"
         exchange="EXCHANGE"
+        outputFile="../logs/TradeLog.csv"
         />
 
 </Simulation>

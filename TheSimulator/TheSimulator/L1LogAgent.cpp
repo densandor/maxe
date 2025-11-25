@@ -4,6 +4,7 @@
 #include "ExchangeAgentMessagePayloads.h"
 
 #include <iostream>
+#include <filesystem>
 
 L1LogAgent::L1LogAgent(const Simulation* simulation)
 	: Agent(simulation), m_outputFile(), m_mostRecentPayload(nullptr), m_aggregationPeriod(0) { }
@@ -73,7 +74,16 @@ void L1LogAgent::configure(const pugi::xml_node& node, const std::string& config
 	}
 
 	if (!(att = node.attribute("outputFile")).empty()) {
-		m_outputFile.open(simulation()->parameters().processString(att.as_string()));
+		std::string filename = simulation()->parameters().processString(att.as_string());
+        
+        // If filename doesn't contain a path separator, prepend logs/
+        namespace fs = std::filesystem;
+        fs::path filePath(filename);
+        if (filePath.parent_path().empty()) {
+            filePath = fs::path("logs") / filePath;
+        }
+        
+        m_outputFile.open(filePath.string());
 	}
 
 	if (!(att = node.attribute("aggregationPeriod")).empty()) {

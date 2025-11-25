@@ -2,6 +2,7 @@
 #include "Simulation.h"
 
 #include <pybind11/stl.h>
+#include <filesystem>
 
 PythonAgent::PythonAgent(const Simulation* simulation, const std::string& pythonClass, const std::string& file)
 	: Agent(simulation), m_class(pythonClass), m_file(file) { }
@@ -17,6 +18,17 @@ void PythonAgent::configure(const pugi::xml_node& node, const std::string& confi
 			m_parameters[std::string(attr.name())] = simulation()->parameters().processString(attr.as_string());
 		}
 	}
+
+	// Add agents/ to sys.path so py::module::import can find modules there
+	py::module sys = py::module::import("sys");
+    namespace fs = std::filesystem;
+    fs::path configPath = fs::absolute(configurationPath);
+    fs::path repoRoot = configPath.parent_path();
+    fs::path agentsDir = (repoRoot / "agents").lexically_normal();
+	auto sys_path_vec = sys.attr("path").cast<std::vector<std::string>>();
+    if (fs::exists(agentsDir) && std::find(sys_path_vec.begin(), sys_path_vec.end(), agentsDir.string()) == sys_path_vec.end()) {
+        sys.attr("path").attr("insert")(0, agentsDir.string());
+    }
 
 	py::object agentClass;
 	if (m_file == "") {

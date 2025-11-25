@@ -187,19 +187,19 @@ void Simulation::setupChildConfiguration(const pugi::xml_node& node, const std::
 					m_agentList.push_back(std::move(eaptr));
 				}
 			} else {
-				std::string filePath = nodeName + ".py";
-				if (!std::filesystem::exists(filePath)) {
-					throw SimulationException("Simulation::configure(): unrecognized node '"
-						+ nodeName
-						+ "', tried looking into the file '"
-						+ filePath
-						+ "', but it does not exist"
-					);
-				} else {
+				// std::string filePath = nodeName + ".py";
+				// if (!std::filesystem::exists(filePath)) {
+				// 	throw SimulationException("Simulation::configure(): unrecognized node '"
+				// 		+ nodeName
+				// 		+ "', tried looking into the file '"
+				// 		+ filePath
+				// 		+ "', but it does not exist"
+				// 	);
+				// } else {
 					auto eaptr = std::make_unique<PythonAgent>(this, nodeName, "");
 					eaptr->configure(*nit, configurationPath);
 					m_agentList.push_back(std::move(eaptr));
-				}
+				// }
 			}
 		}
 	}

@@ -4,6 +4,7 @@
 #include "ExchangeAgentMessagePayloads.h"
 
 #include <iostream>
+#include <filesystem>
 
 TradeLogAgent::TradeLogAgent(const Simulation* simulation)
 	: Agent(simulation) { }
@@ -44,9 +45,19 @@ void TradeLogAgent::configure(const pugi::xml_node& node, const std::string& con
 	}
 
 	if (!(att = node.attribute("outputFile")).empty()) {
-        m_outputFile.open(simulation()->parameters().processString(att.as_string()));
+        std::string filename = simulation()->parameters().processString(att.as_string());
+        
+        // If filename doesn't contain a path separator, prepend logs/
+        namespace fs = std::filesystem;
+        fs::path filePath(filename);
+        if (filePath.parent_path().empty()) {
+            filePath = fs::path("logs") / filePath;
+        }
+        
+        m_outputFile.open(filePath.string());
+
         if (m_outputFile.is_open()) {
-            // header: minimal (time,price)
+            // header: time,price
             m_outputFile << "time,price\n";
         } else {
             std::cerr << name() << ": Failed to open trade CSV file: " << att.as_string() << std::endl;
