@@ -20,9 +20,9 @@ void TradeLogAgent::receiveMessage(const MessagePtr& messagePtr) {
 		auto pptr = std::dynamic_pointer_cast<EventTradePayload>(messagePtr->payload);
 		const auto& trade = pptr->trade;
 		
-		std::cout << name() << ": ";
-		trade.printHuman();
-		std::cout << std::endl;
+		// std::cout << name() << ": ";
+		// trade.printHuman();
+		// std::cout << std::endl;
 
 		// write CSV row: time, price (use Money::toCentString like L1LogAgent)
         if (m_outputFile.is_open()) {

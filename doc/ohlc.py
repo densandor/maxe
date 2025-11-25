@@ -14,7 +14,7 @@ def generate_candles(csv_file, timeframe_seconds=60):
     df['time'] = pd.to_datetime(df['time_ms'], unit='ms')
     
     # Create time buckets based on timeframe
-    df['candle_time'] = df['time'].dt.floor(f'{timeframe_seconds}S')
+    df['candle_time'] = df['time'].dt.floor(f'{timeframe_seconds}s')
     
     # Group by candle time and calculate OHLC
     candles = df.groupby('candle_time').agg(
