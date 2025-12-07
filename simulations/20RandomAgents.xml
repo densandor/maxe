@@ -2,26 +2,26 @@
 <Simulation start="0" duration="3600001">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000"/>
-    <RandomAgent name="TRADER_RANDOM_0" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1"/>
-    <RandomAgent name="TRADER_RANDOM_1" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="201"/>
-    <RandomAgent name="TRADER_RANDOM_2" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="401"/>
-    <RandomAgent name="TRADER_RANDOM_3" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="601"/>
-    <RandomAgent name="TRADER_RANDOM_4" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="801"/>
-    <RandomAgent name="TRADER_RANDOM_5" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1001"/>
-    <RandomAgent name="TRADER_RANDOM_6" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1201"/>
-    <RandomAgent name="TRADER_RANDOM_7" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1401"/>
-    <RandomAgent name="TRADER_RANDOM_8" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1601"/>
-    <RandomAgent name="TRADER_RANDOM_9" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1801"/>
-    <RandomAgent name="TRADER_RANDOM_10" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2001"/>
-    <RandomAgent name="TRADER_RANDOM_11" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2201"/>
-    <RandomAgent name="TRADER_RANDOM_12" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2401"/>
-    <RandomAgent name="TRADER_RANDOM_13" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2601"/>
-    <RandomAgent name="TRADER_RANDOM_14" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2801"/>
-    <RandomAgent name="TRADER_RANDOM_15" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3001"/>
-    <RandomAgent name="TRADER_RANDOM_16" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3201"/>
-    <RandomAgent name="TRADER_RANDOM_17" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3401"/>
-    <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3601"/>
-    <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3801"/>
+    <RandomAgent name="TRADER_RANDOM_0" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_1" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="201" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_2" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="401" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_3" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="601" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_4" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="801" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_5" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1001" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_6" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1201" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_7" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1401" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_8" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1601" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_9" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1801" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_10" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2001" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_11" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2201" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_12" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2401" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_13" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2601" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_14" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="2801" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_15" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3001" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_16" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3201" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_17" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3401" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3601" multiplier="1"/>
+    <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3801" multiplier="1"/>
     <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
     <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
 </Simulation>
