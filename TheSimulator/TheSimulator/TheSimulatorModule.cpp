@@ -184,4 +184,16 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 		.def(py::init<Trade>())
 		.def_readonly("trade", &EventTradePayload::trade)
 		;
+
+	py::class_<Trade>(m, "Trade")
+        .def(py::init<TradeID, Timestamp, OrderDirection, OrderID, OrderID, Volume, Money>())
+        .def("id", &Trade::id)
+        .def("timestamp", &Trade::timestamp)
+        .def("setTimestamp", &Trade::setTimestamp)
+        .def("aggressingOrderID", &Trade::aggressingOrderID)
+        .def("direction", &Trade::direction)
+        .def("restingOrderID", &Trade::restingOrderID)
+        .def("volume", &Trade::volume)
+        .def("price", &Trade::price)
+        ;
 }

@@ -1,14 +1,21 @@
 from thesimulator import *
+from PnLTracker import PnLTracker
 import random
+
 
 class RandomAgent:
     def configure(self, params):
-        # save locally the configuration params passed so that they are properly typed
-        self.exchange = str(params['exchange'])
-        self.p_buy = float(params['p_buy'])
-        self.quantity = int(params['quantity'])
-        self.interval = int(params['interval'])
-        self.offset = int(params.get('offset', 1))
+        # Generic parameters
+        self.exchange = str(params["exchange"])
+        self.offset = int(params.get("offset", 1))
+        self.interval = int(params["interval"])
+
+        # RandomAgent-specific parameters
+        self.p_buy = float(params["p_buy"])
+        self.quantity = int(params["quantity"])
+
+        self.pnl = PnLTracker()
+        self.market_orders = set()
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -28,30 +35,50 @@ class RandomAgent:
             bestBid = float(payload.bestBidPrice.toCentString())
             lastTradePrice = float(payload.lastTradePrice.toCentString())
 
+            self.pnl.mark_to_market(lastTradePrice)
+
             # Choose side 50/50
             if random.random() < self.p_buy:
                 direction = OrderDirection.Buy
-                # print(f"{self.name()}: BUY", end='')
             else:
                 direction = OrderDirection.Sell
-                # print(f"{self.name()}: SELL", end='')
 
             # Choose order type 95% limit, 5% market
             if random.random() < 0.05 and ((direction == OrderDirection.Buy and bestAsk > 0) or (direction == OrderDirection.Sell and bestBid > 0)):
-                # print(" MARKET")
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, self.quantity * 100))
             else:
                 delta = random.uniform(-1,1) * 0.01
                 
                 planned_price = lastTradePrice * (1.0 + delta)
-                # print(f" (planned: {planned_price:.2f})", end='')
                 if direction == OrderDirection.Buy and (planned_price > bestAsk) and bestAsk > 0:
                     planned_price = bestAsk
-                    # print(f" new planned: {planned_price:.2f}", end='')
                 elif direction == OrderDirection.Sell and (planned_price < bestBid) and bestBid > 0:
                     planned_price = bestBid
-                    # print(f" new planned: {planned_price:.2f}", end='')
-                # print(f" LIMIT @ {planned_price:.2f}")
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.quantity, Money(planned_price)))
             return
-    
+        
+        if type == "RESPONSE_PLACE_ORDER_MARKET":
+            order_id = payload.id
+            sub_payload = SubscribeEventTradeByOrderPayload(order_id)
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "SUBSCRIBE_EVENT_ORDER_TRADE", sub_payload)
+            return
+        
+        if type == "RESPONSE_PLACE_ORDER_LIMIT":
+            order_id = payload.id
+            sub_payload = SubscribeEventTradeByOrderPayload(order_id)
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "SUBSCRIBE_EVENT_ORDER_TRADE", sub_payload)
+            return
+        
+        if type == "EVENT_TRADE":
+            trade = payload.trade
+            if trade.aggressingOrderID() in self.market_orders:
+                print("Market order filled:", trade.aggressingOrderID())
+            fill_price = float(trade.price().toCentString())
+            fill_volume = int(trade.volume())
+            direction = trade.direction()
+
+            self.pnl.update_on_fill(fill_price, fill_volume, direction)
+            return
+        
+        if type == "EVENT_SIMULATION_STOP":
+            print(self.name(), self.pnl.snapshot())
