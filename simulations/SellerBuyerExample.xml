@@ -21,7 +21,12 @@
     <TradeLogAgent
         name="LOGGER_TRADES"
         exchange="EXCHANGE"
-        outputFile="../logs/TradeLog.csv"
+        outputFile="TradeLog.csv"
+        />
+    
+    <PnLManagerAgent
+        name="PNL"
+        exchange="EXCHANGE"
         />
 
 </Simulation>

@@ -185,14 +185,30 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 		.def_readonly("trade", &EventTradePayload::trade)
 		;
 
+	// PnL request / response payloads
+	py::class_<RequestPnLPayload, MessagePayload, std::shared_ptr<RequestPnLPayload>>(m, "RequestPnLPayload")
+		.def(py::init<>())
+		;
+
+	py::class_<ResponsePnLPayload, MessagePayload, std::shared_ptr<ResponsePnLPayload>>(m, "ResponsePnLPayload")
+		.def(py::init<int, const Money&, const Money&, const Money&, const Money&>())
+		.def_readwrite("inventory", &ResponsePnLPayload::inventory)
+		.def_readwrite("avg_price", &ResponsePnLPayload::avg_price)
+		.def_readwrite("realized_pnl", &ResponsePnLPayload::realized_pnl)
+		.def_readwrite("unrealized_pnl", &ResponsePnLPayload::unrealized_pnl)
+		.def_readwrite("last_price", &ResponsePnLPayload::last_price)
+		;
+
 	py::class_<Trade>(m, "Trade")
-        .def(py::init<TradeID, Timestamp, OrderDirection, OrderID, OrderID, Volume, Money>())
+        .def(py::init<TradeID, Timestamp, OrderDirection, OrderID, Owner, OrderID, Owner, Volume, Money>())
         .def("id", &Trade::id)
         .def("timestamp", &Trade::timestamp)
         .def("setTimestamp", &Trade::setTimestamp)
+		.def("direction", &Trade::direction)
         .def("aggressingOrderID", &Trade::aggressingOrderID)
-        .def("direction", &Trade::direction)
+		.def("aggressingOwner", &Trade::aggressingOwner)
         .def("restingOrderID", &Trade::restingOrderID)
+		.def("restingOwner", &Trade::restingOwner)
         .def("volume", &Trade::volume)
         .def("price", &Trade::price)
         ;

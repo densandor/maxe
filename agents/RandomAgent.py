@@ -1,7 +1,5 @@
 from thesimulator import *
-from PnLTracker import PnLTracker
 import random
-
 
 class RandomAgent:
     def configure(self, params):
@@ -13,9 +11,6 @@ class RandomAgent:
         # RandomAgent-specific parameters
         self.p_buy = float(params["p_buy"])
         self.quantity = int(params["quantity"])
-
-        self.pnl = PnLTracker()
-        self.market_orders = set()
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -34,8 +29,6 @@ class RandomAgent:
             bestAsk = float(payload.bestAskPrice.toCentString())
             bestBid = float(payload.bestBidPrice.toCentString())
             lastTradePrice = float(payload.lastTradePrice.toCentString())
-
-            self.pnl.mark_to_market(lastTradePrice)
 
             # Choose side 50/50
             if random.random() < self.p_buy:
@@ -56,29 +49,3 @@ class RandomAgent:
                     planned_price = bestBid
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.quantity, Money(planned_price)))
             return
-        
-        if type == "RESPONSE_PLACE_ORDER_MARKET":
-            order_id = payload.id
-            sub_payload = SubscribeEventTradeByOrderPayload(order_id)
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "SUBSCRIBE_EVENT_ORDER_TRADE", sub_payload)
-            return
-        
-        if type == "RESPONSE_PLACE_ORDER_LIMIT":
-            order_id = payload.id
-            sub_payload = SubscribeEventTradeByOrderPayload(order_id)
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "SUBSCRIBE_EVENT_ORDER_TRADE", sub_payload)
-            return
-        
-        if type == "EVENT_TRADE":
-            trade = payload.trade
-            if trade.aggressingOrderID() in self.market_orders:
-                print("Market order filled:", trade.aggressingOrderID())
-            fill_price = float(trade.price().toCentString())
-            fill_volume = int(trade.volume())
-            direction = trade.direction()
-
-            self.pnl.update_on_fill(fill_price, fill_volume, direction)
-            return
-        
-        if type == "EVENT_SIMULATION_STOP":
-            print(self.name(), self.pnl.snapshot())

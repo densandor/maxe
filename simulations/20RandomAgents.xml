@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Simulation start="0" duration="3600001">
+<Simulation start="0" duration="100001">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000"/>
     <RandomAgent name="TRADER_RANDOM_0" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="1" multiplier="1"/>
@@ -23,20 +23,22 @@
     <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3601" multiplier="1"/>
     <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET" p_buy="0.5" quantity="1" interval="1000" offset="3801" multiplier="1"/>
     
-    <!-- <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" quantity="1" interval="1000" offset="1" lookback="5" threshold="0.01"/>
-    <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" quantity="1" interval="1000" offset="201" lookback="5" threshold="0.01"/> -->
-    <!-- <MomentumAgent name="TRADER_MOMENTUM_2" exchange="MARKET" quantity="1" interval="1000" offset="401" lookback="5" threshold="0.01"/>
+    <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" quantity="1" interval="1000" offset="1" lookback="5" threshold="0.01"/>
+    <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" quantity="1" interval="1000" offset="201" lookback="5" threshold="0.01"/>
+    <MomentumAgent name="TRADER_MOMENTUM_2" exchange="MARKET" quantity="1" interval="1000" offset="401" lookback="5" threshold="0.01"/>
     <MomentumAgent name="TRADER_MOMENTUM_3" exchange="MARKET" quantity="1" interval="1000" offset="601" lookback="5" threshold="0.01"/>
-    <MomentumAgent name="TRADER_MOMENTUM_4" exchange="MARKET" quantity="1" interval="1000" offset="801" lookback="5" threshold="0.01"/> -->
+    <MomentumAgent name="TRADER_MOMENTUM_4" exchange="MARKET" quantity="1" interval="1000" offset="801" lookback="5" threshold="0.01"/>
 
-    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_0" exchange="MARKET" interval="1000" offset="1" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_1" exchange="MARKET" interval="1000" offset="201" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/> -->
-    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_2" exchange="MARKET" interval="1000" offset="401" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_0" exchange="MARKET" interval="1000" offset="1" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_1" exchange="MARKET" interval="1000" offset="201" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_2" exchange="MARKET" interval="1000" offset="401" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_3" exchange="MARKET" interval="1000" offset="601" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_4" exchange="MARKET" interval="1000" offset="801" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/> -->
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_4" exchange="MARKET" interval="1000" offset="801" theta_init="10000" omega_fund="0.001" sigma_fund="10" max_volume="10"/>
 
-    <!-- <QLearningAgent name="QLearner1" class="QLearningAgent" exchange="MARKET" interval="1000" offset="1" alpha="0.10" gamma="0.99" epsilon="0.20" epsilon_min="0.01" epsilon_decay="0.999" /> -->
+    <QLearningAgent name="QLearner1" class="QLearningAgent" exchange="MARKET" interval="1000" offset="1" alpha="0.10" gamma="0.99" epsilon="0.20" epsilon_min="0.01" epsilon_decay="0.999" />
 
     <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
     <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
+    <!-- <OrderLogAgent name="ORDER_LOGGER" exchange="MARKET"/> -->
+    <PnLManagerAgent name="PNL" exchange="MARKET"/>
 </Simulation>

@@ -10,7 +10,7 @@ void PriorityProRataBook::processAgainstTheBuyQueue(const OrderPtr& order, Money
 		order->removeVolume(effectiveVolume);
 		m_lastBetteringBuyOrder->removeVolume(effectiveVolume);
 		if(effectiveVolume > 0) {
-			logTrade(OrderDirection::Sell, order->id(), m_lastBetteringBuyOrder->id(), effectiveVolume, bestBuyList.price());
+			logTrade(OrderDirection::Sell, order->id(), order->owner(), m_lastBetteringBuyOrder->id(), m_lastBetteringBuyOrder->owner(), effectiveVolume, bestBuyList.price());
 		}
 
 		if (m_lastBetteringBuyOrder->volume() == 0) {
@@ -28,7 +28,7 @@ void PriorityProRataBook::processAgainstTheSellQueue(const OrderPtr& order, Mone
 		order->removeVolume(effectiveVolume);
 		m_lastBetteringSellOrder->removeVolume(effectiveVolume);
 		if (effectiveVolume > 0) {
-			logTrade(OrderDirection::Buy, order->id(), m_lastBetteringSellOrder->id(), effectiveVolume, bestSellList.price());
+			logTrade(OrderDirection::Buy, order->id(), order->owner(), m_lastBetteringSellOrder->id(), m_lastBetteringSellOrder->owner(), effectiveVolume, bestSellList.price());
 		}
 
 		if (m_lastBetteringSellOrder->volume() == 0) {

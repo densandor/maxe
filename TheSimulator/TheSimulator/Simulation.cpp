@@ -2,6 +2,7 @@
 
 #include "ExchangeAgent.h"
 #include "TradeLogAgent.h"
+#include "PnLManagerAgent.h"
 #include "OrderLogAgent.h"
 #include "L1LogAgent.h"
 #include "BouchaudAgent.h"
@@ -168,6 +169,10 @@ void Simulation::setupChildConfiguration(const pugi::xml_node& node, const std::
 			m_agentList.push_back(std::move(eaptr));
 		} else if (nodeName == "DoobAgent") {
 			auto eaptr = std::make_unique<DoobAgent>(this);
+			eaptr->configure(*nit, configurationPath);
+			m_agentList.push_back(std::move(eaptr));
+		} else if (nodeName == "PnLManagerAgent") {
+			auto eaptr = std::make_unique<PnLManagerAgent>(this);
 			eaptr->configure(*nit, configurationPath);
 			m_agentList.push_back(std::move(eaptr));
 		} else {

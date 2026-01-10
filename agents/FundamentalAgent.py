@@ -1,8 +1,6 @@
 from thesimulator import *
-from PnLTracker import PnLTracker
 import random
 import math
-
 
 class FundamentalAgent:
     def configure(self, params):
@@ -17,8 +15,6 @@ class FundamentalAgent:
         self.sensitivity = float(params.get("sensitivity", 0.001))
         self.update_s_d = float(params.get("update_s_d", 10.0))
         self.max_volume = int(params.get("max_volume", 10))
-
-        self.pnl = PnLTracker()
 
     # Fundamental price update (simulates random information coming in)
     def _update_fundamental_price(self):
@@ -44,11 +40,6 @@ class FundamentalAgent:
         if type == "RESPONSE_RETRIEVE_L1":
             bestAsk = float(payload.bestAskPrice.toCentString())
             bestBid = float(payload.bestBidPrice.toCentString())
-            lastTradePrice = float(payload.lastTradePrice.toCentString())
-
-            # Update mark‑to‑market PnL with latest trade price
-            if lastTradePrice > 0:
-                self.pnl.mark_to_market(lastTradePrice)
 
             current_fundamental_price = self.fundamental_price
             # If there are no resting orders, do nothing
@@ -74,24 +65,4 @@ class FundamentalAgent:
 
             # Place market order
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, volume))
-            return
-
-        if type == "RESPONSE_PLACE_ORDER_MARKET":
-            order_id = payload.id
-            sub_payload = SubscribeEventTradeByOrderPayload(order_id)
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "SUBSCRIBE_EVENT_ORDER_TRADE", sub_payload)
-            return
-
-        if type == "EVENT_TRADE":
-            trade = payload.trade
-            fill_price = float(trade.price().toCentString())
-            fill_volume = int(trade.volume())
-            direction = trade.direction()
-            print(fill_price, fill_volume, direction)
-
-            self.pnl.update_pnl_on_fill(fill_price, fill_volume, direction)
-            return
-        
-        if type == "EVENT_SIMULATION_STOP":
-            print(self.name(), self.pnl.snapshot())
             return

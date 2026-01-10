@@ -15,7 +15,7 @@ void PureProRataBook::processAgainstTheBuyQueue(const OrderPtr& order, Money min
 			orderVolumePair.first->removeVolume(orderVolumePair.second);
 			order->removeVolume(orderVolumePair.second);
 			if (orderVolumePair.second > 0) {
-				logTrade(OrderDirection::Sell, order->id(), orderVolumePair.first->id(), orderVolumePair.second, bestBuyList->price());
+				logTrade(OrderDirection::Sell, order->id(), order->owner(), orderVolumePair.first->id(), orderVolumePair.first->owner(), orderVolumePair.second, bestBuyList->price());
 			}
 		}
 
@@ -26,7 +26,7 @@ void PureProRataBook::processAgainstTheBuyQueue(const OrderPtr& order, Money min
 			(*it)->removeVolume(applicableVolume);
 			order->removeVolume(applicableVolume);
 			if (applicableVolume > 0) {
-				logTrade(OrderDirection::Sell, order->id(), (*it)->id(), applicableVolume, bestBuyList->price());
+				logTrade(OrderDirection::Sell, order->id(), order->owner(), (*it)->id(), (*it)->owner(), applicableVolume, bestBuyList->price());
 			}
 
 			if ((*it)->volume() == 0) {
@@ -57,7 +57,7 @@ void PureProRataBook::processAgainstTheSellQueue(const OrderPtr& order, Money ma
 			orderVolumePair.first->removeVolume(orderVolumePair.second);
 			order->removeVolume(orderVolumePair.second);
 			if (orderVolumePair.second > 0) {
-				logTrade(OrderDirection::Buy, order->id(), orderVolumePair.first->id(), orderVolumePair.second, bestSellList->price());
+				logTrade(OrderDirection::Buy, order->id(), order->owner(), orderVolumePair.first->id(), orderVolumePair.first->owner(), orderVolumePair.second, bestSellList->price());
 			}
 		}
 
@@ -68,7 +68,7 @@ void PureProRataBook::processAgainstTheSellQueue(const OrderPtr& order, Money ma
 			(*it)->removeVolume(applicableVolume);
 			order->removeVolume(applicableVolume);
 			if(applicableVolume > 0) {
-				logTrade(OrderDirection::Sell, order->id(), (*it)->id(), applicableVolume, bestSellList->price());
+				logTrade(OrderDirection::Sell, order->id(), order->owner(), (*it)->id(), (*it)->owner(), applicableVolume, bestSellList->price());
 			}
 
 			if ((*it)->volume() == 0) {

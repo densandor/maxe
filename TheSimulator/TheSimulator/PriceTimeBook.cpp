@@ -11,7 +11,7 @@ void PriceTimeBook::processAgainstTheBuyQueue(const OrderPtr& order, Money minPr
 		order->removeVolume(usedVolume);
 		iop->removeVolume(usedVolume);
 		if(usedVolume > 0) {
-			logTrade(OrderDirection::Sell, order->id(), iop->id(), usedVolume, bestBuyDeque->price());
+			logTrade(OrderDirection::Sell, order->id(), order->owner(), iop->id(), iop->owner(), usedVolume, bestBuyDeque->price());
 		}
 		if (iop->volume() == 0) {
 			bestBuyDeque->pop_front();
@@ -36,7 +36,7 @@ void PriceTimeBook::processAgainstTheSellQueue(const OrderPtr& order, Money maxP
 		order->removeVolume(usedVolume);
 		iop->removeVolume(usedVolume);
 		if (usedVolume > 0) {
-			logTrade(OrderDirection::Buy, order->id(), iop->id(), usedVolume, bestSellDeque->price());
+			logTrade(OrderDirection::Buy, order->id(), order->owner(), iop->id(), iop->owner(), usedVolume, bestSellDeque->price());
 		}
 		if (iop->volume() == 0) {
 			bestSellDeque->pop_front();

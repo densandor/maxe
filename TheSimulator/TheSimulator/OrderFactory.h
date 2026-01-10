@@ -15,14 +15,14 @@ public:
 	OrderFactory(OrderFactory&& orderFactory) noexcept;
 	~OrderFactory();
 
-	MarketOrderPtr makeMarketOrder(OrderDirection direction, Timestamp timestamp, Volume volume);
-	LimitOrderPtr makeLimitOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Money price);
+	MarketOrderPtr makeMarketOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Owner owner);
+	LimitOrderPtr makeLimitOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Owner owner, Money price);
 
 	// convenience methods
-	MarketOrderPtr marketBuy(Timestamp timestamp, Volume volume);
-	MarketOrderPtr marketSell(Timestamp timestamp, Volume volume);
-	LimitOrderPtr limitBuy(Timestamp timestamp, Volume volume, Money price);
-	LimitOrderPtr limitSell(Timestamp timestamp, Volume volume, Money price);
+	MarketOrderPtr marketBuy(Timestamp timestamp, Volume volume, Owner owner);
+	MarketOrderPtr marketSell(Timestamp timestamp, Volume volume, Owner owner);
+	LimitOrderPtr limitBuy(Timestamp timestamp, Volume volume, Owner owner, Money price);
+	LimitOrderPtr limitSell(Timestamp timestamp, Volume volume, Owner owner, Money price);
 private:
 	OrderID m_orderCount;
 };

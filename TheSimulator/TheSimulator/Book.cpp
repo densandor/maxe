@@ -84,15 +84,15 @@ void Book::placeOrder(const MarketOrderPtr& order) {
 	}
 }
 
-MarketOrderPtr Book::placeMarketOrder(OrderDirection direction, Timestamp timestamp, Volume volume) {
-	auto ret = m_orderRecordPtr->makeMarketOrder(direction, timestamp, volume);
+MarketOrderPtr Book::placeMarketOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Owner owner) {
+	auto ret = m_orderRecordPtr->makeMarketOrder(direction, timestamp, volume, owner);
 	placeOrder(ret);
 
 	return ret;
 }
 
-LimitOrderPtr Book::placeLimitOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Money price) {
-	auto ret = m_orderRecordPtr->makeLimitOrder(direction, timestamp, volume, price);
+LimitOrderPtr Book::placeLimitOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Owner owner, Money price) {
+	auto ret = m_orderRecordPtr->makeLimitOrder(direction, timestamp, volume, owner, price);
 	placeOrder(ret);
 
 	return ret;
@@ -176,8 +176,8 @@ void Book::unregisterLimitOrder(const LimitOrderPtr& order) {
 	m_orderIdMap.erase(order->id());
 }
 
-void Book::logTrade(OrderDirection direction, OrderID aggressorId, OrderID restingId, Volume volume, Money execPrice) {
-	TradePtr tradePtr = tradeFactory()->makeRecord(TIMESTAMP_INVALID, direction, aggressorId, restingId, volume, execPrice);
+void Book::logTrade(OrderDirection direction, OrderID aggressingId, Owner aggressingOwner, OrderID restingId, Owner restingOwner, Volume volume, Money execPrice) {
+	TradePtr tradePtr = tradeFactory()->makeRecord(TIMESTAMP_INVALID, direction, aggressingId, aggressingOwner, restingId, restingOwner, volume, execPrice);
 	m_lastTradePrice = execPrice;
 	m_tradeLoggingCallback(tradePtr);
 }

@@ -33,8 +33,10 @@ void TradeLogAgent::receiveMessage(const MessagePtr& messagePtr) {
             << std::to_string(trade.timestamp()) << ","
             << trade.price().toCentString() << ","
             << trade.aggressingOrderID() << ","
-            << (trade.direction() == OrderDirection::Buy ? "Buy" : "Sell") << ","
+            << trade.aggressingOwner() << ","
+            << (trade.direction() == OrderDirection::Buy ? "BUY" : "SELL") << ","
             << trade.restingOrderID() << ","
+            << trade.restingOwner() << ","
             << trade.volume() << std::endl;
             m_outputFile.flush();
         }
@@ -65,7 +67,7 @@ void TradeLogAgent::configure(const pugi::xml_node& node, const std::string& con
 
         if (m_outputFile.is_open()) {
             // header: id,time,price,agressing,direction,resting,volume
-            m_outputFile << "id,time,price,agressing,direction,resting,volume\n";
+            m_outputFile << "id,time,price,aggressing,aggressingOwner,direction,resting,restingOwner,volume\n";
         } else {
             std::cerr << name() << ": Failed to open trade CSV file: " << att.as_string() << std::endl;
         }

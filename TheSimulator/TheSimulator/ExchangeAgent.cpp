@@ -22,7 +22,7 @@ ExchangeAgent::ExchangeAgent(const Simulation* simulation, const std::string& na
 void ExchangeAgent::receiveMessage(const MessagePtr& msg) {
 	if (msg->type == "PLACE_ORDER_MARKET") {
 		auto ptr = std::dynamic_pointer_cast<PlaceOrderMarketPayload>(msg->payload);
-		auto mop = m_bookPtr->placeMarketOrder(ptr->direction, msg->arrival, ptr->volume);
+		auto mop = m_bookPtr->placeMarketOrder(ptr->direction, msg->arrival, ptr->volume, msg->source);
 		
 		PlaceOrderMarketResponsePayload retpay(mop->id(), ptr);
 		auto retpayptr = std::make_shared<PlaceOrderMarketResponsePayload>(retpay);
@@ -32,7 +32,7 @@ void ExchangeAgent::receiveMessage(const MessagePtr& msg) {
 		notifyMarketOrderSubscribers(mop);
 	} else if (msg->type == "PLACE_ORDER_LIMIT") {
 		auto ptr = std::dynamic_pointer_cast<PlaceOrderLimitPayload>(msg->payload);
-		auto lop = m_bookPtr->placeLimitOrder(ptr->direction, msg->arrival, ptr->volume, ptr->price);
+		auto lop = m_bookPtr->placeLimitOrder(ptr->direction, msg->arrival, ptr->volume, msg->source, ptr->price);
 
 		PlaceOrderLimitResponsePayload retpay(lop->id(), ptr);
 		auto retpayptr = std::make_shared<PlaceOrderLimitResponsePayload>(retpay);

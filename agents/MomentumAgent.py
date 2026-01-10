@@ -1,7 +1,5 @@
 from thesimulator import *
-from PnLTracker import PnLTracker
 import collections
-
 
 class MomentumAgent:
     def configure(self, params):
@@ -18,9 +16,6 @@ class MomentumAgent:
 
         # Local price history
         self.prices = collections.deque(maxlen=self.max_history)
-
-        # PnL state
-        self.pnl = PnLTracker()
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -41,8 +36,6 @@ class MomentumAgent:
             bestAsk = float(payload.bestAskPrice.toCentString())
             bestBid = float(payload.bestBidPrice.toCentString())
             lastTradePrice = float(payload.lastTradePrice.toCentString())
-
-            self.pnl.mark_to_market(lastTradePrice)
 
             # === Momentum ===
 
@@ -95,22 +88,3 @@ class MomentumAgent:
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.quantity, Money(planned_price)))
             return
 
-        if type == "RESPONSE_PLACE_ORDER_LIMIT":
-            order_id = payload.id
-            sub_payload = SubscribeEventTradeByOrderPayload(order_id)
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "SUBSCRIBE_EVENT_ORDER_TRADE", sub_payload)
-            return
-        
-        if type == "EVENT_TRADE":
-            trade = payload.trade
-
-            fill_price = float(trade.price().toCentString())
-            fill_volume = int(trade.volume())
-            direction = trade.direction()
-
-            self.pnl.update_on_fill(fill_price, fill_volume, direction)
-            return
-        
-        if type == "EVENT_SIMULATION_STOP":
-            print(self.name(), self.pnl.snapshot())
-            return

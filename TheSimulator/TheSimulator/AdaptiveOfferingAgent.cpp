@@ -60,7 +60,7 @@ void AdaptiveOfferingAgent::receiveMessage(const MessagePtr& msg) {
 		const Timestamp timeDelta = currentTimestamp - m_currentOrder.timeOfPlacement;
 		if(timeDelta > 0) {
 			auto& ffr = m_fulfillmentRates[m_currentOrder.centDeltaFromBestPrice];
-			ffr.push_back(std::make_pair(timeDelta, (double)tradedDelta / m_currentOrder.offeredVolume));
+			ffr.emplace_back(static_cast<double>(timeDelta), static_cast<double>(tradedDelta) / static_cast<double>(m_currentOrder.offeredVolume));
 			if (ffr.size() > m_memorySize) {
 				ffr.pop_front();
 			}

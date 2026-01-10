@@ -1,8 +1,6 @@
 from thesimulator import *
-from PnLTracker import PnLTracker
 import random
 import numpy as np
-
 
 class QLearningAgent:
     def configure(self, params):
@@ -10,6 +8,10 @@ class QLearningAgent:
         self.exchange = str(params["exchange"])
         self.interval = int(params["interval"])
         self.offset = int(params.get("offset", 1))
+        # PnL manager agent name (defaults to 'PNL')
+        self.pnl_agent = str(params.get("pnlAgent", "PNL"))
+        # placeholder for pending state when awaiting PnL response
+        self._pending_state = None
 
         # Q-learning parameters
         self.alpha = float(params.get("alpha", 0.1)) # learning rate
@@ -30,7 +32,6 @@ class QLearningAgent:
         self.Q = np.zeros((len(self.positions) * len(self.trends), len(self.action_space)))
 
         # Book-keeping
-        self.pnl = PnLTracker()
         self.position = 0           # current signed position (−1, 0, +1)
         self.last_price = None      # last trade price seen
         self.prev_state = None
@@ -98,9 +99,6 @@ class QLearningAgent:
             if lastTradePrice <= 0 or (bestAsk <= 0 and bestBid <= 0):
                 return
 
-            # Update mark-to-market PnL
-            self.pnl.mark_to_market(lastTradePrice)
-
             # Compute simple trend
             trend = self._discretize_trend(self.last_price, lastTradePrice)
             self.last_price = lastTradePrice
@@ -108,14 +106,29 @@ class QLearningAgent:
             # Current state index
             state_idx = self._state_to_index(self.position, trend)
 
-            # Reward: change in total PnL since last step
-            current_pnl = self.pnl.snapshot()["total_pnl"]
+            # Request PnL snapshot from PnL manager and wait for RESPONSE_PNL
+            # Store pending state for continuation when RESPONSE_PNL arrives
+            self._pending_state = state_idx
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnl_agent, "REQUEST_PNL", EmptyPayload())
+            return
+
+        if type == "RESPONSE_PNL":
+            # Received PnL response from PnLManagerAgent
+            realized = float(payload.realized_pnl.toCentString())
+            unrealized = float(payload.unrealized_pnl.toCentString())
+
+            current_pnl = realized + unrealized
             if not hasattr(self, "last_pnl"):
                 self.last_pnl = current_pnl
             reward = current_pnl - self.last_pnl
             self.last_pnl = current_pnl
 
-            # Q-learning update from previous transition
+            # Continue Q-learning update using pending state
+            if self._pending_state is None:
+                return
+            state_idx = self._pending_state
+            self._pending_state = None
+
             if self.prev_state is not None and self.prev_action is not None:
                 self._update_q(reward, state_idx)
 
@@ -151,36 +164,4 @@ class QLearningAgent:
             # Store previous state/action for next update
             self.prev_state = state_idx
             self.prev_action = action
-            return
-
-        if type == "RESPONSE_PLACE_ORDER_MARKET":
-            order_id = payload.id
-            sub_payload = SubscribeEventTradeByOrderPayload(order_id)
-            simulation.dispatchMessage(
-                currentTimestamp,
-                0,
-                self.name(),
-                self.exchange,
-                "SUBSCRIBE_EVENT_ORDER_TRADE",
-                sub_payload
-            )
-            return
-
-        if type == "EVENT_TRADE":
-            trade = payload.trade
-            fill_price = float(trade.price().toCentString())
-            fill_volume = int(trade.volume())
-            direction = trade.direction()
-            print(fill_price, fill_volume, direction)
-
-            # Update PnL and position on fill
-            self.pnl.update_pnl_on_fill(fill_price, fill_volume, direction)
-            if direction == OrderDirection.Buy:
-                self.position += fill_volume
-            elif direction == OrderDirection.Sell:
-                self.position -= fill_volume
-            return
-
-        if type == "EVENT_SIMULATION_STOP":
-            print(self.name(), self.pnl.snapshot())
             return

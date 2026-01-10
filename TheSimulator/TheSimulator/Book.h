@@ -37,8 +37,8 @@ public:
 	Book(OrderFactoryPtr orderFactoryPtr, TradeFactoryPtr tradeFactoryPtr);
 	virtual ~Book() = default;
 
-	MarketOrderPtr placeMarketOrder(OrderDirection direction, Timestamp timestamp, Volume volume);
-	LimitOrderPtr placeLimitOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Money price);
+	MarketOrderPtr placeMarketOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Owner owner);
+	LimitOrderPtr placeLimitOrder(OrderDirection direction, Timestamp timestamp, Volume volume, Owner owner, Money price);
 	void cancelOrder(const OrderID orderId);
 	Volume cancelOrder(const OrderID orderId, Volume volumeToCancel);
 
@@ -76,7 +76,7 @@ protected:
 	virtual void processAgainstTheBuyQueue(const OrderPtr& order, Money minPrice) = 0; // you want to keep it this way
 	virtual void processAgainstTheSellQueue(const OrderPtr& order, Money maxPrice) = 0;
 
-	void logTrade(OrderDirection direction, OrderID aggressorId, OrderID restingId, Volume volume, Money execPrice);
+	void logTrade(OrderDirection direction, OrderID aggressingId, Owner aggressingOwner, OrderID restingId, Owner restingOwner, Volume volume, Money execPrice);
 private:
 	OrderFactoryPtr m_orderRecordPtr;
 	TradeFactoryPtr m_tradeRecordPtr;

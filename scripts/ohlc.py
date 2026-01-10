@@ -4,7 +4,7 @@ def generate_candles(csv_file, timeframe_seconds=60):
     
     df = pd.read_csv(csv_file)
     
-    df.columns = ["id", "time", "price", "agressing", "direction", "resting", "volume"]
+    df.columns = ["id", "time", "price", "aggressing", "aggressingOwner", "direction", "resting", "restingOwner", "volume"]
     
     # Assume "time" is in milliseconds
     df["datetime"] = pd.to_datetime(df["time"], unit="ms")

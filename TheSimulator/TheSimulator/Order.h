@@ -8,6 +8,7 @@
 #include "ICSVPrintable.h"
 
 #include <memory>
+#include <string>
 
 using OrderID = unsigned long int;
 constexpr OrderID ORDERID_INVALID = 0;
@@ -16,6 +17,8 @@ enum class OrderDirection : unsigned int {
 	Buy,
 	Sell
 };
+
+using Owner = std::string;
 
 class BasicOrder : public IHumanPrintable, public ICSVPrintable {
 public:
@@ -43,6 +46,7 @@ class Order : public BasicOrder {
 public:
 	virtual ~Order() = default;
 	inline OrderDirection direction() const { return m_direction; }
+	inline Owner owner() const { return m_owner; }
 
 	Order(const Order& order);
 	Order(Order&& order);
@@ -51,9 +55,10 @@ public:
 	void printCSV() const override;
 
 protected:
-	Order(OrderID id, OrderDirection orderDirection, Timestamp timestamp, Volume orderVolume);
+	Order(OrderID id, OrderDirection orderDirection, Timestamp timestamp, Volume orderVolume, Owner owner);
 private:
 	const OrderDirection m_direction;
+	const Owner m_owner;
 };
 using OrderPtr = std::shared_ptr<Order>;
 
@@ -65,7 +70,7 @@ public:
 	void printHuman() const override;
 	void printCSV() const override;
 protected:
-	MarketOrder(OrderID id, OrderDirection direction, Timestamp timestamp, Volume volume);
+	MarketOrder(OrderID id, OrderDirection direction, Timestamp timestamp, Volume volume, Owner owner);
 
 	friend class OrderFactory;
 };
@@ -86,7 +91,7 @@ public:
 		return *this;
 	}
 protected:
-	LimitOrder(OrderID id, OrderDirection direction, Timestamp timestamp, Volume volume, const Money& price);
+	LimitOrder(OrderID id, OrderDirection direction, Timestamp timestamp, Volume volume, Owner owner, const Money& price);
 
 	friend class OrderFactory;
 private:

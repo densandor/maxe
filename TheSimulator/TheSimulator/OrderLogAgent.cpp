@@ -18,13 +18,12 @@ void OrderLogAgent::receiveMessage(const MessagePtr& messagePtr) {
 	} else if (messagePtr->type == "EVENT_ORDER_MARKET") {
 		auto pptr = std::dynamic_pointer_cast<EventOrderMarketPayload>(messagePtr->payload);
 		const auto& order = pptr->order;
-
 		std::cout << name() << ": ";
 		order.printHuman();
+		std::cout << std::endl;
 	} else if (messagePtr->type == "EVENT_ORDER_LIMIT") {
 		auto pptr = std::dynamic_pointer_cast<EventOrderLimitPayload>(messagePtr->payload);
 		const auto& order = pptr->order;
-
 		std::cout << name() << ": ";
 		order.printHuman();
 		std::cout << std::endl;
