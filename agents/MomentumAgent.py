@@ -1,21 +1,30 @@
 from thesimulator import *
 import collections
+import random
 
 class MomentumAgent:
+    """
+    Momentum trader
+
+    At each wake-up the agent requests L1 data and updates a short history of trade prices.
+    It computes the relative price change over `lookback` periods.
+    If the relative change exceeds `threshold` it places a limit order to buy slightly inside the spread (or to sell if the change is below -`threshold`).
+    Orders use the configured `quantity` and are placed to improve fill odds while avoiding crossing the book.
+    """
+
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
-        self.quantity = int(params["quantity"])
         self.interval = int(params["interval"])
         self.offset = int(params.get("offset", 1))
+        self.trade_probability = float(params.get("trade_probability", 0.2))
 
-        # Momentum-specific config
-        self.lookback = int(params.get("lookback", 5))  # how many past prices to use
-        self.threshold = float(params.get("threshold", 0.001))  # minimum return to act (e.g. 0.1%)
-        self.max_history = max(self.lookback + 1, 3)
+        self.quantity = int(params["quantity"])
 
-        # Local price history
-        self.prices = collections.deque(maxlen=self.max_history)
+        # MomentumAgent-specific parameters
+        self.lookback = int(params.get("lookback", 5)) # how many past prices to use
+        self.threshold = float(params.get("threshold", 0.001)) # minimum return to act (e.g. 0.1%)
+        self.prices = collections.deque(maxlen=self.lookback) # local price history
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -28,6 +37,11 @@ class MomentumAgent:
         if type == "WAKE_UP":
             # Schedule the next wakeup
             simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
+
+            # Decide whether to attempt trading this wakeup (probabilistic)
+            if random.random() >= self.trade_probability:
+                return
+
             # Request L1 data from the exchange
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", RetrieveL1Payload())
             return
