@@ -1,9 +1,7 @@
 from thesimulator import *
-from PnLTracker import PnLTracker
 import numpy as np
 from stable_baselines3 import DQN
 from gymnasium import Env, spaces
-import random
 
 
 class TradingEnv(Env):

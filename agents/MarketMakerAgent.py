@@ -86,7 +86,6 @@ class MarketMakerAgent:
             return
         
         if type == "RESPONSE_PNL":
-
             # Received PnL response from PnLManagerAgent
             realized = float(payload.realized_pnl)
             unrealized = float(payload.unrealized_pnl)
