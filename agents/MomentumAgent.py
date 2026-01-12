@@ -1,6 +1,7 @@
 from thesimulator import *
 import collections
 import random
+import math
 
 class MomentumAgent:
     """
@@ -21,10 +22,19 @@ class MomentumAgent:
 
         self.quantity = int(params["quantity"])
 
+        # optional PnL agent name for inventory checks
+        self.pnl_agent = str(params.get("pnlAgent", "PNL"))
+        # maximum inventory (absolute) before scaling orders down
+        self.max_inventory = int(params.get("max_inventory", 50))
+
+        # pending planned order waiting for PnL response
+        self._pending_order = None
+
         # MomentumAgent-specific parameters
         self.lookback = int(params.get("lookback", 5)) # how many past prices to use
         self.threshold = float(params.get("threshold", 0.001)) # minimum return to act (e.g. 0.1%)
         self.prices = collections.deque(maxlen=self.lookback) # local price history
+        self.slowdown_exponent = float(params.get("slowdown_exponent", 2.0)) # how quickly to scale down orders near max inventory
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -38,12 +48,8 @@ class MomentumAgent:
             # Schedule the next wakeup
             simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
 
-            # Decide whether to attempt trading this wakeup (probabilistic)
-            if random.random() >= self.trade_probability:
-                return
-
             # Request L1 data from the exchange
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", RetrieveL1Payload())
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", EmptyPayload())
             return
         
         if type == "RESPONSE_RETRIEVE_L1":
@@ -54,24 +60,19 @@ class MomentumAgent:
             # === Momentum ===
 
             # Update local price history
-            if lastTradePrice > 0:
-                self.prices.append(lastTradePrice)
-
-            # Need enough history to compute momentum
-            if len(self.prices) < self.lookback + 1:
+            self.prices.append(lastTradePrice)
+            # Decide whether to attempt a trade this wakeup (probabilistic trading)
+            if random.random() >= self.trade_probability:
                 return
 
             # Simple momentum: compare latest price to older price
             p_now = self.prices[-1]
-            p_past = self.prices[-1 - self.lookback]
-            # print("Most recent price:", p_now, "Olderprice:", p_past)
+            p_past = self.prices[0]
 
             if p_past <= 0:
                 return
 
             rel_change = (p_now - p_past) / p_past  # positive = uptrend, negative = downtrend
-            # print("Relative change:", rel_change)
-
             # Decide direction based on momentum and threshold
             if rel_change > self.threshold:
                 direction = OrderDirection.Buy
@@ -98,7 +99,30 @@ class MomentumAgent:
                     planned_price = bestAsk
                 else:
                     planned_price = p_now
-            # print("Taking a trade: Time =", currentTimestamp, "Side =", direction, "Price =", planned_price)
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.quantity, Money(planned_price)))
+            # Query PnL manager for our inventory before placing the order so we can scale size
+            self._pending_order = (direction, planned_price)
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnl_agent, "REQUEST_PNL", EmptyPayload())
+            return
+
+        if type == "RESPONSE_PNL":
+            # Place pending order adjusted by current inventory
+            if self._pending_order is None:
+                return
+            inventory = int(getattr(payload, "inventory", 0))
+            direction, planned_price = self._pending_order
+            self._pending_order = None
+
+            # scale factor reduces size as inventory approaches limit
+            if self.max_inventory <= 0:
+                scale = 1.0
+            else:
+                scale = max(0.0, 1.0 - (abs(inventory) / float(self.max_inventory))**self.slowdown_exponent)
+
+            order_qty = int(math.floor(self.quantity * scale))
+            if order_qty <= 0:
+                # fully capped, skip placing
+                return
+
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, order_qty, Money(planned_price)))
             return
 

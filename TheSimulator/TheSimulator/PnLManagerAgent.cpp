@@ -46,10 +46,10 @@ void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
 		const std::string requester = msg->source;
 
 		int inventory = 0;
-		Money avg_price = Money(0);
-		Money realized = Money(0);
-		Money unrealized = Money(0);
-		Money lastPrice = m_last_trade_price;
+		double avg_price = 0.0;
+		double realized = 0.0;
+		double unrealized = 0.0;
+		double lastPrice = (double)m_last_trade_price;
 
 		auto it = m_states.find(requester);
 		if (it != m_states.end()) {
@@ -57,7 +57,7 @@ void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
 			inventory = s.inventory;
 			avg_price = s.avg_price;
 			realized = s.realized_pnl;
-			if (s.inventory != 0 && lastPrice != Money(0) && s.avg_price != Money(0)) {
+			if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != 0.0) {
 				unrealized = (lastPrice - s.avg_price) * s.inventory;
 			}
 		}
@@ -72,16 +72,15 @@ void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
 			const std::string& agent = kv.first;
 			const PnLState& s = kv.second;
 
-			Money unrealized = Money(0);
-			Money lastPrice = m_last_trade_price;
-			if (s.inventory != 0 && lastPrice != Money(0) && s.avg_price != Money(0)) {
+			double unrealized = 0.0;
+			double lastPrice = (double)m_last_trade_price;
+			if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != 0.0) {
 				unrealized = (lastPrice - s.avg_price) * s.inventory;
 			}
 
-			// Print deterministic columns using Money::toCentString()
 			std::cout << agent << ", "
-				<< s.inventory << ", " << s.avg_price.toCentString() << ", "
-				<< s.realized_pnl.toCentString() << ", " << unrealized.toCentString() << ", " << lastPrice.toCentString() << std::endl;
+				<< s.inventory << ", " << std::fixed << std::setprecision(6) << s.avg_price << ", "
+				<< std::fixed << std::setprecision(6) << s.realized_pnl << ", " << unrealized << ", " << lastPrice << std::endl;
 		}
 	}
 }
@@ -93,10 +92,12 @@ void PnLManagerAgent::updateOnFill(const std::string& owner, const Money& fill_p
 
 	auto& s = m_states[owner]; // creates entry if missing
 
+	double fill_price_d = static_cast<double>(fill_price);
+
 	// No existing position -> open new
 	if (s.inventory == 0) {
 		s.inventory = (int)dq;
-		s.avg_price = fill_price;
+		s.avg_price = fill_price_d;
 		if (s.inventory != 0) m_agents_with_positions.insert(owner);
 		return;
 	}
@@ -104,7 +105,7 @@ void PnLManagerAgent::updateOnFill(const std::string& owner, const Money& fill_p
 	// Increasing existing position (same side)
 	if ((s.inventory > 0 && dq > 0) || (s.inventory < 0 && dq < 0)) {
 		int new_inventory = (int)(s.inventory + dq);
-		Money numerator = s.avg_price * (int)std::llabs(s.inventory) + fill_price * (int)std::llabs(dq);
+		double numerator = s.avg_price * (int)std::llabs(s.inventory) + fill_price_d * (int)std::llabs(dq);
 		s.avg_price = numerator / (int)std::llabs(new_inventory);
 		s.inventory = new_inventory;
 		if (s.inventory != 0) m_agents_with_positions.insert(owner);
@@ -114,11 +115,11 @@ void PnLManagerAgent::updateOnFill(const std::string& owner, const Money& fill_p
 
 	// Reducing or flipping
 	int closing_qty = (int)std::min((long long)std::llabs(s.inventory), (long long)std::llabs(dq));
-	Money pnl_close = Money(0);
+	double pnl_close = 0.0;
 	if (s.inventory > 0) { // closing long
-		pnl_close = (fill_price - s.avg_price) * closing_qty;
+		pnl_close = (fill_price_d - s.avg_price) * closing_qty;
 	} else { // closing short
-		pnl_close = (s.avg_price - fill_price) * closing_qty;
+		pnl_close = (s.avg_price - fill_price_d) * closing_qty;
 	}
 
 	s.realized_pnl += pnl_close;
@@ -128,12 +129,12 @@ void PnLManagerAgent::updateOnFill(const std::string& owner, const Money& fill_p
 	if (new_inventory == 0) {
 		// Position fully closed
 		s.inventory = 0;
-		s.avg_price = Money(0);
+		s.avg_price = 0.0;
 		m_agents_with_positions.erase(owner);
 	} else if ((s.inventory > 0 && new_inventory < 0) || (s.inventory < 0 && new_inventory > 0)) {
 		// Flipped side: remaining quantity is new position at fill_price
 		s.inventory = new_inventory;
-		s.avg_price = fill_price;
+		s.avg_price = fill_price_d;
 		m_agents_with_positions.insert(owner);
 	} else {
 		// Partially reduced, still same side
@@ -143,7 +144,7 @@ void PnLManagerAgent::updateOnFill(const std::string& owner, const Money& fill_p
 	}
 }
 
-bool PnLManagerAgent::test_getPnLSnapshot(const std::string& owner, int& inventory, Money& avg_price, Money& realized_pnl, Money& unrealized_pnl) const {
+bool PnLManagerAgent::test_getPnLSnapshot(const std::string& owner, int& inventory, double& avg_price, double& realized_pnl, double& unrealized_pnl) const {
 	auto it = m_states.find(owner);
 	if (it == m_states.end()) return false;
 	const PnLState& s = it->second;
@@ -152,9 +153,9 @@ bool PnLManagerAgent::test_getPnLSnapshot(const std::string& owner, int& invento
 	avg_price = s.avg_price;
 	realized_pnl = s.realized_pnl;
 
-	Money unrealized = Money(0);
-	if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != Money(0)) {
-		unrealized = (m_last_trade_price - s.avg_price) * s.inventory;
+	double unrealized = 0.0;
+	if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != 0.0) {
+		unrealized = (static_cast<double>(m_last_trade_price) - s.avg_price) * s.inventory;
 	}
 	unrealized_pnl = unrealized;
 	return true;

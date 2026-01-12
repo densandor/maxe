@@ -23,7 +23,7 @@ class RandomAgent:
             # Schedule the next wakeup
             simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
             # Request L1 data from the exchange
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", RetrieveL1Payload())
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", EmptyPayload())
             return
         if type == "RESPONSE_RETRIEVE_L1":
             bestAsk = float(payload.bestAskPrice.toCentString())

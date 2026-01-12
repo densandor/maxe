@@ -11,34 +11,27 @@ class MarketMakerAgent:
         self.exchange = str(params["exchange"])
         self.interval = int(params["interval"])
         self.offset = int(params.get("offset", 1))
-        self.trade_probability = float(params.get("trade_probability", 0.2))
+        self.trade_probability = float(params.get("tradeProbability", 0.2))
 
         self.pnl_agent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name
+        self.market_data_agent = str(params.get("marketDataAgent", "MARKET_DATA")) # Market data agent name
 
         # MarketMakerAgent-specific parameters
-        self.starting_capital = float(params.get("starting_capital", 100000.0)) # starting capital (monetary units consistent with PnL manager outputs)
-        self.omega = float(params.get("omega", 0.01)) # fraction of capital to risk (omega). Q_t = omega * K_t
+        self.starting_capital = float(params.get("startingCapital", 100000.0)) # starting capital
+        self.capital_risk_multiplier = float(params.get("capitalRiskMultiplier", 0.2)) # fraction of capital to risk
 
-        # Parameters for splitting liquidity and inventory control
-        self.n_levels = int(params.get("levels", 3)) # number of distinct levels per side
-        # maximum desired inventory (I_bar)
-        self.I_bar = float(params.get("I_bar", 100.0))
-        # adverse-selection strength (r)
-        self.r = float(params.get("r", 0.5))
-        # lookback for price change (l_k)
-        self.l_k = int(params.get("l_k", 10))
-        # price tick multiplier for placing orders across levels (fractional)
-        self.tick = float(params.get("tick", 0.001))
+        # Parameters for splitting liquidity and managing inventory
+        self.orders_each_side = int(params.get("ordersEachSide", 4)) # number of distinct price levels per side
+        self.max_inventory = float(params.get("maxInventory", 100.0))
+        self.adverse_selection_multiplier = float(params.get("r", 1000)) # sensitivity to price changes for adverse selection
+        self.lookback = int(params.get("lookback", 10)) # lookback for price change (lookback)
+        self.tick = float(params.get("tick", 0.001)) # price tick multiplier for placing orders across levels (fractional)
 
-        # Demand signal smoothing and price adjustment parameters (piece 3)
-        # exponential smoothing weight for observed demand D_t
-        self.alpha_demand = float(params.get("alpha_demand", 0.5))
-        # threshold s beyond which demand moves mid-price
-        self.demand_threshold = float(params.get("demand_threshold", 0.0))
-        # small price fraction per unit of (D - s) to adjust mid-price
-        self.demand_scale = float(params.get("demand_scale", 0.0001))
-        # sensitivity of mid-price to inventory changes (c in the notes)
-        self.c = float(params.get("c", 0.0))
+        # Demand signal smoothing and price adjustment parameters
+        self.demand_smoothing = float(params.get("demandSmoothing", 0.15)) # exponential smoothing weight for observed demand (D)
+        self.demand_threshold = float(params.get("demandThreshold", 0.0)) # threshold beyond which demand moves mid-price (s)
+        self.demand_scale = float(params.get("demandScale", 0.0001)) # small price fraction per unit of (D - s) to adjust mid-price
+        self.c = float(params.get("c", 0.0)) # sensitivity of mid-price to inventory changes
 
         # Parameters for spread setting based on recent mid-price volatility
         # gamma scales sigma to a spread; xi is a minimum spread (price units)
@@ -48,17 +41,16 @@ class MarketMakerAgent:
         self.tau = float(params.get("tau", 2.0))
 
         # Price history for adverse-selection heuristic (used for sigma calculation)
-        self.price_history = collections.deque(maxlen=self.l_k + 1)
+        self.price_history = collections.deque(maxlen=self.lookback + 1)
         # Keep a separate mid-price history to compute volatility over previous 10 periods
         self.mid_history = collections.deque(maxlen=10)
 
-        # Smoothed demand signal D~_t and accumulated demand in the current period
-        self.D_tilde = 0.0
-        self.current_period_demand = 0.0
+        self.demand_signal = 0.0 # smoothed demand D~
+        self.current_demand = 0.0 # demand at current wake-up
 
         # Inventory tracking for I~ logic (keep two previous inventories to detect changes)
-        self.prev_inventory_1 = 0
-        self.prev_inventory_2 = 0
+        self.inventory_t_minus_1 = 0
+        self.inventory_t_minus_2 = 0
         self.I_tilde_prev = 0.0
 
         # Minimum liquidity unit and optional caps
@@ -74,60 +66,42 @@ class MarketMakerAgent:
         if type == "EVENT_SIMULATION_START":
             # Schedule the first wakeup
             simulation.dispatchMessage(currentTimestamp, self.offset, self.name(), self.name(), "WAKE_UP", EmptyPayload())
-            # Subscribe to market orders so we can observe D_t (market order net demand)
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "SUBSCRIBE_EVENT_ORDER_MARKET", EmptyPayload())
-
             return
 
         if type == "WAKE_UP":
             # Schedule the next wakeup
             simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
-
-            # Before requesting PnL, update the smoothed market demand D~ using the accumulated market orders
-            D_t = self.current_period_demand
-            # update smoothed demand (exponential smoothing); if first period, this will simply set D_tilde to D_t
-            self.D_tilde = self.alpha_demand * D_t + (1.0 - self.alpha_demand) * self.D_tilde
-            # reset period demand accumulator
-            self.current_period_demand = 0.0
+            # Request market data to update demand signal and plan liquidity provision
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.market_data_agent, "REQUEST_MARKET_DATA", EmptyPayload())
+            return
+        
+        if type == "RESPONSE_REQUEST_MARKET_DATA":
+            # Before requesting PnL, update the smoothed market demand using the accumulated market orders
+            current_demand = payload.demand # signed integer: buys positive, sells negative
+            # update smoothed demand (exponential smoothing); if first period, this will simply set demand_signal to current_demand
+            self.demand_signal = self.demand_smoothing * current_demand + (1.0 - self.demand_smoothing) * self.demand_signal
 
             # Request a PnL snapshot from the PnL manager to compute available capital
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnl_agent, "REQUEST_PNL", EmptyPayload())
             return
-
-        if type == "EVENT_ORDER_MARKET":
-            # Observe market orders arriving during the period and accumulate signed net demand D_t
-            # payload.order.direction: OrderDirection.Buy/Sell
-            # payload.order.volume: Volume
-            try:
-                mo = payload.order
-                vol = int(getattr(mo, 'volume', 0))
-                dir = getattr(mo, 'direction', None)
-                if dir == OrderDirection.Buy:
-                    self.current_period_demand += vol
-                else:
-                    self.current_period_demand -= vol
-            except Exception:
-                # If payload structure differs, ignore
-                pass
-            return
-
+        
         if type == "RESPONSE_PNL":
 
             # Received PnL response from PnLManagerAgent
-            realized = float(payload.realized_pnl.toCentString())
-            unrealized = float(payload.unrealized_pnl.toCentString())
+            realized = float(payload.realized_pnl)
+            unrealized = float(payload.unrealized_pnl)
             inventory = int(getattr(payload, "inventory", 0))
 
             # shift inventory history and store latest inventory for quoting logic
             self.prev_inventory_2 = self.prev_inventory_1
-            self.prev_inventory_1 = inventory
+            self.prev_inventory_1 = self.inventory
             self.inventory = inventory
 
             # Available capital = starting capital + realized + mark-to-market (unrealized)
             capital = self.starting_capital + realized + unrealized
 
             # Total liquidity to offer (floor to integer units)
-            total_liquidity = int(math.floor(self.omega * capital))
+            total_liquidity = int(math.floor(self.capital_risk_multiplier * capital))
 
             # Enforce bounds
             if total_liquidity < self.min_liquidity_unit:
@@ -138,19 +112,18 @@ class MarketMakerAgent:
                 total_liquidity = self.max_total_liquidity
 
             # Split roughly equally between buy and sell
-            buy_qty = total_liquidity // 2
-            sell_qty = total_liquidity - buy_qty
+            one_side_liquidity = total_liquidity // 2
 
             # Save pending quantities and request L1 data to choose prices
-            self._pending_liquidity = (buy_qty, sell_qty)
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", RetrieveL1Payload())
+            self._pending_liquidity = one_side_liquidity
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", EmptyPayload())
             return
 
         if type == "RESPONSE_RETRIEVE_L1":
             if self._pending_liquidity is None:
                 return
 
-            buy_qty, sell_qty = self._pending_liquidity
+            one_side_liquidity = self._pending_liquidity
             self._pending_liquidity = None
 
             bestAsk = float(payload.bestAskPrice.toCentString())
@@ -163,16 +136,16 @@ class MarketMakerAgent:
 
             # Adverse-selection factor: scale down supply when recent price moves are large
             selection_factor = 1.0
-            if len(self.price_history) >= (self.l_k + 1):
+            if len(self.price_history) >= (self.lookback + 1):
                 p_now = self.price_history[-1]
-                p_past = self.price_history[-1 - self.l_k]
+                p_past = self.price_history[-1 - self.lookback]
                 if p_past > 0:
                     price_change = abs(p_now - p_past) / p_past
-                    selection_factor = max(0.0, 1.0 - self.r * price_change)
+                    selection_factor = max(0.0, 1.0 - self.adverse_selection_multiplier * price_change)
 
             # Inventory adjustment: reduce bids when long, reduce asks when short
             inventory = getattr(self, 'inventory', 0)
-            inv_ratio = inventory / float(self.I_bar) if self.I_bar != 0 else 0.0
+            inv_ratio = inventory / float(self.max_inventory) if self.max_inventory != 0 else 0.0
             bid_factor = max(0.0, 1.0 - inv_ratio)
             ask_factor = max(0.0, 1.0 + inv_ratio)
 
@@ -186,17 +159,17 @@ class MarketMakerAgent:
 
             # Demand-based adjustment
             demand_adj = 0.0
-            if abs(self.D_tilde) > self.demand_threshold:
-                if self.D_tilde > self.demand_threshold:
-                    demand_adj = self.demand_scale * (self.D_tilde - self.demand_threshold)
-                elif self.D_tilde < -self.demand_threshold:
-                    demand_adj = self.demand_scale * (self.D_tilde + self.demand_threshold)
+            if abs(self.demand_signal) > self.demand_threshold:
+                if self.demand_signal > self.demand_threshold:
+                    demand_adj = self.demand_scale * (self.demand_signal - self.demand_threshold)
+                elif self.demand_signal < -self.demand_threshold:
+                    demand_adj = self.demand_scale * (self.demand_signal + self.demand_threshold)
 
             # Inventory tilde: update only if inventory changed in the last period
             I_tilde = self.I_tilde_prev
             if abs(self.prev_inventory_1 - self.prev_inventory_2) > 0:
-                # c * (I_k,t / I_bar)
-                I_tilde = self.c * (inventory / float(self.I_bar)) if self.I_bar != 0 else 0.0
+                # c * (I_k,t / max_inventory)
+                I_tilde = self.c * (inventory / float(self.max_inventory)) if self.max_inventory != 0 else 0.0
 
             # Inventory-based price adjustment: down if long, up if short
             inv_adj = 0.0
@@ -235,7 +208,7 @@ class MarketMakerAgent:
                     pass
 
             # Determine levels and per-level base quantities
-            levels = max(1, int(self.n_levels))
+            levels = max(1, int(self.orders_each_side))
             base_buy = float(buy_qty) / levels
             base_sell = float(sell_qty) / levels
 

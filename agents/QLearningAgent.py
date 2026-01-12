@@ -86,9 +86,9 @@ class QLearningAgent:
 
         if type == "WAKE_UP":
             # Schedule next wakeup
-            simulation.dispatchMessage(currentTimestamp, self.offset, self.name(), self.name(), "WAKE_UP", EmptyPayload())
+            simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
             # Request L1 data from the exchange
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", RetrieveL1Payload())
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", EmptyPayload())
             return
 
         if type == "RESPONSE_RETRIEVE_L1":
@@ -114,8 +114,9 @@ class QLearningAgent:
 
         if type == "RESPONSE_PNL":
             # Received PnL response from PnLManagerAgent
-            realized = float(payload.realized_pnl.toCentString())
-            unrealized = float(payload.unrealized_pnl.toCentString())
+            realized = float(payload.realized_pnl)
+            
+            unrealized = float(payload.unrealized_pnl)
 
             current_pnl = realized + unrealized
             if not hasattr(self, "last_pnl"):

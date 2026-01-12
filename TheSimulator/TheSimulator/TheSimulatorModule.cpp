@@ -149,10 +149,6 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 		.def_readwrite("tickContainers", &RetrieveBookResponsePayload::tickContainers)
 		;
 
-	py::class_<RetrieveL1Payload, MessagePayload, std::shared_ptr<RetrieveL1Payload>>(m, "RetrieveL1Payload")
-		.def(py::init<>())
-		;
-
 	py::class_<RetrieveL1ResponsePayload, MessagePayload, std::shared_ptr<RetrieveL1ResponsePayload>>(m, "RetrieveL1ResponsePayload")
 		.def(py::init<Timestamp, Money, Volume, Volume, Money, Volume, Volume, Money>())
 		.def_readwrite("time", &RetrieveL1ResponsePayload::time)
@@ -185,18 +181,20 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 		.def_readonly("trade", &EventTradePayload::trade)
 		;
 
-	// PnL request / response payloads
-	py::class_<RequestPnLPayload, MessagePayload, std::shared_ptr<RequestPnLPayload>>(m, "RequestPnLPayload")
-		.def(py::init<>())
+	// PnL response
+	py::class_<ResponsePnLPayload, MessagePayload, std::shared_ptr<ResponsePnLPayload>>(m, "ResponsePnLPayload")
+		.def(py::init<int, double, double, double, double>())
+	.def_readwrite("inventory", &ResponsePnLPayload::inventory)
+	.def_readwrite("avg_price", &ResponsePnLPayload::avg_price)
+	.def_readwrite("realized_pnl", &ResponsePnLPayload::realized_pnl)
+	.def_readwrite("unrealized_pnl", &ResponsePnLPayload::unrealized_pnl)
+	.def_readwrite("last_price", &ResponsePnLPayload::last_price)
 		;
 
-	py::class_<ResponsePnLPayload, MessagePayload, std::shared_ptr<ResponsePnLPayload>>(m, "ResponsePnLPayload")
-		.def(py::init<int, const Money&, const Money&, const Money&, const Money&>())
-		.def_readwrite("inventory", &ResponsePnLPayload::inventory)
-		.def_readwrite("avg_price", &ResponsePnLPayload::avg_price)
-		.def_readwrite("realized_pnl", &ResponsePnLPayload::realized_pnl)
-		.def_readwrite("unrealized_pnl", &ResponsePnLPayload::unrealized_pnl)
-		.def_readwrite("last_price", &ResponsePnLPayload::last_price)
+	// Market data response
+	py::class_<ResponseMarketDataPayload, MessagePayload, std::shared_ptr<ResponseMarketDataPayload>>(m, "ResponseMarketDataPayload")
+		.def(py::init<int>())
+		.def_readwrite("demand", &ResponseMarketDataPayload::demand)
 		;
 
 	py::class_<Trade>(m, "Trade")

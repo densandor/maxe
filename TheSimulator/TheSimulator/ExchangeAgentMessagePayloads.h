@@ -136,11 +136,11 @@ struct RequestPnLPayload : public MessagePayload {
 
 struct ResponsePnLPayload : public MessagePayload {
 	int inventory;
-	Money avg_price;
-	Money realized_pnl;
-	Money unrealized_pnl;
-	Money last_price;
+	double avg_price;
+	double realized_pnl;
+	double unrealized_pnl;
+	double last_price;
 
-	ResponsePnLPayload(int inventory, const Money& avg_price, const Money& realized_pnl, const Money& unrealized_pnl, const Money& last_price)
+	ResponsePnLPayload(int inventory, double avg_price, double realized_pnl, double unrealized_pnl, double last_price)
 		: inventory(inventory), avg_price(avg_price), realized_pnl(realized_pnl), unrealized_pnl(unrealized_pnl), last_price(last_price) { }
 };

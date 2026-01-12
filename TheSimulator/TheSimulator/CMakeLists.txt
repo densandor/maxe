@@ -67,6 +67,8 @@ add_executable (TheSimulator
 	"Trade.cpp"
 	"Trade.h"
 	"PnLManagerAgent.cpp"
+	"MarketDataAgent.cpp"
+	"MarketDataAgent.h"
 	"PnLManagerAgent.h"
 	"TradeFactory.cpp"
 	"TradeFactory.h"

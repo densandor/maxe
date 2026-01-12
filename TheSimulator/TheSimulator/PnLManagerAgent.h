@@ -8,8 +8,8 @@
 
 struct PnLState {
 	int inventory = 0; // signed position
-	Money avg_price = Money(0);  // average entry price
-	Money realized_pnl = Money(0);
+	double avg_price = 0.0;  // average entry price (float representation)
+	double realized_pnl = 0.0;
 };
 
 class PnLManagerAgent : public Agent {
@@ -25,7 +25,7 @@ public:
 	// Test helpers (public for unit tests)
 	void test_updateOnFill(const std::string& owner, const Money& price, Volume volume, OrderDirection direction) { updateOnFill(owner, price, volume, direction); }
 	void test_setLastTradePrice(const Money& p) { m_last_trade_price = p; }
-	bool test_getPnLSnapshot(const std::string& owner, int& inventory, Money& avg_price, Money& realized_pnl, Money& unrealized_pnl) const;
+	bool test_getPnLSnapshot(const std::string& owner, int& inventory, double& avg_price, double& realized_pnl, double& unrealized_pnl) const;
 private:
 	void updateOnFill(const std::string& owner, const Money& price, Volume volume, OrderDirection direction);
 

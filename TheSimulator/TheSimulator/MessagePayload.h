@@ -28,6 +28,11 @@ struct EmptyPayload : public MessagePayload {
 
 };
 
+struct ResponseMarketDataPayload : public MessagePayload {
+	int demand;
+	ResponseMarketDataPayload(int demand) : demand(demand) {}
+};
+
 struct GenericPayload : public MessagePayload, public std::map<std::string, std::string> {
 	GenericPayload(const std::map<std::string, std::string>& initMap)
 		: MessagePayload(), std::map<std::string, std::string>(initMap) { }

@@ -18,8 +18,7 @@ class FundamentalAgent:
         self.trade_probability = float(params.get("trade_probability", 0.1))
 
         # FundamentalAgent-specific parameters
-        # Initial price the asset is believed to be (in cents)
-        self.fundamental_price = float(params.get("fundamental_price_init", 10000.0)) # the price the agent believes the asset to be worth
+        self.fundamental_price = float(params.get("fundamental_price_init", 100.0)) # the price the agent believes the asset to be worth
         self.sensitivity = float(params.get("sensitivity", 0.001)) # how sensitive demand is to mispricing
         self.update_s_d = float(params.get("update_s_d", 10.0)) # the standard deviation for random updates to fundamental price
         self.max_volume = int(params.get("max_volume", 10)) # limits on volume
@@ -47,7 +46,7 @@ class FundamentalAgent:
                 return
 
             # Request L1 data from the exchange (only if we intend to trade)
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", RetrieveL1Payload())
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", EmptyPayload())
             return
 
         if type == "RESPONSE_RETRIEVE_L1":
