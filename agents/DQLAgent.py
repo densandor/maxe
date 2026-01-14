@@ -64,7 +64,7 @@ class TradingEnv(Env):
         return obs, reward, self.done, False, {}
 
 
-class SimpleDQNAgent:
+class DQLAgent:
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
