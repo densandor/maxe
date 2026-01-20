@@ -9,8 +9,8 @@ class MarketMakerAgent:
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
-        self.interval = int(params["interval"])
         self.offset = int(params.get("offset", 1))
+        self.interval = int(params.get("interval", 1000))
         self.trade_probability = float(params.get("tradeProbability", 0.2))
 
         self.pnl_agent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name

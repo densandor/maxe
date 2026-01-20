@@ -16,25 +16,23 @@ class MomentumAgent:
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
-        self.interval = int(params["interval"])
+        self.interval = int(params.get("interval", 1000))
         self.offset = int(params.get("offset", 1))
         self.trade_probability = float(params.get("trade_probability", 0.2))
 
-        self.quantity = int(params["quantity"])
-
-        # optional PnL agent name for inventory checks
-        self.pnl_agent = str(params.get("pnlAgent", "PNL"))
-        # maximum inventory (absolute) before scaling orders down
-        self.max_inventory = int(params.get("max_inventory", 50))
-
-        # pending planned order waiting for PnL response
-        self._pending_order = None
-
         # MomentumAgent-specific parameters
+        self.pnl_agent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name for checking inventory
+
+        self.quantity = int(params.get("quantity", 1))
+
         self.lookback = int(params.get("lookback", 5)) # how many past prices to use
         self.threshold = float(params.get("threshold", 0.001)) # minimum return to act (e.g. 0.1%)
         self.prices = collections.deque(maxlen=self.lookback) # local price history
+
+        self.max_inventory = int(params.get("max_inventory", 50)) # maximum inventory (absolute) before scaling orders down
         self.slowdown_exponent = float(params.get("slowdown_exponent", 2.0)) # how quickly to scale down orders near max inventory
+
+        self._pending_order = None # pending planned order waiting for PnL response
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -120,7 +118,6 @@ class MomentumAgent:
 
             order_qty = int(math.floor(self.quantity * scale))
             if order_qty <= 0:
-                # fully capped, skip placing
                 return
 
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, order_qty, Money(planned_price)))

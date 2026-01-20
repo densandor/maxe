@@ -6,13 +6,12 @@ class QLearningAgent:
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
-        self.interval = int(params["interval"])
         self.offset = int(params.get("offset", 1))
-        # PnL manager agent name (defaults to 'PNL')
-        self.pnl_agent = str(params.get("pnlAgent", "PNL"))
-        # placeholder for pending state when awaiting PnL response
-        self._pending_state = None
+        self.interval = int(params.get("interval", 1000))
 
+        # QLearningAgent-specific parameters
+        self.pnl_agent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name for checking inventory
+        
         # Q-learning parameters
         self.alpha = float(params.get("alpha", 0.1)) # learning rate
         self.gamma = float(params.get("gamma", 0.99)) # discount factor
@@ -32,15 +31,16 @@ class QLearningAgent:
         self.Q = np.zeros((len(self.positions) * len(self.trends), len(self.action_space)))
 
         # Book-keeping
-        self.position = 0           # current signed position (−1, 0, +1)
-        self.last_price = None      # last trade price seen
+        self.position = 0 # current signed position (−1, 0, +1)
+        self.last_price = None # last trade price seen
         self.prev_state = None
         self.prev_action = None
+
+        self._pending_state = None # placeholder for pending state when awaiting PnL response
 
     # --- Helper methods for state / action encoding ---
 
     def _discretize_trend(self, last_price, new_price, threshold=0.0001):
-        """Very simple trend: up, down, or flat based on relative price change."""
         if last_price is None or last_price <= 0:
             return 0
         ret = (new_price - last_price) / last_price
@@ -58,10 +58,9 @@ class QLearningAgent:
 
     def _epsilon_greedy(self, state_idx):
         if random.random() < self.epsilon:
-            return random.choice(self.action_space)
+            return random.choice(self.action_space) # explore with random action with probability epsilon
         else:
-            return int(np.argmax(self.Q[state_idx, :]))
-
+            return int(np.argmax(self.Q[state_idx, :])) # exploit best known action with probability 1 - epsilon
     # --- Q-learning update ---
 
     def _update_q(self, reward, new_state_idx):

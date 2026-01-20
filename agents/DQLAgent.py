@@ -68,8 +68,9 @@ class DQLAgent:
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
-        self.interval = int(params["interval"])
         self.offset = int(params.get("offset", 1))
+        self.interval = int(params.get("interval", 1000))
+        self.trade_probability = float(params.get("trade_probability", 1))
         
         # DQN hyperparameters (passed to Stable-Baselines3)
         learning_rate = float(params.get("learning_rate", 1e-4))

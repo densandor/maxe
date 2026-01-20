@@ -6,14 +6,13 @@ class RandomAgent:
         # Generic parameters
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
-        self.interval = int(params["interval"],1000)
+        self.interval = int(params.get("interval", 1000))
         self.trade_probability = float(params.get("trade_probability", 0.1))
 
         # RandomAgent-specific parameters
-        self.buy_probability = float(params["buy_probability"], 0.5)
-        self.quantity = int(params["quantity"], 1)
+        self.buy_probability = float(params.get("buy_probability", 0.5))
+        self.quantity = int(params.get("quantity", 1))
         self.limit_order_multiplier = int(params.get("limit_order_multiplier", 100))
-
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()

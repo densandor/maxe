@@ -37,7 +37,7 @@
 
     <!-- <QLearningAgent name="QLearner1" class="QLearningAgent" exchange="MARKET" offset="1" alpha="0.10" gamma="0.99" epsilon="0.20" epsilon_min="0.01" epsilon_decay="0.999" /> -->
 
-    <!-- <DQLAgent name="DQLAgent1" class="DQLAgent" exchange="MARKET" offset="1" learningRate="0.001" gamma="0.99" epsilon="1.0" epsilonMin="0.01" epsilonDecay="0.995" batchSize="32" memorySize="10000" targetUpdateFrequency="1000"/> -->
+    <DQLAgent name="DQLAgent1" class="DQLAgent" exchange="MARKET" offset="1" learningRate="0.001" gamma="0.99" epsilon="1.0" epsilonMin="0.01" epsilonDecay="0.995" batchSize="32" memorySize="10000" targetUpdateFrequency="1000"/>
 
     <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
     <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
