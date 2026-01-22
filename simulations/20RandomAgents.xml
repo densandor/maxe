@@ -1,17 +1,17 @@
 <?xml version="1.0" ?>
-<Simulation start="0" duration="3600001">
+<Simulation start="0" duration="100001">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000"/>
-    <RandomAgent name="TRADER_RANDOM_0" exchange="MARKET" offset="1"/>
-    <RandomAgent name="TRADER_RANDOM_1" exchange="MARKET" offset="201"/>
-    <RandomAgent name="TRADER_RANDOM_2" exchange="MARKET" offset="401"/>
-    <RandomAgent name="TRADER_RANDOM_3" exchange="MARKET" offset="601"/>
-    <RandomAgent name="TRADER_RANDOM_4" exchange="MARKET" offset="801"/>
-    <RandomAgent name="TRADER_RANDOM_5" exchange="MARKET" offset="1001"/>
-    <RandomAgent name="TRADER_RANDOM_6" exchange="MARKET" offset="1201"/>
-    <RandomAgent name="TRADER_RANDOM_7" exchange="MARKET" offset="1401"/>
-    <RandomAgent name="TRADER_RANDOM_8" exchange="MARKET" offset="1601"/>
-    <RandomAgent name="TRADER_RANDOM_9" exchange="MARKET" offset="1801"/>
+    <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET" offset="1"/>
+    <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET" offset="201"/>
+    <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET" offset="401"/>
+    <RandomAgent name="TRADER_RANDOM_03" exchange="MARKET" offset="601"/>
+    <RandomAgent name="TRADER_RANDOM_04" exchange="MARKET" offset="801"/>
+    <RandomAgent name="TRADER_RANDOM_05" exchange="MARKET" offset="1001"/>
+    <RandomAgent name="TRADER_RANDOM_06" exchange="MARKET" offset="1201"/>
+    <RandomAgent name="TRADER_RANDOM_07" exchange="MARKET" offset="1401"/>
+    <RandomAgent name="TRADER_RANDOM_08" exchange="MARKET" offset="1601"/>
+    <RandomAgent name="TRADER_RANDOM_09" exchange="MARKET" offset="1801"/>
     <RandomAgent name="TRADER_RANDOM_10" exchange="MARKET" offset="2001"/>
     <RandomAgent name="TRADER_RANDOM_11" exchange="MARKET" offset="2201"/>
     <RandomAgent name="TRADER_RANDOM_12" exchange="MARKET" offset="2401"/>
@@ -24,20 +24,20 @@
     <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET" offset="3801"/>
     
     <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" offset="1" lookback="5" threshold="0.01"/>
-    <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" offset="201" lookback="10" threshold="0.02"/>
+    <!-- <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" offset="201" lookback="10" threshold="0.02"/>
     <MomentumAgent name="TRADER_MOMENTUM_2" exchange="MARKET" offset="401" lookback="20" threshold="0.03"/>
     <MomentumAgent name="TRADER_MOMENTUM_3" exchange="MARKET" offset="601" lookback="50" threshold="0.04"/>
-    <MomentumAgent name="TRADER_MOMENTUM_4" exchange="MARKET" offset="801" lookback="100" threshold="0.05"/>
+    <MomentumAgent name="TRADER_MOMENTUM_4" exchange="MARKET" offset="801" lookback="100" threshold="0.05"/> -->
 
     <FundamentalAgent name="TRADER_FUNDAMENTAL_0" exchange="MARKET" offset="1"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_1" exchange="MARKET" offset="201"/>
+    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_1" exchange="MARKET" offset="201"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_2" exchange="MARKET" offset="401"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_3" exchange="MARKET" offset="601"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_4" exchange="MARKET" offset="801"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_4" exchange="MARKET" offset="801"/> -->
 
-    <!-- <QLearningAgent name="QLearner1" class="QLearningAgent" exchange="MARKET" offset="1" alpha="0.10" gamma="0.99" epsilon="0.20" epsilon_min="0.01" epsilon_decay="0.999" /> -->
+    <QLearningAgent name="TRADER_Q_LEARNING_00" class="QLearningAgent" exchange="MARKET" offset="1" alpha="0.10" gamma="0.99" epsilon="0.20" epsilon_min="0.01" epsilon_decay="0.999" />
 
-    <DQLAgent name="DQLAgent1" class="DQLAgent" exchange="MARKET" offset="1" learningRate="0.001" gamma="0.99" epsilon="1.0" epsilonMin="0.01" epsilonDecay="0.995" batchSize="32" memorySize="10000" targetUpdateFrequency="1000"/>
+    <DQLAgent name="TRADER_DQL_00" class="DQLAgent" exchange="MARKET" offset="1" alpha="0.001" gamma="0.99" epsilon="1.0" epsilonMin="0.01" epsilonDecay="0.995" batchSize="32" memorySize="10000" targetUpdateFrequency="1000"/>
 
     <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
     <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>

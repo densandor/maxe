@@ -128,19 +128,3 @@ struct EventTradePayload : public MessagePayload {
 
 	EventTradePayload(const Trade& trade) : trade(trade) { }
 };
-
-// Request/Response payloads for PnL queries
-struct RequestPnLPayload : public MessagePayload {
-	RequestPnLPayload() = default;
-};
-
-struct ResponsePnLPayload : public MessagePayload {
-	int inventory;
-	double avg_price;
-	double realized_pnl;
-	double unrealized_pnl;
-	double last_price;
-
-	ResponsePnLPayload(int inventory, double avg_price, double realized_pnl, double unrealized_pnl, double last_price)
-		: inventory(inventory), avg_price(avg_price), realized_pnl(realized_pnl), unrealized_pnl(unrealized_pnl), last_price(last_price) { }
-};

@@ -184,11 +184,11 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 	// PnL response
 	py::class_<ResponsePnLPayload, MessagePayload, std::shared_ptr<ResponsePnLPayload>>(m, "ResponsePnLPayload")
 		.def(py::init<int, double, double, double, double>())
-	.def_readwrite("inventory", &ResponsePnLPayload::inventory)
-	.def_readwrite("avg_price", &ResponsePnLPayload::avg_price)
-	.def_readwrite("realized_pnl", &ResponsePnLPayload::realized_pnl)
-	.def_readwrite("unrealized_pnl", &ResponsePnLPayload::unrealized_pnl)
-	.def_readwrite("last_price", &ResponsePnLPayload::last_price)
+		.def_readwrite("inventory", &ResponsePnLPayload::inventory)
+		.def_readwrite("avgPrice", &ResponsePnLPayload::avgPrice)
+		.def_readwrite("realizedPnl", &ResponsePnLPayload::realizedPnl)
+		.def_readwrite("unrealizedPnl", &ResponsePnLPayload::unrealizedPnl)
+		.def_readwrite("lastPrice", &ResponsePnLPayload::lastPrice)
 		;
 
 	// Market data response

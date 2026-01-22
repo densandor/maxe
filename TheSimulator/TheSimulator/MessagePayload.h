@@ -37,3 +37,18 @@ struct GenericPayload : public MessagePayload, public std::map<std::string, std:
 	GenericPayload(const std::map<std::string, std::string>& initMap)
 		: MessagePayload(), std::map<std::string, std::string>(initMap) { }
 };
+
+struct RequestPnLPayload : public MessagePayload {
+	RequestPnLPayload() = default;
+};
+
+struct ResponsePnLPayload : public MessagePayload {
+	int inventory;
+	double avgPrice;
+	double realizedPnl;
+	double unrealizedPnl;
+	double lastPrice;
+
+	ResponsePnLPayload(int inventory, double avgPrice, double realizedPnl, double unrealizedPnl, double lastPrice)
+		: inventory(inventory), avgPrice(avgPrice), realizedPnl(realizedPnl), unrealizedPnl(unrealizedPnl), lastPrice(lastPrice) { }
+};

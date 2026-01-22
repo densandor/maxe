@@ -10,70 +10,65 @@ class QLearningAgent:
         self.interval = int(params.get("interval", 1000))
 
         # QLearningAgent-specific parameters
-        self.pnl_agent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name for checking inventory
+        self.pnlAgent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name for checking inventory
         
         # Q-learning parameters
         self.alpha = float(params.get("alpha", 0.1)) # learning rate
         self.gamma = float(params.get("gamma", 0.99)) # discount factor
-        self.epsilon = float(params.get("epsilon", 0.1)) # exploration rate
-        self.epsilon_min = float(params.get("epsilon_min", 0.01))
-        self.epsilon_decay = float(params.get("epsilon_decay", 0.999))
+        self.epsilon = float(params.get("epsilon", 1)) # exploration rate
+        self.minEpsilon = float(params.get("minEpsilon", 0.01))
+        self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
 
-        # Discrete state design: position ∈ {-1, 0, +1}, price trend ∈ {-1, 0, +1}
-        # Encode state index as (position_idx * 3 + trend_idx) in [0, 8]
+        # State space: (positionIndex * 3 + trendIndex) in [0, 8]
         self.positions = [-1, 0, 1]
         self.trends = [-1, 0, 1]
 
         # Action space: 0 = go short 1, 1 = go flat, 2 = go long 1
-        self.action_space = [0, 1, 2]
+        self.actionSpace = [0, 1, 2]
 
         # Q-table: 9 states x 3 actions
-        self.Q = np.zeros((len(self.positions) * len(self.trends), len(self.action_space)))
+        self.Q = np.zeros((len(self.positions) * len(self.trends), len(self.actionSpace)))
+        self.previousState = None
+        self.previousAction = None
 
         # Book-keeping
         self.position = 0 # current signed position (−1, 0, +1)
-        self.last_price = None # last trade price seen
-        self.prev_state = None
-        self.prev_action = None
+        self.oldPrice = None # last trade price seen
+        self.oldPnl = 0
 
-        self._pending_state = None # placeholder for pending state when awaiting PnL response
+        self.pendingState = None # placeholder for pending state when awaiting PnL response
 
-    # --- Helper methods for state / action encoding ---
-
-    def _discretize_trend(self, last_price, new_price, threshold=0.0001):
-        if last_price is None or last_price <= 0:
+    # Helper methods for state and action encoding
+    def _discretiseTrend(self, oldPrice, currentPrice, threshold=0.0001):
+        if oldPrice is None or oldPrice <= 0:
             return 0
-        ret = (new_price - last_price) / last_price
-        if ret > threshold:
+        relativeChange = (currentPrice - oldPrice) / oldPrice
+        if relativeChange > threshold:
             return 1
-        elif ret < -threshold:
+        elif relativeChange < -threshold:
             return -1
         else:
             return 0
 
-    def _state_to_index(self, position, trend):
-        pos_idx = self.positions.index(position)
-        tr_idx = self.trends.index(trend)
-        return pos_idx * len(self.trends) + tr_idx
+    def _stateToIndex(self, position, trend):
+        positionIndex = self.positions.index(position)
+        trendIndex = self.trends.index(trend)
+        return positionIndex * len(self.trends) + trendIndex
 
-    def _epsilon_greedy(self, state_idx):
+    def _epsilonGreedy(self, stateIndex):
         if random.random() < self.epsilon:
-            return random.choice(self.action_space) # explore with random action with probability epsilon
+            return random.choice(self.actionSpace) # explore with random action with probability epsilon
         else:
-            return int(np.argmax(self.Q[state_idx, :])) # exploit best known action with probability 1 - epsilon
-    # --- Q-learning update ---
-
-    def _update_q(self, reward, new_state_idx):
-        if self.prev_state is None or self.prev_action is None:
+            return int(np.argmax(self.Q[stateIndex, :])) # exploit best known action with probability 1 - epsilon
+    
+    # Q-learning update
+    def _updateQ(self, reward, newStateIndex):
+        if self.previousState is None or self.previousAction is None:
             return
-        s = self.prev_state
-        a = self.prev_action
-        best_next = np.max(self.Q[new_state_idx, :])
-        td_target = reward + self.gamma * best_next
-        td_error = td_target - self.Q[s, a]
-        self.Q[s, a] += self.alpha * td_error
-
-    # --- Messaging ---
+        s = self.previousState
+        a = self.previousAction
+        bestNextReward = np.max(self.Q[newStateIndex, :])
+        self.Q[s, a] = (1 - self.alpha) * self.Q[s, a] + self.alpha * (reward + self.gamma * bestNextReward)
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -93,75 +88,67 @@ class QLearningAgent:
         if type == "RESPONSE_RETRIEVE_L1":
             bestAsk = float(payload.bestAskPrice.toCentString())
             bestBid = float(payload.bestBidPrice.toCentString())
-            lastTradePrice = float(payload.lastTradePrice.toCentString())
+            currentPrice = float(payload.lastTradePrice.toCentString())
 
-            if lastTradePrice <= 0 or (bestAsk <= 0 and bestBid <= 0):
+            if currentPrice <= 0 or (bestAsk <= 0 and bestBid <= 0):
                 return
 
             # Compute simple trend
-            trend = self._discretize_trend(self.last_price, lastTradePrice)
-            self.last_price = lastTradePrice
+            trend = self._discretiseTrend(self.oldPrice, currentPrice)
+            self.oldPrice = currentPrice
 
             # Current state index
-            state_idx = self._state_to_index(self.position, trend)
+            stateIndex = self._stateToIndex(self.position, trend)
 
             # Request PnL snapshot from PnL manager and wait for RESPONSE_PNL
             # Store pending state for continuation when RESPONSE_PNL arrives
-            self._pending_state = state_idx
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnl_agent, "REQUEST_PNL", EmptyPayload())
+            self.pendingState = stateIndex
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnlAgent, "REQUEST_PNL", EmptyPayload())
             return
 
         if type == "RESPONSE_PNL":
             # Received PnL response from PnLManagerAgent
-            realized = float(payload.realized_pnl)
-            
-            unrealized = float(payload.unrealized_pnl)
+            realized = payload.realizedPnl
+            unrealized = payload.unrealizedPnl
 
-            current_pnl = realized + unrealized
-            if not hasattr(self, "last_pnl"):
-                self.last_pnl = current_pnl
-            reward = current_pnl - self.last_pnl
-            self.last_pnl = current_pnl
+            totalPnl = realized + unrealized
+            reward = totalPnl - self.oldPnl
+            self.oldPnl = totalPnl
 
             # Continue Q-learning update using pending state
-            if self._pending_state is None:
+            if self.pendingState is None:
                 return
-            state_idx = self._pending_state
-            self._pending_state = None
+            stateIndex = self.pendingState
+            self.pendingState = None
 
-            if self.prev_state is not None and self.prev_action is not None:
-                self._update_q(reward, state_idx)
+            if self.previousState is not None and self.previousAction is not None:
+                self._updateQ(reward, stateIndex)
 
             # Choose new action
-            action = self._epsilon_greedy(state_idx)
+            action = self._epsilonGreedy(stateIndex)
 
-            # Decay epsilon (optional)
-            if self.epsilon > self.epsilon_min:
-                self.epsilon *= self.epsilon_decay
+            # Store previous state/action for next update
+            self.previousState = stateIndex
+            self.previousAction = action
+
+            # Decay epsilon
+            if self.epsilon > self.minEpsilon:
+                self.epsilon *= self.epsilonDecay
 
             # Translate action to target position
-            target_position = -1 if action == 0 else (0 if action == 1 else 1)
+            targetPosition = self.positions[action]
 
             # Decide order direction and volume to move from current position to target
-            delta_pos = target_position - self.position
-            if delta_pos == 0:
-                # No trade
-                self.prev_state = state_idx
-                self.prev_action = action
+            positionChange = targetPosition - self.position
+            if positionChange == 0:
                 return
-
-            direction = OrderDirection.Buy if delta_pos > 0 else OrderDirection.Sell
-            volume = abs(delta_pos)  # single-unit steps
-
-            if volume <= 0:
-                self.prev_state = state_idx
-                self.prev_action = action
-                return
+            
+            if positionChange > 0:
+                direction = OrderDirection.Buy
+            else:
+                direction = OrderDirection.Sell
+            volume = abs(positionChange)
 
             # Place market order to change position
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, volume))
-
-            # Store previous state/action for next update
-            self.prev_state = state_idx
-            self.prev_action = action
             return

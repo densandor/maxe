@@ -6,26 +6,27 @@ class FundamentalAgent:
     """
     Fundamental trader
 
-    At each wake-up, the agent updates its believed fundamental price by adding Gaussian noise (N(0, update_s_d)), then compares that fundamental to the current best ask/bid to compute mispricing and demand (demand = sensitivity * mispricing).
-    If |d| >= 1 the agent places a market order with volume = round(|d|) (clipped to [1, max_volume]) and side determined by sign(d).
+    1. At each wake-up, the agent updates its believed fundamental price by adding Gaussian noise (N(0, `priceUpdateSigma`)).
+    2. Then, it compares that fundamental price to the current best ask/bid to compute mispricing and demand (demand = sensitivity * mispricing).
+    3. If |d| >= 1 the agent places a market order with volume = round(|d|) (clipped to [1, max_volume]) and side determined by sign(d).
     """
-    def configure(self, params):
 
+    def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
         self.interval = int(params.get("interval", 1000))
-        self.trade_probability = float(params.get("trade_probability", 0.1))
+        self.pTrade = float(params.get("pTrade", 0.1))
 
         # FundamentalAgent-specific parameters
-        self.fundamental_price = float(params.get("fundamental_price_init", 100.0)) # the price the agent believes the asset to be worth
-        self.update_s_d = float(params.get("update_s_d", 10.0)) # the standard deviation for random updates to fundamental price
-        self.sensitivity = float(params.get("sensitivity", 0.001)) # how sensitive demand is to mispricing
-        self.max_volume = int(params.get("max_volume", 10)) # limits on volume
+        self.fundamentalPrice = float(params.get("fundamentalPrice", 100.0)) # the price the agent believes the asset to be worth
+        self.priceUpdateSigma = float(params.get("priceUpdateSigma", 3.0)) # the standard deviation for random updates to fundamental price
+        self.sensitivity = float(params.get("sensitivity", 1)) # how sensitive demand is to mispricing
+        self.maxVolume = int(params.get("maxVolume", 10)) # limits on volume
 
-    # Fundamental price update (simulates random information coming in)
-    def _update_fundamental_price(self):
-        self.fundamental_price += random.gauss(0.0, self.update_s_d)
+    # Fundamental price update
+    def _update_fundamentalPrice(self):
+        self.fundamentalPrice += random.gauss(0.0, self.priceUpdateSigma)
 
     # Message handling
     def receiveMessage(self, simulation, type, payload):
@@ -36,13 +37,13 @@ class FundamentalAgent:
             return
 
         if type == "WAKE_UP":
-            # Update fundamental_price
-            self._update_fundamental_price()
+            # Update fundamentalPrice
+            self._update_fundamentalPrice()
             # Schedule next wakeup
             simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
 
             # Decide whether to attempt a trade this wakeup (probabilistic trading)
-            if random.random() >= self.trade_probability:
+            if random.random() >= self.pTrade:
                 return
 
             # Request L1 data from the exchange (only if we intend to trade)
@@ -53,21 +54,20 @@ class FundamentalAgent:
             bestAsk = float(payload.bestAskPrice.toCentString())
             bestBid = float(payload.bestBidPrice.toCentString())
 
-            current_fundamental_price = self.fundamental_price
+            currentFundamentalPrice = self.fundamentalPrice
             # If there are no resting orders, do nothing
             if bestAsk <= 0 and bestBid <= 0:
                 return
 
-            # Demand function (buy / sell / idle)
-            if bestAsk > 0 and current_fundamental_price > bestAsk:
-                mispricing = current_fundamental_price - bestAsk
-                demand = self.sensitivity * mispricing
-                volume = int(max(1, min(self.max_volume, math.floor(demand))))
+            if bestAsk > 0 and currentFundamentalPrice > bestAsk:
+                mispricing = currentFundamentalPrice - bestAsk
+                volume = self.sensitivity * mispricing
+                volume = int(max(1, min(self.maxVolume, math.floor(volume))))
                 direction = OrderDirection.Buy
-            elif bestBid > 0 and current_fundamental_price < bestBid:
-                mispricing = bestBid - current_fundamental_price
-                demand = self.sensitivity * mispricing
-                volume = int(max(1, min(self.max_volume, math.floor(demand))))
+            elif bestBid > 0 and currentFundamentalPrice < bestBid:
+                mispricing = bestBid - currentFundamentalPrice
+                volume = self.sensitivity * mispricing
+                volume = int(max(1, min(self.maxVolume, math.floor(volume))))
                 direction = OrderDirection.Sell
             else:
                 return

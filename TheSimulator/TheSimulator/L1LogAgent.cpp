@@ -76,7 +76,7 @@ void L1LogAgent::configure(const pugi::xml_node& node, const std::string& config
 	if (!(att = node.attribute("outputFile")).empty()) {
 		std::string filename = simulation()->parameters().processString(att.as_string());
         
-        // If filename doesn't contain a path separator, prepend logs/
+        // If filename doesn't contain a path separator, add logs/
         namespace fs = std::filesystem;
         fs::path filePath(filename);
         if (filePath.parent_path().empty()) {
@@ -84,6 +84,12 @@ void L1LogAgent::configure(const pugi::xml_node& node, const std::string& config
         }
         
         m_outputFile.open(filePath.string());
+
+		if (m_outputFile.is_open()) {
+            m_outputFile << "time,bid,ask\n";
+        } else {
+            std::cerr << name() << ": Failed to open L1 CSV file: " << att.as_string() << std::endl;
+        }
 	}
 
 	if (!(att = node.attribute("aggregationPeriod")).empty()) {
