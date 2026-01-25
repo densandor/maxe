@@ -1,54 +1,10 @@
 from thesimulator import *
+
 import numpy as np
 import collections
-from stable_baselines3 import DQN
-from gymnasium import Env, spaces
+import matplotlib.pyplot as plt
 
-class TradingEnv(Env):
-    """Minimal trading environment wrapper for Stable-Baselines3."""
-    
-    def __init__(self, agent):
-        super(TradingEnv, self).__init__()
-        self.agent = agent
-        
-        # State: [position, normalized_last_price, price_trend, volatility]
-        self.observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(4,), dtype=np.float32)
-        
-        # Action space: 3 discrete actions
-        # 0: go short 1, 1: go flat, 2: go long 1
-        self.action_space = spaces.Discrete(3)
-        
-        # Tracking
-        self.last_reward = 0.0
-        self.done = False
-    
-    def reset(self, seed=None):
-        """Reset at episode start."""
-        super().reset(seed=seed)
-        state = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32)
-        return state, {}
-    
-    def step(self, action):
-        """Convert action int to target position and return reward."""
-        # Decode action: 0 = go short 1, 1 = go flat, 2 = go long 1
-        positions = [-1, 0, 1]
-        target_position = positions[action]
-        
-        # Store target position in agent for use in receiveMessage()
-        self.agent.target_position = target_position
-        
-        # Reward is PnL change (set by agent in receiveMessage)
-        reward = self.agent.step_reward
-        
-        # Obs: [position, normalized_price, trend, volatility]
-        obs = np.array([
-            float(self.agent.position),
-            self.agent.normalized_price,
-            self.agent.price_trend,
-            self.agent.volatility
-        ], dtype=np.float32)
-        
-        return obs, reward, self.done, False, {}
+from dqn.agent import ManualDQLAgent
 
 
 class DQLAgent:
@@ -56,7 +12,7 @@ class DQLAgent:
         # Generic parameters
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
-        self.interval = int(params.get("interval", 1000))
+        self.interval = int(params.get("interval", 1))
         self.pTrade = float(params.get("pTrade", 1))
         
         # PnL manager agent
@@ -65,10 +21,9 @@ class DQLAgent:
         # DQN hyperparameters
         alpha = float(params.get("alpha", 0.1))
         gamma = float(params.get("gamma", 0.99))
-        explorationFraction = float(params.get("explorationFraction", 0.1))
-        explorationFinalEps = float(params.get("explorationFinalEps", 0.01))
         batchSize = int(params.get("batchSize", 32))
-        pretrainedWeights = str(params.get("pretrainedWeights", ""))
+        bufferCapacity = int(params.get("bufferCapacity", 60))
+        self.target_update_freq = int(params.get("targetUpdateFreq", 10))
         
         # Book-keeping
         self.position = 0
@@ -82,39 +37,19 @@ class DQLAgent:
         self._last_trade_price = None
         
         # Create environment and DQN agent
-        self.env = TradingEnv(self)
-        
-        if pretrainedWeights:
-            try:
-                self.dqn = DQN.load(pretrainedWeights, env=self.env)
-                print(f"{self.name()} loaded pretrained model from {pretrainedWeights}")
-            except Exception as e:
-                print(f"{self.name()} failed to load: {e}")
-                self.dqn = DQN(
-                    "MlpPolicy",
-                    self.env,
-                    learning_rate=alpha,
-                    gamma=gamma,
-                    exploration_fraction=explorationFraction,
-                    exploration_final_eps=explorationFinalEps,
-                    batch_size=batchSize,
-                    learning_starts=0,
-                    buffer_size=60,
-                    verbose=1
-                )
-        else:
-            self.dqn = DQN(
-                "MlpPolicy",
-                self.env,
-                learning_rate=alpha,
-                gamma=gamma,
-                exploration_fraction=explorationFraction,
-                exploration_final_eps=explorationFinalEps,
-                batch_size=batchSize,
-                learning_starts=0,
-                buffer_size=60,
-                verbose=1
-            )
+        self.dqn = ManualDQLAgent(
+            state_size=4,
+            action_size=3,
+            learning_rate=alpha,
+            gamma=gamma,
+            batch_size=batchSize,
+            buffer_capacity=bufferCapacity
+        )
+
+        self.training_steps = 0
+        self._last_state = None
+        self._last_action = None
+        self.losses = []
     
     # State construction
     def _updateStateFeatures(self, newPrice):
@@ -180,7 +115,7 @@ class DQLAgent:
             
             # Compute reward as change in total PnL
             totalPnl = realizedPnl + unrealizedPnl
-            self.step_reward = totalPnl - self.oldPnl
+            reward = totalPnl - self.oldPnl
             self.oldPnl = totalPnl
             
             # Get action from DQN
@@ -191,10 +126,31 @@ class DQLAgent:
                 self.volatility
             ], dtype=np.float32)
             
-            action, _ = self.dqn.predict(obs, deterministic=False)
+            # Add previous transition to replay buffer
+            if self._last_action is not None and self._last_state is not None:
+                self.dqn.replay_buffer.add(
+                    self._last_state,
+                    self._last_action,
+                    reward,
+                    obs,
+                    done=False
+                )
             
-            # Train DQN (online learning)
-            self.dqn.learn(total_timesteps=1)
+            # Select action using epsilon-greedy
+            action = self.dqn.select_action(obs, training=True)
+            self._last_state = obs
+            self._last_action = action
+            
+            # Train on batch
+            loss = self.dqn.train_step()
+            if loss is not None:
+                self.losses.append(loss)
+            
+            # Periodically update target network
+            self.training_steps += 1
+            if self.training_steps % self.target_update_freq == 0:
+                self.dqn.update_target_network()
+                self.dqn.decay_epsilon()
             
             # Translate action to target position
             positions = [-1, 0, 1]
@@ -217,9 +173,9 @@ class DQLAgent:
         
         if type == "EVENT_SIMULATION_STOP":
             print(f"{self.name()} simulation stopped")
-            try:
-                self.dqn.save(f"{self.name()}_model")
-                print(f"{self.name()} saved model to {self.name()}_model.zip")
-            except Exception as e:
-                print(f"{self.name()} failed to save: {e}")
+            plt.plot(self.losses)
+            plt.title("DQL Agent Training Loss")
+            plt.xlabel("Training Steps")
+            plt.ylabel("Loss")
+            plt.show()
             return

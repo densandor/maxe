@@ -6,7 +6,7 @@ class RandomAgent:
         # Generic parameters
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
-        self.interval = int(params.get("interval", 1000))
+        self.interval = int(params.get("interval", 1))
         self.pTrade = float(params.get("pTrade", 1))
 
         # RandomAgent-specific parameters

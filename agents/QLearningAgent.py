@@ -7,7 +7,7 @@ class QLearningAgent:
         # Generic parameters
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
-        self.interval = int(params.get("interval", 1000))
+        self.interval = int(params.get("interval", 1))
 
         # QLearningAgent-specific parameters
         self.pnlAgent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name for checking inventory
