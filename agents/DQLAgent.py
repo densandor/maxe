@@ -94,17 +94,17 @@ class DQLAgent:
     
     def _computeTargetQValues(self, rewards, next_states):
         with torch.no_grad():
-            # Step 1: Select best actions using PRIMARY network
+            # Select best actions using current Q-network
             best_actions = self.qNetwork(next_states).argmax(dim=1)
 
-            # Step 2: Evaluate selected actions using TARGET network
-            target_q_values = self.targetNetwork(next_states)
-            target_q_next = target_q_values.gather(1, best_actions.unsqueeze(1)).squeeze(1)
+            # Evaluate selected actions using target network
+            targetQValues = self.targetNetwork(next_states)
+            targetQNext = targetQValues.gather(1, best_actions.unsqueeze(1)).squeeze(1)
             
-            # Step 3: Compute target Q-values with Bellman backup
-            target_q = rewards + self.gamma * target_q_next
+            # Compute target Q-values using Bellman equation
+            targetQ = rewards + self.gamma * targetQNext
         
-        return target_q
+        return targetQ
     
     def _trainStep(self):
         # Check if we have enough data
