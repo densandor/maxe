@@ -1,10 +1,13 @@
 from thesimulator import *
+from dqn.Network import Network
+from dqn.ReplayMemory import ReplayMemory
 
 import numpy as np
 import collections
 import matplotlib.pyplot as plt
-
-from dqn.agent import ManualDQLAgent
+import torch
+import torch.nn as nn
+import torch.optim as optim
 
 
 class DQLAgent:
@@ -15,62 +18,132 @@ class DQLAgent:
         self.interval = int(params.get("interval", 1))
         self.pTrade = float(params.get("pTrade", 1))
         
-        # PnL manager agent
+        # DQKAgent-specific parameters
         self.pnlAgent = str(params.get("pnlAgent", "PNL"))
         
         # DQN hyperparameters
-        alpha = float(params.get("alpha", 0.1))
-        gamma = float(params.get("gamma", 0.99))
-        batchSize = int(params.get("batchSize", 32))
-        bufferCapacity = int(params.get("bufferCapacity", 60))
-        self.target_update_freq = int(params.get("targetUpdateFreq", 10))
+        self.alpha = float(params.get("alpha", 0.1))
+        self.gamma = float(params.get("gamma", 0.99))
+        self.epsilon = float(params.get("epsilon", 1.0))
+        self.minEpsilon = float(params.get("minEpsilon", 0.01))
+        self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
+        self.batchSize = int(params.get("batchSize", 6))
+        self.memoryCapacity = int(params.get("memoryCapacity", 60))
+        self.targetNetworkUpdateFrequency = int(params.get("targetNetworkUpdateFrequency", 10))
         
-        # Book-keeping
-        self.position = 0
+        # State features
+        self.position = 0 # Feature 1: Current position (-1, 0, 1)
         self.priceHistory = collections.deque(maxlen=20)
-        self.normalized_price = 0.0
-        self.price_trend = 0.0
-        self.volatility = 0.0
-        self.step_reward = 0.0
+        self.normalisedPrice = 0.0 # Feature 2: Normalised price
+        self.priceTrend = 0.0 # Feature 3: Price trend
+        self.volatility = 0.0 # Feature 4: Volatility
         self.oldPnl = 0.0
-        self.target_position = None
-        self._last_trade_price = None
-        
-        # Create environment and DQN agent
-        self.dqn = ManualDQLAgent(
-            state_size=4,
-            action_size=3,
-            learning_rate=alpha,
-            gamma=gamma,
-            batch_size=batchSize,
-            buffer_capacity=bufferCapacity
-        )
 
-        self.training_steps = 0
-        self._last_state = None
-        self._last_action = None
+        self.actionSpaceSize = 3 # Actions: Sell, Hold, Buy
+        
+        # Initialise networks
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.qNetwork = Network(4, 3).to(self.device)
+        self.targetNetwork = Network(4, 3).to(self.device)
+        self.steps = 0
+        self.lastState = None
+        self.lastAction = None
+        # Initialise target with same weights as Q-network
+        self.targetNetwork.load_state_dict(self.qNetwork.state_dict())
+        self.targetNetwork.eval() # Target network never trains
+        
+        # Initialise optimiser and loss
+        self.optimiser = optim.Adam(self.qNetwork.parameters(), lr=self.alpha)
+        self.lossFunction = nn.MSELoss()
         self.losses = []
-    
-    # State construction
-    def _updateStateFeatures(self, newPrice):
+        
+        # Initialise replay buffer
+        self.memory = ReplayMemory(capacity=self.memoryCapacity)   
+
+    def _updateState(self, newPrice):
         self.priceHistory.append(newPrice)
         
         # Normalized price (relative to first in window)
         base = self.priceHistory[0]
-        self.normalized_price = np.log(newPrice / (base + 1e-8))
-        self.normalized_price = np.clip(self.normalized_price, -1.0, 1.0)
-        self.normalized_price = round(self.normalized_price, 1)
+        self.normalisedPrice = np.log(newPrice / (base + 1e-8))
+        self.normalisedPrice = np.clip(self.normalisedPrice, -1.0, 1.0)
+        self.normalisedPrice = round(self.normalisedPrice, 1)
         
         # Price trend
         if len(self.priceHistory) >= 2:
             ret = (self.priceHistory[-1] - self.priceHistory[-2]) / (self.priceHistory[-2] + 1e-8)
-            self.price_trend = 1.0 if ret > 0.0001 else (-1.0 if ret < -0.0001 else 0.0)
+            self.priceTrend = 1.0 if ret > 0.0001 else (-1.0 if ret < -0.0001 else 0.0)
         
         # Volatility
         if len(self.priceHistory) >= 2:
             returns = np.diff(np.log(np.array(self.priceHistory)))
             self.volatility = float(np.std(returns)) if len(returns) > 0 else 0.0
             self.volatility = round(self.volatility, 1)
+
+    def _selectAction(self, state):
+        if np.random.random() < self.epsilon:
+            # Explore: random action
+            return np.random.randint(0, self.actionSpaceSize)
+        
+        # Exploit: greedy action from Q-network
+        stateTensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
+        with torch.no_grad():
+            qValues = self.qNetwork(stateTensor)
+            action = qValues.argmax(dim=1).item()
+        return action
+    
+    def _computeTargetQValues(self, rewards, next_states):
+        with torch.no_grad():
+            # Step 1: Select best actions using PRIMARY network
+            best_actions = self.qNetwork(next_states).argmax(dim=1)
+
+            # Step 2: Evaluate selected actions using TARGET network
+            target_q_values = self.targetNetwork(next_states)
+            target_q_next = target_q_values.gather(1, best_actions.unsqueeze(1)).squeeze(1)
+            
+            # Step 3: Compute target Q-values with Bellman backup
+            target_q = rewards + self.gamma * target_q_next
+        
+        return target_q
+    
+    def _trainStep(self):
+        # Check if we have enough data
+        if len(self.memory) < self.batchSize:
+            return None
+        
+        # Sample batch
+        batch = self.memory.sample(self.batchSize)
+        states, actions, rewards, next_states = batch
+        
+        # Forward Pass
+        # Compute Q-values for sampled actions
+        qValues = self.qNetwork(states)
+        qValuesTaken = qValues.gather(1, actions.unsqueeze(1)).squeeze(1)
+        
+        # Compute target Q-values
+        targetQ = self._computeTargetQValues(rewards, next_states)
+        
+        # Loss Computation
+        loss = self.lossFunction(qValuesTaken, targetQ)
+        
+        # Backward Pass
+        self.optimiser.zero_grad()
+        loss.backward()
+        
+        # Gradient clipping to prevent exploding gradients
+        torch.nn.utils.clip_grad_norm_(self.qNetwork.parameters(), max_norm=1.0)
+        
+        self.optimiser.step()
+        
+        self.steps += 1
+        
+        return loss.item()
+    
+    def _updateTargetNetwork(self):
+        self.targetNetwork.load_state_dict(self.qNetwork.state_dict())
+    
+    def _decayEpsilon(self):
+        self.epsilon = max(self.minEpsilon, self.epsilon * self.epsilonDecay)
     
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -85,20 +158,10 @@ class DQLAgent:
             return
         
         if type == "RESPONSE_RETRIEVE_L1":
-            bestAsk = float(payload.bestAskPrice.toCentString())
-            bestBid = float(payload.bestBidPrice.toCentString())
             lastTradePrice = float(payload.lastTradePrice.toCentString())
             
-            if lastTradePrice <= 0 or (bestAsk <= 0 and bestBid <= 0):
-                return
-            
-            # Store market data for later use
-            self._last_trade_price = lastTradePrice
-            self._last_bestAsk = bestAsk
-            self._last_bestBid = bestBid
-            
             # Update state features
-            self._updateStateFeatures(lastTradePrice)
+            self._updateState(lastTradePrice)
             
             # Request PnL from PnL manager agent
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnlAgent, "REQUEST_PNL", EmptyPayload())
@@ -119,45 +182,34 @@ class DQLAgent:
             self.oldPnl = totalPnl
             
             # Get action from DQN
-            obs = np.array([
-                float(self.position),
-                self.normalized_price,
-                self.price_trend,
-                self.volatility
-            ], dtype=np.float32)
+            state = np.array([float(self.position), self.normalisedPrice, self.priceTrend,self.volatility], dtype=np.float32)
             
-            # Add previous transition to replay buffer
-            if self._last_action is not None and self._last_state is not None:
-                self.dqn.replay_buffer.add(
-                    self._last_state,
-                    self._last_action,
-                    reward,
-                    obs,
-                    done=False
-                )
+            # Add previous transition to replay memory
+            if self.lastAction is not None and self.lastState is not None:
+                self.memory.add(self.lastState, self.lastAction, reward, state)
             
             # Select action using epsilon-greedy
-            action = self.dqn.select_action(obs, training=True)
-            self._last_state = obs
-            self._last_action = action
+            action = self._selectAction(state)
+            self.lastState = state
+            self.lastAction = action
             
             # Train on batch
-            loss = self.dqn.train_step()
+            loss = self._trainStep()
             if loss is not None:
                 self.losses.append(loss)
             
             # Periodically update target network
-            self.training_steps += 1
-            if self.training_steps % self.target_update_freq == 0:
-                self.dqn.update_target_network()
-                self.dqn.decay_epsilon()
+            self.steps += 1
+            if self.steps % self.targetNetworkUpdateFrequency == 0:
+                self._updateTargetNetwork()
+                self._decayEpsilon()
             
             # Translate action to target position
             positions = [-1, 0, 1]
-            target_position = positions[action]
+            targetPosition = positions[action]
             
             # Decide order direction and volume to move from current position to target
-            positionChange = target_position - self.position
+            positionChange = targetPosition - self.position
             if positionChange == 0:
                 return
             

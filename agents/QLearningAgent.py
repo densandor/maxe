@@ -100,9 +100,9 @@ class QLearningAgent:
             # Current state index
             stateIndex = self._stateToIndex(self.position, trend)
 
-            # Request PnL snapshot from PnL manager and wait for RESPONSE_PNL
             # Store pending state for continuation when RESPONSE_PNL arrives
             self.pendingState = stateIndex
+            # Request PnL snapshot from PnL manager and wait for RESPONSE_PNL
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnlAgent, "REQUEST_PNL", EmptyPayload())
             return
 
