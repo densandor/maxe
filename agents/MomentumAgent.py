@@ -62,7 +62,8 @@ class MomentumAgent:
             # Compare latest price to older price
             currentPrice = self.priceHistory[-1]
             oldPrice = self.priceHistory[0]
-            self.relativeChange = (currentPrice - oldPrice) / oldPrice  # positive = uptrend, negative = downtrend
+            if oldPrice != 0:
+                self.relativeChange = (currentPrice - oldPrice) / oldPrice  # positive = uptrend, negative = downtrend
 
             # Decide direction based on momentum and threshold
             if self.relativeChange > self.threshold:

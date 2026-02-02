@@ -65,7 +65,7 @@ class DQLAgent:
         
         # Normalized price (relative to first in window)
         base = self.priceHistory[0]
-        self.normalisedPrice = np.log(newPrice / (base + 1e-8))
+        self.normalisedPrice = np.log(newPrice / base)
         self.normalisedPrice = np.clip(self.normalisedPrice, -1.0, 1.0)
         self.normalisedPrice = round(self.normalisedPrice, 1)
         
@@ -159,7 +159,8 @@ class DQLAgent:
         
         if type == "RESPONSE_RETRIEVE_L1":
             lastTradePrice = float(payload.lastTradePrice.toCentString())
-            
+            if lastTradePrice <= 0:
+                return
             # Update state features
             self._updateState(lastTradePrice)
             

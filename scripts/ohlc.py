@@ -7,8 +7,7 @@ def generate_candles(csv_file, timeframe_seconds=60):
     df.columns = ["id", "time", "price", "aggressing", "aggressingOwner", "direction", "resting", "restingOwner", "volume"]
     
     # Assume "time" is in milliseconds
-    df["datetime"] = pd.to_datetime(df["time"], unit="ms")
-    print(df["datetime"])
+    df["datetime"] = pd.to_datetime(df["time"], unit="s")
     
     # Create time buckets based on timeframe
     df["candle_time"] = df["datetime"].dt.floor(f"{timeframe_seconds}s")

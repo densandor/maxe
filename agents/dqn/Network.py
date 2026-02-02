@@ -9,7 +9,7 @@ class Network(nn.Module):
         self.layer2 = nn.Linear(hidden_size, hidden_size)
         self.layer3 = nn.Linear(hidden_size, action_size)
 
-        # Optional: Initialise weights with small values for stability
+        # Initialise weights with small values
         self._initialiseWeights()
 
     def _initialiseWeights(self):
