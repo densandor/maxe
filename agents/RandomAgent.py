@@ -7,7 +7,7 @@ class RandomAgent:
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
         self.interval = int(params.get("interval", 1))
-        self.pTrade = float(params.get("pTrade", 1))
+        self.pTrade = float(params.get("pTrade", 0.02))
 
         # RandomAgent-specific parameters
         self.pMarketOrder = float(params.get("pMarketOrder", 0.05))
