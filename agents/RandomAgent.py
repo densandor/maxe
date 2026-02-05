@@ -7,12 +7,12 @@ class RandomAgent:
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
         self.interval = int(params.get("interval", 1))
-        self.pTrade = float(params.get("pTrade", 1))
+        self.pTrade = float(params.get("pTrade", 0.3))
 
         # RandomAgent-specific parameters
-        self.pMarketOrder = float(params.get("pMarketOrder", 0.05))
+        self.pMarketOrder = float(params.get("pMarketOrder", 0.07))
         self.volume = int(params.get("volume", 1))
-        self.marketOrderMultiplier = int(params.get("marketOrderMultiplier", 100))
+        self.marketOrderMultiplier = int(params.get("marketOrderMultiplier", 29))
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<Simulation start="0" duration="27000">
+<Simulation start="0" duration="13500">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000"/>
     <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
@@ -22,7 +22,27 @@
     <RandomAgent name="TRADER_RANDOM_17" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET"/>
-    
+    <RandomAgent name="TRADER_RANDOM_20" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_21" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_22" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_23" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_24" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_25" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_26" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_27" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_28" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_29" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_30" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_31" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_32" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_33" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_34" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_35" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_36" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_37" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_38" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_39" exchange="MARKET"/>
+
     <!-- <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" offset="1" lookback="5" threshold="0.01"/> -->
     <!-- <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" offset="201" lookback="10" threshold="0.02"/>
     <MomentumAgent name="TRADER_MOMENTUM_2" exchange="MARKET" offset="401" lookback="20" threshold="0.03"/>

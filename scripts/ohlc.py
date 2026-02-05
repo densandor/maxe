@@ -1,19 +1,18 @@
 import pandas as pd
 
-def generate_candles(csv_file, timeframe_seconds=60):
+def generateCandles(csv, timeframeSeconds=60):
     
-    df = pd.read_csv(csv_file)
-    
+    df = pd.read_csv(csv)
     df.columns = ["id", "time", "price", "aggressing", "aggressingOwner", "direction", "resting", "restingOwner", "volume"]
     
-    # Assume "time" is in milliseconds
-    df["datetime"] = pd.to_datetime(df["time"], unit="s")
+    # Assume "time" column is in seconds
+    df["dateTime"] = pd.to_datetime(df["time"], unit="s")
     
     # Create time buckets based on timeframe
-    df["candle_time"] = df["datetime"].dt.floor(f"{timeframe_seconds}s")
+    df["candleTime"] = df["dateTime"].dt.floor(str(timeframeSeconds) + "s")
     
     # Group by candle candle_time and calculate OHLC
-    candles = df.groupby("candle_time").agg(
+    candles = df.groupby("candleTime").agg(
         open=("price", "first"),
         high=("price", "max"),
         low=("price", "min"),
@@ -21,6 +20,6 @@ def generate_candles(csv_file, timeframe_seconds=60):
         volume=("price", "count")
     ).reset_index()
     
-    candles.rename(columns={"candle_time": "time"}, inplace=True)
+    candles.rename(columns={"candleTime": "time"}, inplace=True)
     
     return candles
