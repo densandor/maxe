@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-<<<<<<< HEAD
 
 from ohlc import generateCandles
 
@@ -63,29 +62,6 @@ def plotReturnsWithNormal(logReturns, bins=25, title="Log returns vs normal"):
     plt.yscale("log")
     plt.show()
 
-=======
-from ohlc import generate_candles
-
-
-def calculate_acf_returns(log_returns, max_lags=20):
-    n = len(log_returns)
-    mu = np.mean(log_returns)
-    centered = log_returns - mu
-    
-    # Lag-0 autocovariance (variance)
-    gamma_0 = np.sum(centered ** 2) / n
-    
-    # Initialize ACF array
-    acf = np.zeros(max_lags + 1)
-    acf[0] = 1.0  # By definition
-    
-    # Calculate ACF for each lag
-    for k in range(1, max_lags + 1):
-        gamma_k = np.sum(centered[:-k] * centered[k:]) / n
-        acf[k] = gamma_k / gamma_0
-    
-    return acf
->>>>>>> d1d1a676631596850660ec09985a37a9535ef9b1
 
 
 def calculate_acf_volatility(log_returns, max_lags=30, measure='absolute'):
@@ -147,7 +123,6 @@ if __name__ == "__main__":
 
     logReturns = np.log(closePrices[1:] / closePrices[:-1])
 
-<<<<<<< HEAD
     lagsToCalculate = [60, 300]
     autocorrelationResults = autocorrelation(logReturns, lags=lagsToCalculate)
     print("Autocorrelation Function (ACF) of Returns:")
@@ -158,17 +133,3 @@ if __name__ == "__main__":
     print("\nExcess Kurtosis of Returns: " + str(excessKurtosis))
 
     plotReturnsWithNormal(logReturns)
-=======
-    # Calculate ACF using custom function
-    max_lags = 200
-    acf_values = calculate_acf_returns(log_returns, max_lags=max_lags)
-
-    plt.plot([lag+1 for lag in range(max_lags+1)], acf_values)
-    plt.xlabel("Lag")
-    plt.ylabel("Autocorrelation")
-    plt.legend()
-    plt.show()
-
-    acf_vol, decay_exp = calculate_acf_volatility(log_returns, max_lags=15, measure='absolute')
-    print(f"Volatility Clustering (lag-1):  {acf_vol[1]}  [expect: 0.3-0.6]")
->>>>>>> d1d1a676631596850660ec09985a37a9535ef9b1

@@ -1,7 +1,7 @@
 from thesimulator import *
 import random
 
-class RandomAgent:
+class NewRandomAgent:
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
@@ -9,10 +9,10 @@ class RandomAgent:
         self.interval = int(params.get("interval", 1))
         self.pTrade = float(params.get("pTrade", 0.3))
 
-        # RandomAgent-specific parameters
-        self.pMarketOrder = float(params.get("pMarketOrder", 0.07))
+        # NewRandomAgent-specific parameters
+        self.pInefficientOrder = float(params.get("pInefficientOrder", 0.05))
         self.volume = int(params.get("volume", 1))
-        self.marketOrderMultiplier = int(params.get("marketOrderMultiplier", 29))
+        self.inefficientMultiplier = int(params.get("inefficientMultiplier", 1))
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -41,19 +41,22 @@ class RandomAgent:
             else:
                 direction = OrderDirection.Sell
 
-            # Choose order type
-            if random.random() < self.pMarketOrder and ((direction == OrderDirection.Buy and bestAsk > 0) or (direction == OrderDirection.Sell and bestBid > 0)):
-                # Market order
-                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, self.volume * self.marketOrderMultiplier))
-            else:
-                # Limit order
-                delta = random.uniform(-1,1) # Up to 1% away from last trade price
-                planned_price = lastTradePrice * (1.0 + delta * 0.01)
+            # Limit order
+            delta = random.uniform(-0.1,0.1) # Up to 2% away from last trade price
+            planned_price = lastTradePrice * (1.0 + delta)
 
+            if random.random() < self.pInefficientOrder:
+                # Make the order inefficient by placing it on the wrong side of the book
+                if direction == OrderDirection.Buy:
+                    planned_price = lastTradePrice * (1.0 + abs(delta))
+                else:
+                    planned_price = lastTradePrice * (1.0 - abs(delta))
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.volume * self.inefficientMultiplier, Money(planned_price)))
+            else:
                 if direction == OrderDirection.Buy and (planned_price > bestAsk) and bestAsk > 0:
                     planned_price = bestAsk
                 elif direction == OrderDirection.Sell and (planned_price < bestBid) and bestBid > 0:
                     planned_price = bestBid
-                
+            
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.volume, Money(planned_price)))
             return
