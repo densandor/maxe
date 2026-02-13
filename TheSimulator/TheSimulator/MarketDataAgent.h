@@ -15,4 +15,9 @@ public:
 private:
     std::string m_exchange;
     int m_demand = 0;
+    int m_fastMaoWindow = 12;
+    int m_slowMaoWindow = 26;
+    double m_fastEma = 0.0;
+    double m_slowEma = 0.0;
+    bool m_firstPrice = true;
 };

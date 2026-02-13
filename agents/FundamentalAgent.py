@@ -2,15 +2,8 @@ from thesimulator import *
 import random
 import math
 
+
 class FundamentalAgent:
-    """
-    Fundamental trader
-
-    1. At each wake-up, the agent updates its believed fundamental price by adding Gaussian noise (N(0, `priceUpdateSigma`)).
-    2. Then, it compares that fundamental price to the current best ask/bid to compute mispricing and demand (demand = sensitivity * mispricing).
-    3. If |d| >= 1 the agent places a market order with volume = round(|d|) (clipped to [1, max_volume]) and side determined by sign(d).
-    """
-
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])

@@ -43,11 +43,11 @@
     <RandomAgent name="TRADER_RANDOM_38" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_39" exchange="MARKET"/>
 
-    <!-- <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" offset="1" lookback="5" threshold="0.01"/> -->
-    <!-- <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" offset="201" lookback="10" threshold="0.02"/>
-    <MomentumAgent name="TRADER_MOMENTUM_2" exchange="MARKET" offset="401" lookback="20" threshold="0.03"/>
-    <MomentumAgent name="TRADER_MOMENTUM_3" exchange="MARKET" offset="601" lookback="50" threshold="0.04"/>
-    <MomentumAgent name="TRADER_MOMENTUM_4" exchange="MARKET" offset="801" lookback="100" threshold="0.05"/> -->
+    <!-- <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" offset="1" lookback="10" threshold="0.1"/> -->
+    <!-- <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" offset="1" lookback="10" threshold="0.02"/>
+    <MomentumAgent name="TRADER_MOMENTUM_2" exchange="MARKET" offset="1" lookback="20" threshold="0.03"/>
+    <MomentumAgent name="TRADER_MOMENTUM_3" exchange="MARKET" offset="1" lookback="50" threshold="0.04"/>
+    <MomentumAgent name="TRADER_MOMENTUM_4" exchange="MARKET" offset="1" lookback="100" threshold="0.05"/> -->
 
     <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_0" exchange="MARKET" offset="1"/> -->
     <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_1" exchange="MARKET" offset="201"/>

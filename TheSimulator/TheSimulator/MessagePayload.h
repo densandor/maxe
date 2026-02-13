@@ -30,7 +30,9 @@ struct EmptyPayload : public MessagePayload {
 
 struct ResponseMarketDataPayload : public MessagePayload {
 	int demand;
-	ResponseMarketDataPayload(int demand) : demand(demand) {}
+	double fastMAO;
+	double slowMAO;
+	ResponseMarketDataPayload(int demand, double fastMAO, double slowMAO) : demand(demand), fastMAO(fastMAO), slowMAO(slowMAO) {}
 };
 
 struct GenericPayload : public MessagePayload, public std::map<std::string, std::string> {

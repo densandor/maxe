@@ -3,33 +3,27 @@ import collections
 import random
 import math
 
+
 class MomentumAgent:
-    """
-    Momentum trader
-
-    1. At each wake-up the agent requests L1 data and updates a short history of trade prices.
-    2. It computes the relative price change over `lookback` periods.
-    3. If the change exceeds `threshold` it places a market order to buy (or to sell if the change is below -`threshold`).
-    4. Orders use the configured `sensitivity`.
-    """
-
     def configure(self, params):
         # Generic parameters
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
         self.interval = int(params.get("interval", 1))
-        self.pTrade = float(params.get("pTrade", 0.2))
+        self.pTrade = float(params.get("pTrade", 1))
 
         # MomentumAgent-specific parameters
         self.pnlAgent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name for checking inventory
 
         self.lookback = int(params.get("lookback", 5)) # how many past prices to use
-        self.threshold = float(params.get("threshold", 0.001)) # minimum return to act (e.g. 0.1%)
+        self.threshold = float(params.get("threshold", 0.01)) # minimum return to act (e.g. 0.1%)
         self.priceHistory = collections.deque(maxlen=self.lookback) # local price history
 
-        self.sensitivity = int(params.get("sensitivity", 1)) # base order sensitivity
+        self.sensitivity = int(params.get("sensitivity", 100)) # base order sensitivity
         self.maxInventory = int(params.get("maxInventory", 50)) # maximum inventory (absolute) before scaling orders down
         self.slowdownExponent = float(params.get("slowdownExponent", 1)) # how quickly to scale down orders near max inventory
+        self.profitFactor = float(params.get("profitFactor", 1.2)) # factor for taking profits
+        self.profitProportion = float(params.get("profitProportion", 0.8)) # proportion of position to take when taking profits (0-1]
 
         self.pendingOrderDirection = None # pending planned order direction waiting for PnL response
         self.relativeChange = 0 # last computed relative price change
@@ -54,48 +48,61 @@ class MomentumAgent:
 
             # Update local price history
             self.priceHistory.append(lastTradePrice)
-            
-            # Decide whether to attempt a trade this wakeup (needs to be done after updating prices)
-            if random.random() >= self.pTrade:
-                return
 
             # Compare latest price to older price
             currentPrice = self.priceHistory[-1]
             oldPrice = self.priceHistory[0]
             if oldPrice != 0:
                 self.relativeChange = (currentPrice - oldPrice) / oldPrice  # positive = uptrend, negative = downtrend
-
+            
             # Decide direction based on momentum and threshold
             if self.relativeChange > self.threshold:
-                direction = OrderDirection.Buy
+                self.pendingOrderDirection = OrderDirection.Buy
             elif self.relativeChange < -self.threshold:
-                direction = OrderDirection.Sell
-            else:
-                return
+                self.pendingOrderDirection = OrderDirection.Sell
 
-            # Query PnL manager for inventory before placing the order so we can scale size
-            self.pendingOrderDirection = direction
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnlAgent, "REQUEST_PNL", EmptyPayload())
             return
 
         if type == "RESPONSE_PNL":
-            # Place pending order adjusted by current inventory
-            if self.pendingOrderDirection is None:
-                return
             inventory = payload.inventory
+            avgPrice = float(payload.avgPrice)
+
+            if inventory > 0:
+                profitTargetPrice = avgPrice * self.profitFactor
+            elif inventory < 0:
+                profitTargetPrice = avgPrice / self.profitFactor
+            
+            if inventory > 0 and self.priceHistory[-1] > profitTargetPrice:
+                print("Taking profit on long position: inventory={}, avgPrice={}, currentPrice={}, targetPrice={}".format(inventory, avgPrice, self.priceHistory[-1], profitTargetPrice))
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Sell, math.floor(abs(inventory) * self.profitProportion)))
+            if inventory < 0 and self.priceHistory[-1] < profitTargetPrice:
+                print("Taking profit on short position: inventory={}, avgPrice={}, currentPrice={}, targetPrice={}".format(inventory, avgPrice, self.priceHistory[-1], profitTargetPrice))
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Buy, math.floor(abs(inventory) * self.profitProportion)))
+
+            # Decide whether to attempt a momentum trade this wakeup
+            if self.pendingOrderDirection is None or random.random() >= self.pTrade:
+                return
+            
             direction = self.pendingOrderDirection
             self.pendingOrderDirection = None
-
-            # Reducer the order size as inventory approaches limit
-            if self.maxInventory <= 0:
-                scale = 1.0
-            else:
+            
+            # Only apply scale if order is increasing inventory in the direction we're already holding
+            if (inventory > 0 and direction == OrderDirection.Buy) or (inventory < 0 and direction == OrderDirection.Sell):
                 scale = max(0.0, 1.0 - (abs(inventory) / float(self.maxInventory))**self.slowdownExponent)
+            else:
+                scale = 1.0
 
-            volume = int(math.floor(self.relativeChange * self.sensitivity * scale))
+            volume = int(math.floor(abs(self.relativeChange) * self.sensitivity * scale))
+
+            # Ensure we don't exceed maxInventory in either direction
+            if direction == OrderDirection.Buy:
+                volume = min(volume, max(0, self.maxInventory - inventory))
+            else:  # Sell
+                volume = min(volume, max(0, self.maxInventory + inventory))
 
             if volume <= 0:
                 return
-
+            print("Placing momentum order: direction={}, volume={}, inventory={}, relativeChange={:.4f}, scale={:.4f}".format(direction, volume, inventory, self.relativeChange, scale))
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, volume))
             return

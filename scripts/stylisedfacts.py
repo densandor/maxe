@@ -22,17 +22,13 @@ def autocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
 def heavyTails(logReturns):
     mean = np.mean(logReturns)
     standardDeviation = np.std(logReturns, ddof=0)
-    
-    if standardDeviation == 0:
-        return np.nan
-
     z = (logReturns - mean) / standardDeviation
     fourthMoment = np.mean(z ** 4)
     excessKurtosis = fourthMoment - 3.0
     return excessKurtosis
 
 
-def plotReturnsWithNormal(logReturns, bins=25, title="Log returns vs normal"):
+def plotReturnsWithNormal(logReturns, bins=20, title="Log returns vs normal"):
     logReturns = np.asarray(logReturns)
     mean = np.mean(logReturns)
     standardDeviation = np.std(logReturns, ddof=0)
@@ -63,27 +59,26 @@ def plotReturnsWithNormal(logReturns, bins=25, title="Log returns vs normal"):
     plt.show()
 
 
-
-def calculate_acf_volatility(log_returns, max_lags=30, measure='absolute'):
+def autocorrelationVolatility(logReturns, max_lags=30, measure='absolute'):
     # Step 1: Create volatility measure
     if measure == 'absolute':
-        vol = np.abs(log_returns)
+        volatility = np.abs(logReturns)
     else:  # squared
-        vol = log_returns ** 2
+        volatility = logReturns ** 2
     
-    n = len(vol)
-    mu_vol = np.mean(vol)
-    centered_vol = vol - mu_vol
+    n = len(volatility)
+    mean = np.mean(volatility)
+    centeredVolatility = volatility - mean
     
     # Step 2: Calculate lag-0 autocovariance
-    gamma_0 = np.sum(centered_vol ** 2) / n
+    gamma_0 = np.sum(centeredVolatiliity ** 2) / n
     
     # Step 3: Calculate ACF at each lag
     acf_vol = np.zeros(max_lags + 1)
     acf_vol[0] = 1.0
     
     for k in range(1, max_lags + 1):
-        gamma_k = np.sum(centered_vol[:-k] * centered_vol[k:]) / n
+        gamma_k = np.sum(centeredVolatiliity[:-k] * centeredVolatiliity[k:]) / n
         acf_vol[k] = gamma_k / gamma_0
     
     # Step 4: Estimate decay exponent (optional)
