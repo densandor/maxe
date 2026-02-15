@@ -167,7 +167,6 @@ void ExchangeAgent::receiveMessage(const MessagePtr& msg) {
 		} else {
 			auto iit = std::upper_bound(subscribers.begin(), subscribers.end(), msg->source);
 			subscribers.insert(iit, msg->source);
-
 			auto sretpptr = std::make_shared<SuccessResponsePayload>("Agent subscribed to trade events for order " + std::to_string(pptr->id) + ":" + msg->source);
 			fastRespondToMessage(msg, sretpptr);
 		}

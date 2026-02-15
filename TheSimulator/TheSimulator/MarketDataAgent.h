@@ -3,6 +3,8 @@
 #include "Agent.h"
 
 #include <string>
+#include <fstream>
+#include <list>
 
 class MarketDataAgent : public Agent {
 public:
@@ -14,10 +16,18 @@ public:
 
 private:
     std::string m_exchange;
-    int m_demand = 0;
-    int m_fastMaoWindow = 12;
-    int m_slowMaoWindow = 26;
+    unsigned long long m_offset = 1;
+    unsigned long long m_interval = 1;
+
+    int m_fastWindowSize = 12;
+    int m_slowWindowSize = 26;
     double m_fastEma = 0.0;
     double m_slowEma = 0.0;
     bool m_firstPrice = true;
+
+    std::list<std::string> m_movingAverageSubscribers;
+
+    std::ofstream m_outputFile;
+    void logData(Timestamp timestamp, double price);
+    void notifyMovingAverageSubscribers(Money price, OrderDirection direction);
 };

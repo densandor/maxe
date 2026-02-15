@@ -10,7 +10,7 @@ class QLearningAgent:
         self.interval = int(params.get("interval", 1))
 
         # QLearningAgent-specific parameters
-        self.pnlAgent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name for checking inventory
+        self.pnlAgent = str(params.get("pnlAgent", "PNL_AGENT")) # PnL manager agent name for checking inventory
         
         # Q-learning parameters
         self.alpha = float(params.get("alpha", 0.1)) # learning rate

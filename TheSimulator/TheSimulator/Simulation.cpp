@@ -5,13 +5,10 @@
 #include "PnLManagerAgent.h"
 #include "OrderLogAgent.h"
 #include "L1LogAgent.h"
-#include "BouchaudAgent.h"
-#include "ImpactAgent.h"
 #include "SetupAgent.h"
-#include "AdaptiveOfferingAgent.h"
-#include "RandomWalkMarketMakerAgent.h"
-#include "DoobAgent.h"
 #include "PythonAgent.h"
+#include "MarketDataAgent.h"
+#include "NewsAgent.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -147,32 +144,20 @@ void Simulation::setupChildConfiguration(const pugi::xml_node& node, const std::
 			auto eaptr = std::make_unique<L1LogAgent>(this);
 			eaptr->configure(*nit, configurationPath);
 			m_agentList.push_back(std::move(eaptr));
-		} else if (nodeName == "BouchaudAgent") {
-			auto eaptr = std::make_unique<BouchaudAgent>(this);
-			eaptr->configure(*nit, configurationPath);
-			m_agentList.push_back(std::move(eaptr));
-		} else if (nodeName == "ImpactAgent") {
-			auto eaptr = std::make_unique<ImpactAgent>(this);
-			eaptr->configure(*nit, configurationPath);
-			m_agentList.push_back(std::move(eaptr));
-		} else if (nodeName == "SetupAgent") {
-			auto eaptr = std::make_unique<SetupAgent>(this);
-			eaptr->configure(*nit, configurationPath);
-			m_agentList.push_back(std::move(eaptr));
-		} else if (nodeName == "AdaptiveOfferingAgent") {
-			auto eaptr = std::make_unique<AdaptiveOfferingAgent>(this);
-			eaptr->configure(*nit, configurationPath);
-			m_agentList.push_back(std::move(eaptr));
-		} else if (nodeName == "RandomWalkMarketMakerAgent") {
-			auto eaptr = std::make_unique<RandomWalkMarketMakerAgent>(this);
-			eaptr->configure(*nit, configurationPath);
-			m_agentList.push_back(std::move(eaptr));
-		} else if (nodeName == "DoobAgent") {
-			auto eaptr = std::make_unique<DoobAgent>(this);
+		} else if (nodeName == "MarketDataAgent") {
+			auto eaptr = std::make_unique<MarketDataAgent>(this);
 			eaptr->configure(*nit, configurationPath);
 			m_agentList.push_back(std::move(eaptr));
 		} else if (nodeName == "PnLManagerAgent") {
 			auto eaptr = std::make_unique<PnLManagerAgent>(this);
+			eaptr->configure(*nit, configurationPath);
+			m_agentList.push_back(std::move(eaptr));
+		} else if (nodeName == "NewsAgent") {
+			auto eaptr = std::make_unique<NewsAgent>(this);
+			eaptr->configure(*nit, configurationPath);
+			m_agentList.push_back(std::move(eaptr));
+		} else if (nodeName == "SetupAgent") {
+			auto eaptr = std::make_unique<SetupAgent>(this);
 			eaptr->configure(*nit, configurationPath);
 			m_agentList.push_back(std::move(eaptr));
 		} else {

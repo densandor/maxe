@@ -1,6 +1,8 @@
 #pragma once
 #include "Agent.h"
 
+#include <fstream>
+
 class OrderLogAgent : public Agent {
 public:
 	OrderLogAgent(const Simulation* simulation);
@@ -12,4 +14,5 @@ public:
 	void receiveMessage(const MessagePtr& msg) override;
 private:
 	std::string m_exchange;
+	std::ofstream m_outputFile;
 };

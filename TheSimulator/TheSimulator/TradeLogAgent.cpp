@@ -21,6 +21,7 @@ void TradeLogAgent::receiveMessage(const MessagePtr& messagePtr) {
 		auto pptr = std::dynamic_pointer_cast<EventTradePayload>(messagePtr->payload);
 		const auto& trade = pptr->trade;
 		
+        // Print trade info
 		// std::cout << name() << ": ";
 		// trade.printHuman();
 		// std::cout << std::endl;

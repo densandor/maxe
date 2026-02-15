@@ -181,7 +181,6 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 		.def_readonly("trade", &EventTradePayload::trade)
 		;
 
-	// PnL response
 	py::class_<ResponsePnLPayload, MessagePayload, std::shared_ptr<ResponsePnLPayload>>(m, "ResponsePnLPayload")
 		.def(py::init<int, double, double, double, double>())
 		.def_readwrite("inventory", &ResponsePnLPayload::inventory)
@@ -191,10 +190,15 @@ PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 		.def_readwrite("lastPrice", &ResponsePnLPayload::lastPrice)
 		;
 
-	// Market data response
-	py::class_<ResponseMarketDataPayload, MessagePayload, std::shared_ptr<ResponseMarketDataPayload>>(m, "ResponseMarketDataPayload")
-		.def(py::init<int>())
-		.def_readwrite("demand", &ResponseMarketDataPayload::demand)
+	py::class_<MovingAverageSignalPayload, MessagePayload, std::shared_ptr<MovingAverageSignalPayload>>(m, "MovingAverageSignalPayload")
+		.def(py::init<Money, OrderDirection>())
+		.def_readwrite("price", &MovingAverageSignalPayload::price)
+		.def_readwrite("direction", &MovingAverageSignalPayload::direction)
+		;
+
+	py::class_<NewsPayload, MessagePayload, std::shared_ptr<NewsPayload>>(m, "NewsPayload")
+		.def(py::init<double>())
+		.def_readwrite("news", &NewsPayload::news)
 		;
 
 	py::class_<Trade>(m, "Trade")

@@ -13,7 +13,7 @@ class MomentumAgent:
         self.pTrade = float(params.get("pTrade", 1))
 
         # MomentumAgent-specific parameters
-        self.pnlAgent = str(params.get("pnlAgent", "PNL")) # PnL manager agent name for checking inventory
+        self.pnlAgent = str(params.get("pnlAgent", "PNL_AGENT")) # PnL manager agent name for checking inventory
 
         self.lookback = int(params.get("lookback", 5)) # how many past prices to use
         self.threshold = float(params.get("threshold", 0.01)) # minimum return to act (e.g. 0.1%)

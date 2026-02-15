@@ -3,6 +3,9 @@
 #include "Simulation.h"
 #include "ExchangeAgentMessagePayloads.h"
 
+#include <iostream>
+#include <filesystem>
+
 OrderLogAgent::OrderLogAgent(const Simulation* simulation)
 	: Agent(simulation) { }
 
@@ -18,15 +21,15 @@ void OrderLogAgent::receiveMessage(const MessagePtr& messagePtr) {
 	} else if (messagePtr->type == "EVENT_ORDER_MARKET") {
 		auto pptr = std::dynamic_pointer_cast<EventOrderMarketPayload>(messagePtr->payload);
 		const auto& order = pptr->order;
-		std::cout << name() << ": ";
-		order.printHuman();
-		std::cout << std::endl;
+		// std::cout << name() << ": ";
+		// order.printHuman();
+		// std::cout << std::endl;
 	} else if (messagePtr->type == "EVENT_ORDER_LIMIT") {
 		auto pptr = std::dynamic_pointer_cast<EventOrderLimitPayload>(messagePtr->payload);
 		const auto& order = pptr->order;
-		std::cout << name() << ": ";
-		order.printHuman();
-		std::cout << std::endl;
+		// std::cout << name() << ": ";
+		// order.printHuman();
+		// std::cout << std::endl;
 	}
 }
 
@@ -39,4 +42,22 @@ void OrderLogAgent::configure(const pugi::xml_node& node, const std::string& con
 	if (!(att = node.attribute("exchange")).empty()) { 
 		m_exchange = simulation()->parameters().processString(att.as_string());
 	}
+	if (!(att = node.attribute("outputFile")).empty()) {
+        std::string filename = simulation()->parameters().processString(att.as_string());
+        
+        // If filename doesn't contain a path separator, add logs/
+        namespace fs = std::filesystem;
+        fs::path filePath(filename);
+        if (filePath.parent_path().empty()) {
+            filePath = fs::path("logs") / filePath;
+        }
+        
+        m_outputFile.open(filePath.string());
+
+        if (m_outputFile.is_open()) {
+            m_outputFile << "id,time,price,owner,direction,volume\n";
+        } else {
+            std::cerr << name() << ": Failed to open trade CSV file: " << att.as_string() << std::endl;
+        }
+    }
 }

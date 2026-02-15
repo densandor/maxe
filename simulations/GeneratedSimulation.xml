@@ -1,0 +1,461 @@
+<?xml version="1.0" ?>
+<Simulation start="0" duration="2000">
+    <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
+    <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="2250" askPrice="2250"/>
+    <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="10"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLog.csv" slowWindowSize="20" fastWindowSize="10"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" outputFile="MarketDataLogLarge.csv" slowWindowSize="40" fastWindowSize="20"/>
+    <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
+    <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
+    <PnLManagerAgent name="PNL_AGENT" exchange="MARKET"/>
+    <MAOAgent name="TRADER_MAO_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
+    <MAOAgent name="TRADER_MAO_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_03" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_04" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_05" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_06" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_07" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_08" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_09" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_10" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_11" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_12" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_13" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_14" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_15" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_16" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_17" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_18" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_19" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_20" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_21" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_22" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_23" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_24" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_25" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_26" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_27" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_28" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_29" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_30" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_31" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_32" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_33" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_34" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_35" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_36" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_37" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_38" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_39" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_40" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_41" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_42" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_43" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_44" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_45" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_46" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_47" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_48" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_49" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_50" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_51" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_52" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_53" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_54" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_55" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_56" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_57" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_58" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_59" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_60" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_61" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_62" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_63" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_64" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_65" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_66" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_67" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_68" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_69" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_70" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_71" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_72" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_73" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_74" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_75" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_76" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_77" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_78" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_79" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_80" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_81" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_82" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_83" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_84" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_85" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_86" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_87" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_88" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_89" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_90" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_91" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_92" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_93" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_94" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_95" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_96" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_97" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_98" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_99" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_100" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_101" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_102" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_103" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_104" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_105" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_106" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_107" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_108" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_109" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_110" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_111" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_112" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_113" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_114" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_115" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_116" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_117" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_118" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_119" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_120" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_121" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_122" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_123" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_124" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_125" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_126" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_127" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_128" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_129" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_130" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_131" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_132" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_133" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_134" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_135" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_136" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_137" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_138" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_139" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_140" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_141" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_142" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_143" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_144" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_145" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_146" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_147" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_148" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_149" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <!-- <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_03" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_04" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_05" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_06" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_07" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_08" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_09" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_10" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_11" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_12" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_13" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_14" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_15" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_16" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_17" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_20" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_21" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_22" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_23" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_24" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_25" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_26" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_27" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_28" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_29" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_30" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_31" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_32" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_33" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_34" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_35" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_36" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_37" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_38" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_39" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_40" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_41" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_42" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_43" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_44" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_45" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_46" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_47" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_48" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_49" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_50" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_51" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_52" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_53" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_54" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_55" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_56" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_57" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_58" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_59" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_60" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_61" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_62" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_63" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_64" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_65" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_66" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_67" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_68" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_69" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_70" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_71" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_72" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_73" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_74" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_75" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_76" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_77" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_78" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_79" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_80" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_81" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_82" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_83" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_84" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_85" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_86" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_87" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_88" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_89" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_90" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_91" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_92" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_93" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_94" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_95" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_96" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_97" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_98" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_99" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_100" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_101" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_102" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_103" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_104" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_105" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_106" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_107" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_108" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_109" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_110" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_111" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_112" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_113" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_114" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_115" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_116" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_117" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_118" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_119" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_120" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_121" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_122" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_123" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_124" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_125" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_126" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_127" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_128" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_129" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_130" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_131" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_132" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_133" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_134" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_135" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_136" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_137" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_138" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_139" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_140" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_141" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_142" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_143" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_144" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_145" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_146" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_147" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_148" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_149" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_150" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_151" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_152" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_153" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_154" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_155" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_156" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_157" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_158" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_159" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_160" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_161" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_162" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_163" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_164" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_165" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_166" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_167" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_168" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_169" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_170" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_171" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_172" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_173" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_174" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_175" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_176" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_177" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_178" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_179" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_180" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_181" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_182" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_183" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_184" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_185" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_186" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_187" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_188" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_189" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_190" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_191" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_192" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_193" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_194" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_195" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_196" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_197" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_198" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_199" exchange="MARKET"/> -->
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_00" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_01" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_02" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_03" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_04" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_05" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_06" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_07" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_08" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_09" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_10" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_11" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_12" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_13" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_14" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_15" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_16" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_17" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_18" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_19" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_20" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_21" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_22" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_23" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_24" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_25" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_26" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_27" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_28" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_29" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_30" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_31" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_32" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_33" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_34" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_35" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_36" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_37" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_38" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_39" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_40" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_41" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_42" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_43" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_44" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_45" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_46" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_47" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_48" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_49" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_50" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_51" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_52" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_53" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_54" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_55" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_56" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_57" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_58" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_59" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_60" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_61" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_62" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_63" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_64" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_65" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_66" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_67" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_68" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_69" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_70" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_71" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_72" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_73" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_74" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_75" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_76" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_77" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_78" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_79" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_80" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_81" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_82" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_83" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_84" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_85" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_86" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_87" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_88" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_89" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_90" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_91" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_92" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_93" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_94" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_95" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_96" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_97" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_98" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_99" exchange="MARKET"/>
+</Simulation>

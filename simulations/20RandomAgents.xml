@@ -1,7 +1,9 @@
 <?xml version="1.0" ?>
-<Simulation start="0" duration="13500">
+<Simulation start="0" duration="27000">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
-    <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000"/>
+    <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="2250" askPrice="2250"/>
+    <!-- <MarketDataAgent name="MARKET_DATA_AGENT" exchange="MARKET" fastWindowSize="12" slowWindowSize="26" outputFile="MAOLog.csv"/>
+    <NewsAgent name="NEWS_AGENT" exchange="MARKET" newsInterval="5" newsMean="0" newsSigma="1"/> -->
     <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET"/>
@@ -43,17 +45,23 @@
     <RandomAgent name="TRADER_RANDOM_38" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_39" exchange="MARKET"/>
 
-    <!-- <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" offset="1" lookback="10" threshold="0.1"/> -->
-    <!-- <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" offset="1" lookback="10" threshold="0.02"/>
+    <!-- <MAOAgent name="TRADER_MAO_0" exchange="MARKET"/>
+    <MAOAgent name="TRADER_MAO_1" exchange="MARKET"/>
+    <MAOAgent name="TRADER_MAO_2" exchange="MARKET"/>
+    <MAOAgent name="TRADER_MAO_3" exchange="MARKET"/>
+    <MAOAgent name="TRADER_MAO_4" exchange="MARKET"/> -->
+
+    <!-- <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" offset="1" lookback="10" threshold="0.1"/>
+    <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" offset="1" lookback="10" threshold="0.02"/>
     <MomentumAgent name="TRADER_MOMENTUM_2" exchange="MARKET" offset="1" lookback="20" threshold="0.03"/>
     <MomentumAgent name="TRADER_MOMENTUM_3" exchange="MARKET" offset="1" lookback="50" threshold="0.04"/>
     <MomentumAgent name="TRADER_MOMENTUM_4" exchange="MARKET" offset="1" lookback="100" threshold="0.05"/> -->
 
-    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_0" exchange="MARKET" offset="1"/> -->
-    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_1" exchange="MARKET" offset="201"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_2" exchange="MARKET" offset="401"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_3" exchange="MARKET" offset="601"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_4" exchange="MARKET" offset="801"/> -->
+    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_0" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_1" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_2" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_3" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_4" exchange="MARKET"/> -->
 
     <!-- <QLearningAgent name="TRADER_Q_LEARNING_00" class="QLearningAgent" exchange="MARKET" offset="1" alpha="0.10" gamma="0.99" epsilon="0.20" epsilon_min="0.01" epsilon_decay="0.999" /> -->
 
@@ -62,5 +70,5 @@
     <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
     <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
     <!-- <OrderLogAgent name="ORDER_LOGGER" exchange="MARKET"/> -->
-    <PnLManagerAgent name="PNL" exchange="MARKET"/>
+    <PnLManagerAgent name="PNL_AGENT" exchange="MARKET"/>
 </Simulation>

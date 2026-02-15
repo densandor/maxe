@@ -4,6 +4,7 @@
 #include "ExchangeAgentMessagePayloads.h"
 
 #include <iostream>
+#include <filesystem>
 
 void MarketDataAgent::configure(const pugi::xml_node& node, const std::string& configurationPath) {
     Agent::configure(node, configurationPath);
@@ -12,11 +13,35 @@ void MarketDataAgent::configure(const pugi::xml_node& node, const std::string& c
     if (!(att = node.attribute("exchange")).empty()) {
         m_exchange = simulation()->parameters().processString(att.as_string());
     }
-    if (!(att = node.attribute("fastMaoWindow")).empty()) {
-        m_fastMaoWindow = std::stoi(simulation()->parameters().processString(att.as_string()));
+    if (!(att = node.attribute("fastWindowSize")).empty()) {
+        m_fastWindowSize = std::stoi(simulation()->parameters().processString(att.as_string()));
     }
-    if (!(att = node.attribute("slowMaoWindow")).empty()) {
-        m_slowMaoWindow = std::stoi(simulation()->parameters().processString(att.as_string()));
+    if (!(att = node.attribute("slowWindowSize")).empty()) {
+        m_slowWindowSize = std::stoi(simulation()->parameters().processString(att.as_string()));
+    }
+    if (!(att = node.attribute("offset")).empty()) {
+        m_offset = std::stoull(simulation()->parameters().processString(att.as_string()));
+    }
+    if (!(att = node.attribute("interval")).empty()) {
+        m_interval = std::stoull(simulation()->parameters().processString(att.as_string()));
+    }
+    if (!(att = node.attribute("outputFile")).empty()) {
+        std::string filename = simulation()->parameters().processString(att.as_string());
+        
+        // If filename doesn't contain a path separator, add logs/
+        namespace fs = std::filesystem;
+        fs::path filePath(filename);
+        if (filePath.parent_path().empty()) {
+            filePath = fs::path("logs") / filePath;
+        }
+        
+        m_outputFile.open(filePath.string());
+
+        if (m_outputFile.is_open()) {
+            m_outputFile << "time,price,fastEma,slowEma\n";
+        } else {
+            std::cerr << name() << ": Failed to open moving average CSV file: " << att.as_string() << std::endl;
+        }
     }
 }
 
@@ -24,36 +49,12 @@ void MarketDataAgent::receiveMessage(const MessagePtr& msg) {
     const Timestamp currentTimestamp = simulation()->currentTimestamp();
 
     if (msg->type == "EVENT_SIMULATION_START") {
-        // subscribe to market order events on configured exchange
-        // simulation()->dispatchMessage(currentTimestamp, 0, name(), m_exchange, "SUBSCRIBE_EVENT_ORDER_MARKET", std::make_shared<EmptyPayload>());
-        simulation
+	    simulation()->dispatchMessage(simulation()->currentTimestamp(), m_offset, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>());
         return;
     }
 
-    // if (msg->type == "EVENT_ORDER_MARKET") {
-    //     auto pptr = std::dynamic_pointer_cast<EventOrderMarketPayload>(msg->payload);
-    //     if (!pptr) return;
-
-    //     const MarketOrder& order = pptr->order;
-    //     // accumulate signed demand: buys positive, sells negative
-    //     if (order.direction() == OrderDirection::Buy) {
-    //         m_demand += static_cast<int>(order.volume());
-    //     } else {
-    //         m_demand -= static_cast<int>(order.volume());
-    //     }
-    //     return;
-    // }
-
-    // if (msg->type == "REQUEST_MARKET_DATA") {
-    //     // Respond with accumulated demand and reset it for the next period
-    //     auto resp = std::make_shared<ResponseMarketDataPayload>(m_demand);
-    //     // reset after reporting (behaviour mirrors per-period accumulation)
-    //     m_demand = 0;
-    //     simulation()->dispatchMessage(currentTimestamp, 0, name(), msg->source, "RESPONSE_REQUEST_MARKET_DATA", resp);
-    //     return;
-    // }
-
-    if (msg->type == "REQUEST_MARKET_DATA") {
+    if (msg->type == "WAKE_UP") {
+        simulation()->dispatchMessage(simulation()->currentTimestamp(), m_interval, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>());
         // Request L1 data to calculate MAO
         simulation()->dispatchMessage(currentTimestamp, 0, name(), m_exchange, "RETRIEVE_L1", std::make_shared<EmptyPayload>());
         return;
@@ -61,10 +62,13 @@ void MarketDataAgent::receiveMessage(const MessagePtr& msg) {
 
     if (msg->type == "RESPONSE_RETRIEVE_L1") {
         auto l1 = std::dynamic_pointer_cast<RetrieveL1ResponsePayload>(msg->payload);
-        if (!l1) return;
 
         double price = static_cast<double>(l1->lastTradePrice);
         
+        // Store old EMAs for crossover detection
+        double oldFastEma = m_fastEma;
+        double oldSlowEma = m_slowEma;
+
         // Initialize EMAs with first price
         if (m_firstPrice) {
             m_fastEma = price;
@@ -72,19 +76,50 @@ void MarketDataAgent::receiveMessage(const MessagePtr& msg) {
             m_firstPrice = false;
         } else {
             // Update EMAs with exponential smoothing
-            double fastAlpha = 2.0 / (m_fastMaoWindow + 1);
-            double slowAlpha = 2.0 / (m_slowMaoWindow + 1);
+            double fastAlpha = 2.0 / (m_fastWindowSize + 1);
+            double slowAlpha = 2.0 / (m_slowWindowSize + 1);
             m_fastEma = fastAlpha * price + (1.0 - fastAlpha) * m_fastEma;
             m_slowEma = slowAlpha * price + (1.0 - slowAlpha) * m_slowEma;
         }
-
-        // Calculate MAO values: (price - EMA) / EMA * 100
-        double fastMao = (price - m_fastEma) / m_fastEma * 100.0;
-        double slowMao = (price - m_slowEma) / m_slowEma * 100.0;
-
-        // Respond with MAO values
-        auto resp = std::make_shared<ResponseMarketDataPayload>(static_cast<int>(fastMao * 100));
-        simulation()->dispatchMessage(currentTimestamp, 0, name(), msg->source, "RESPONSE_REQUEST_MAO", resp);
+        
+        // Log data to CSV
+        logData(currentTimestamp, price);
+        
+        if (oldFastEma > oldSlowEma && m_fastEma <= m_slowEma) {
+            // std::cout << "Fast EMA crossed below Slow EMA at timestamp " << currentTimestamp << ": " << m_fastEma << " <= " << m_slowEma << std::endl;
+            notifyMovingAverageSubscribers(Money(price), OrderDirection::Sell);
+        } else if (oldFastEma < oldSlowEma && m_fastEma >= m_slowEma) {
+            // std::cout << "Fast EMA crossed above Slow EMA at timestamp " << currentTimestamp << ": " << m_fastEma << " >= " << m_slowEma << std::endl;
+            notifyMovingAverageSubscribers(Money(price), OrderDirection::Buy);
+        }
         return;
     }
+
+    if (msg->type == "SUBSCRIBE_MOVING_AVERAGE") {
+        if (std::binary_search(m_movingAverageSubscribers.begin(), m_movingAverageSubscribers.end(), msg->source)) {
+            auto eretpptr = std::make_shared<ErrorResponsePayload>("The agent is already subscribed to moving average signals: " + msg->source);
+            fastRespondToMessage(msg, eretpptr);
+        } else {
+            auto iit = std::upper_bound(m_movingAverageSubscribers.begin(), m_movingAverageSubscribers.end(), msg->source);
+            m_movingAverageSubscribers.insert(iit, msg->source);
+
+            auto sretpptr = std::make_shared<SuccessResponsePayload>("Agent subscribed successfully to moving average signals: " + msg->source);
+            fastRespondToMessage(msg, sretpptr);
+        }
+        return;
+    }
+}
+
+void MarketDataAgent::logData(Timestamp timestamp, double price) {
+    if (m_outputFile.is_open()) {
+        m_outputFile << timestamp << "," << price << "," << m_fastEma << "," << m_slowEma << std::endl;
+    }
+}
+
+void MarketDataAgent::notifyMovingAverageSubscribers(Money price, OrderDirection direction) {
+	auto currentTimestamp = simulation()->currentTimestamp();
+	for (const std::string& subscriber : m_movingAverageSubscribers) {
+		auto pptr = std::make_shared<MovingAverageSignalPayload>(price, direction);
+		simulation()->dispatchMessage(currentTimestamp, 0, name(), subscriber, "MOVING_AVERAGE_SIGNAL", pptr);
+	}
 }
