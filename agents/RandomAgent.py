@@ -63,5 +63,6 @@ class RandomAgent:
                 #     plannedPrice = bestAsk
                 # elif direction == OrderDirection.Sell and (plannedPrice < bestBid) and bestBid > 0:
                 #     plannedPrice = bestBid
+            plannedPrice = max(plannedPrice, 0.01) # Ensure price is positive
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.volume, Money(plannedPrice)))
             return

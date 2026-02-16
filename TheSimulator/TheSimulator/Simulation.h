@@ -72,6 +72,7 @@ private:
 	Timestamp m_startTimestamp;
 	Timestamp m_durationTimestamp;
 	Timestamp m_currentTimestamp;
+	int m_lastProgressPercent;
 	ParameterStorage* m_parameters;
 
 	std::random_device m_randomDevice;

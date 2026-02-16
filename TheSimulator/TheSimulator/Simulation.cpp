@@ -12,6 +12,8 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <cstdio>
+#include <iostream>
 
 #include "SimulationException.h"
 #include "ParameterStorage.h"
@@ -22,7 +24,7 @@ Simulation::Simulation(ParameterStorage* parameters)
 }
 
 Simulation::Simulation(ParameterStorage* parameters, Timestamp startTimestamp, Timestamp duration, const std::string& directory)
-	: IMessageable(this, "SIMULATION"), m_parameters(parameters), m_startTimestamp(startTimestamp), m_currentTimestamp(startTimestamp), m_durationTimestamp(duration), m_messageQueue(std::make_unique <std::priority_queue<MessagePtr, std::vector<MessagePtr>, CompareArrival>>()), m_state(SimulationState::INACTIVE), m_randomDevice(), m_randomGenerator(std::make_unique<std::mt19937>(m_randomDevice())) {
+	: IMessageable(this, "SIMULATION"), m_parameters(parameters), m_startTimestamp(startTimestamp), m_currentTimestamp(startTimestamp), m_durationTimestamp(duration), m_messageQueue(std::make_unique <std::priority_queue<MessagePtr, std::vector<MessagePtr>, CompareArrival>>()), m_state(SimulationState::INACTIVE), m_randomDevice(), m_randomGenerator(std::make_unique<std::mt19937>(m_randomDevice())), m_lastProgressPercent(0) {
 }
 
 void Simulation::simulate() {
@@ -93,6 +95,8 @@ void Simulation::receiveMessage(const MessagePtr& msg) {
 }
 
 void Simulation::start() {
+	setvbuf(stdout, NULL, _IONBF, 0);
+	std::cout.setf(std::ios::unitbuf);
 	this->dispatchMessage(m_startTimestamp, 0, "SIMULATION", "*", "EVENT_SIMULATION_START", nullptr);
 	this->dispatchMessage(m_startTimestamp, m_durationTimestamp-1, "SIMULATION", "*", "EVENT_SIMULATION_STOP", nullptr);
 
@@ -109,10 +113,23 @@ void Simulation::step(Timestamp step) {
 		MessagePtr topMessage = m_messageQueue->top();
 		m_messageQueue->pop(); // ordering intentional
 		deliverMessage(topMessage);
+
+		if (m_durationTimestamp > 0) {
+			double progress = (double)(m_currentTimestamp - m_startTimestamp) / m_durationTimestamp;
+			progress = std::min(1.0, std::max(0.0, progress));
+			int percent = (int)(progress * 100);
+			if (percent >= m_lastProgressPercent + 5) {
+				m_lastProgressPercent = (percent / 5) * 5;
+				printf("\r[%d%%]   ", m_lastProgressPercent);
+				fflush(stdout);
+			}
+		}
 	}
 }
 
 void Simulation::stop() {
+	printf("\n");
+	fflush(stdout);
 	m_state = SimulationState::STOPPED;
 }
 
@@ -198,8 +215,6 @@ void Simulation::setupChildConfiguration(const pugi::xml_node& node, const std::
 		return agentAPtr->name() < agentBPtr->name();
 	});
 }
-
-#include <iostream>
 
 void Simulation::configure(const pugi::xml_node& node, const std::string& configurationPath) {
 	pugi::xml_attribute att;

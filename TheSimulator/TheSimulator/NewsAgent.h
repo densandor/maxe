@@ -16,6 +16,7 @@ public:
 private:
     unsigned long long m_offset = 1;
     unsigned long long m_newsPoissonLambda = 10;
+    std::string m_mode = "normal";
 
     double m_mean = 0.0;
     double m_standardDeviation = 0.1;

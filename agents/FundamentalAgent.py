@@ -18,8 +18,8 @@ class FundamentalAgent:
         self.recentNews = None
         self.priceUpdateSigma = float(params.get("priceUpdateSigma", 0.2)) # the standard deviation for random updates to fundamental price
 
-        self.marketOrderThreshold = float(params.get("marketOrderThreshold", random.uniform(0.005, 0.25))) # the minimum mispricing required to place a market order
-        self.opinionThreshold = float(params.get("opinionThreshold", random.uniform(0.01, 0.1))) # the minimum mispricing required to place any order (market or limit)
+        self.marketOrderThreshold = float(params.get("marketOrderThreshold", random.uniform(0.005, 0.25))) # the minimum mispricing required to place a market order - random.uniform(0.005, 0.25)
+        self.opinionThreshold = float(params.get("opinionThreshold", random.uniform(0.01, 0.1))) # the minimum mispricing required to place any order (market or limit) - random.uniform(0.01, 0.1)
         self.limitOrderLambda = float(params.get("limitOrderLambda", 3)) # the lambda parameter for the exponential distribution used to determine limit order prices
 
     # Fundamental price update
@@ -68,7 +68,7 @@ class FundamentalAgent:
             sign = np_random.choice([-1, 1])
             plannedPrice = midPrice + sign * exp_sample
             # print("[{}] Current fundamental price: {}, best bid: {}, best ask: {}, planned order price: {}".format(self.name(),currentFundamentalPrice, bestBid, bestAsk, plannedPrice))
-            plannedPrice = Money(round(plannedPrice, 2))
+            plannedPrice = Money(max(round(plannedPrice, 2), 0.01))
 
             if bestAsk > 0 and currentFundamentalPrice > bestAsk * (1 + self.marketOrderThreshold):
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Buy, 1))

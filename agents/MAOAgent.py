@@ -14,8 +14,8 @@ class MAOAgent:
         self.pnlAgent = str(params.get("pnlAgent", "PNL_AGENT"))
         self.marketDataAgent = str(params.get("marketDataAgent", "MARKET_DATA_AGENT")) # Market data agent name for checking moving average signals
 
-        self.profitFactor = float(params.get("profitFactor", 0.01)) # factor for taking profits
-        self.waitTime = int(params.get("waitTime", random.uniform(0, 50))) # time to wait before acting on a moving average signal, in number of simulation steps
+        self.profitFactor = float(params.get("profitFactor", 0.01)) # factor for taking profits random.uniform(0.01, 0.2)
+        self.waitTime = int(params.get("waitTime", random.uniform(0, 50))) # time to wait before acting on a moving average signal, in number of simulation steps random.uniform(0, 50)
 
         self.lastTradePrice = None
 
