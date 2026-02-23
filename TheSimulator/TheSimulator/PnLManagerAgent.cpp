@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <filesystem>
+#include <algorithm>
 
 PnLManagerAgent::PnLManagerAgent(const Simulation* simulation)
 	: Agent(simulation), m_exchange(""), m_last_trade_price(Money(0)) { }
@@ -19,6 +21,19 @@ void PnLManagerAgent::configure(const pugi::xml_node& node, const std::string& c
 	if (!(att = node.attribute("exchange")).empty()) {
 		m_exchange = simulation()->parameters().processString(att.as_string());
 	}
+
+	if (!(att = node.attribute("sampleInterval")).empty()) {
+		m_sample_interval = att.as_ullong();
+	}
+
+	if (!(att = node.attribute("portfolioOutputFile")).empty()) {
+		m_portfolio_output_file = simulation()->parameters().processString(att.as_string());
+		namespace fs = std::filesystem;
+		fs::path filePath(m_portfolio_output_file);
+		if (filePath.parent_path().empty()) {
+			m_portfolio_output_file = (fs::path("logs") / filePath).string();
+		}
+	}
 }
 
 void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
@@ -27,6 +42,11 @@ void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
 	if (msg->type == "EVENT_SIMULATION_START") {
 		// subscribe to trades on configured exchange
 		simulation()->dispatchMessage(currentTimestamp, currentTimestamp, name(), m_exchange, "SUBSCRIBE_EVENT_TRADE", std::make_shared<EmptyPayload>());
+		// schedule first portfolio sample
+		simulation()->dispatchMessage(currentTimestamp, m_sample_interval, name(), name(), "WAKEUP_SAMPLE_PORTFOLIOS", std::make_shared<EmptyPayload>());
+	} else if (msg->type == "WAKEUP_SAMPLE_PORTFOLIOS") {
+		samplePortfolios(currentTimestamp);
+		simulation()->dispatchMessage(currentTimestamp, m_sample_interval, name(), name(), "WAKEUP_SAMPLE_PORTFOLIOS", std::make_shared<EmptyPayload>());
 	} else if (msg->type == "EVENT_TRADE") {
 		auto pptr = std::dynamic_pointer_cast<EventTradePayload>(msg->payload);
 		const auto& trade = pptr->trade;
@@ -66,6 +86,10 @@ void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
 		simulation()->dispatchMessage(currentTimestamp, 0, name(), requester, "RESPONSE_PNL", resp);
 
 	} else if (msg->type == "EVENT_SIMULATION_STOP") {
+		// Final sample at simulation end
+		samplePortfolios(currentTimestamp);
+		// Write portfolio history CSV
+		writePortfolioCSV();
 		// Snapshot and print final per-agent stats (lazy MTM)
 		std::cout << "\n=== Final PnL summary (agent, inventory, avg_price, realized_pnl, unrealized_pnl, last_price) ===\n";
 		for (const auto& kv : m_states) {
@@ -144,19 +168,66 @@ void PnLManagerAgent::updateOnFill(const std::string& owner, const Money& fill_p
 	}
 }
 
-bool PnLManagerAgent::test_getPnLSnapshot(const std::string& owner, int& inventory, double& avg_price, double& realized_pnl, double& unrealized_pnl) const {
-	auto it = m_states.find(owner);
-	if (it == m_states.end()) return false;
-	const PnLState& s = it->second;
+void PnLManagerAgent::samplePortfolios(Timestamp t) {
+	double lastPrice = (double)m_last_trade_price;
 
-	inventory = s.inventory;
-	avg_price = s.avg_price;
-	realized_pnl = s.realized_pnl;
+	for (const auto& kv : m_states) {
+		const std::string& agent = kv.first;
+		const PnLState& s = kv.second;
 
-	double unrealized = 0.0;
-	if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != 0.0) {
-		unrealized = (static_cast<double>(m_last_trade_price) - s.avg_price) * s.inventory;
+		double unrealized = 0.0;
+		if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != 0.0) {
+			unrealized = (lastPrice - s.avg_price) * s.inventory;
+		}
+
+		double value = s.realized_pnl + unrealized;
+		m_portfolio_history[agent].push_back(value);
 	}
-	unrealized_pnl = unrealized;
-	return true;
+}
+
+void PnLManagerAgent::writePortfolioCSV() {
+	std::ofstream out(m_portfolio_output_file);
+	if (!out.is_open()) {
+		std::cerr << name() << ": Failed to open portfolio CSV: " << m_portfolio_output_file << std::endl;
+		return;
+	}
+
+	// collect and sort agent names for stable column order
+	std::vector<std::string> agents;
+	agents.reserve(m_portfolio_history.size());
+	for (const auto& kv : m_portfolio_history) {
+		agents.push_back(kv.first);
+	}
+	std::sort(agents.begin(), agents.end());
+
+	// header: time, agent1, agent2, ...
+	out << "time";
+	for (const auto& a : agents) {
+		out << "," << a;
+	}
+	out << "\n";
+
+	// one row per sample, timestamp computed from sample_interval
+	size_t max_rows = 0;
+	for (const auto& a : agents) {
+		max_rows = std::max(max_rows, m_portfolio_history[a].size());
+	}
+
+	Timestamp t = m_sample_interval;
+	for (size_t row = 0; row < max_rows; ++row) {
+		out << t;
+		for (const auto& a : agents) {
+			const auto& history = m_portfolio_history[a];
+			if (row < history.size()) {
+			out << "," << std::fixed << std::setprecision(6) << history[row];
+			} else {
+				out << ",0.000000";
+			}
+		}
+		out << "\n";
+		t += m_sample_interval;
+	}
+
+	out.close();
+	std::cout << name() << ": Portfolio history written to " << m_portfolio_output_file << std::endl;
 }

@@ -4,8 +4,17 @@ import matplotlib.pyplot as plt
 
 from ohlc import generateCandles
 
+# Volatility of the mid-price
+def volatility(logReturns, measure='absolute'):
+    if measure == 'absolute':
+        return np.std(np.abs(logReturns), ddof=0)
+    elif measure == 'squared':
+        return np.std(logReturns ** 2, ddof=0)
+    else:
+        raise ValueError("Invalid measure. Use 'absolute' or 'squared'.")
 
-def autocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
+# Autocorrelation of returns (short-term memory)
+def returnAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
     mean = np.mean(logReturns)
     centeredLogReturns = logReturns - mean
 
@@ -18,7 +27,7 @@ def autocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
         results[i+1] = gamma_k / variance
     return results
 
-
+# Excess kurtosis of returns (heavy tails)
 def heavyTails(logReturns):
     mean = np.mean(logReturns)
     standardDeviation = np.std(logReturns, ddof=0)
@@ -58,8 +67,8 @@ def plotReturnsWithNormal(logReturns, bins=20, title="Log returns vs normal"):
     plt.yscale("log")
     plt.show()
 
-
-def autocorrelationVolatility(logReturns, max_lags=30, measure='absolute'):
+# Autocorrelation of the volatility of the mid-price (volatility clustering)
+def volatilityAutocorrelation(logReturns, max_lags=30, measure='absolute'):
     # Step 1: Create volatility measure
     if measure == 'absolute':
         volatility = np.abs(logReturns)
@@ -71,14 +80,14 @@ def autocorrelationVolatility(logReturns, max_lags=30, measure='absolute'):
     centeredVolatility = volatility - mean
     
     # Step 2: Calculate lag-0 autocovariance
-    gamma_0 = np.sum(centeredVolatiliity ** 2) / n
+    gamma_0 = np.sum(centeredVolatility ** 2) / n
     
     # Step 3: Calculate ACF at each lag
     acf_vol = np.zeros(max_lags + 1)
     acf_vol[0] = 1.0
     
     for k in range(1, max_lags + 1):
-        gamma_k = np.sum(centeredVolatiliity[:-k] * centeredVolatiliity[k:]) / n
+        gamma_k = np.sum(centeredVolatility[:-k] * centeredVolatility[k:]) / n
         acf_vol[k] = gamma_k / gamma_0
     
     # Step 4: Estimate decay exponent (optional)
@@ -119,7 +128,7 @@ if __name__ == "__main__":
     logReturns = np.log(closePrices[1:] / closePrices[:-1])
 
     lagsToCalculate = [60, 300]
-    autocorrelationResults = autocorrelation(logReturns, lags=lagsToCalculate)
+    autocorrelationResults = returnAutocorrelation(logReturns, lags=lagsToCalculate)
     print("Autocorrelation Function (ACF) of Returns:")
     for i in range(len(lagsToCalculate)):
         print("Lag " + str(lagsToCalculate[i]) + ": " + str(autocorrelationResults[i + 1]))
@@ -128,3 +137,5 @@ if __name__ == "__main__":
     print("\nExcess Kurtosis of Returns: " + str(excessKurtosis))
 
     plotReturnsWithNormal(logReturns)
+
+    acf_vol, decay_exp = volatilityAutocorrelation(logReturns)

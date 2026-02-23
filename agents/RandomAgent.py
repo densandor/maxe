@@ -10,7 +10,7 @@ class RandomAgent:
         self.pTrade = float(params.get("pTrade", random.uniform(0.2, 0.4)))
 
         # RandomAgent-specific parameters
-        self.pMarketOrder = float(params.get("pMarketOrder", 0.95))
+        self.pMarketOrder = float(params.get("pMarketOrder", 0.975))
         self.volume = int(params.get("volume", 1))
 
     def receiveMessage(self, simulation, type, payload):

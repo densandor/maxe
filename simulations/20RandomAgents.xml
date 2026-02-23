@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
-<Simulation start="0" duration="20000">
+<Simulation start="0" duration="2000">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="2250" askPrice="2250"/>
-    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" fastWindowSize="1000" slowWindowSize="2000" outputFile="MarketDataLogSmall.csv"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT" exchange="MARKET" fastWindowSize="1000" slowWindowSize="2000" outputFile="MarketDataLog.csv"/>
+    <!-- <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" fastWindowSize="1000" slowWindowSize="2000" outputFile="MarketDataLogSmall.csv"/>
     <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" fastWindowSize="2000" slowWindowSize="4000" outputFile="MarketDataLogLarge.csv"/>
-    <NewsAgent name="NEWS_AGENT" exchange="MARKET" newsInterval="100" newsMean="0" newsSigma="0.1"/>
-    <!-- <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
+    <NewsAgent name="NEWS_AGENT" exchange="MARKET" newsInterval="100" newsMean="0" newsSigma="0.1"/> -->
+    <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_03" exchange="MARKET"/>
@@ -24,10 +25,10 @@
     <RandomAgent name="TRADER_RANDOM_16" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_17" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET"/>
-    <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET"/> -->
+    <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET"/>
 
     <!-- SMALL window MAO agents (75 agents with 1000/2000 windows) -->
-    <MAOAgent name="TRADER_MAO_S00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <!-- <MAOAgent name="TRADER_MAO_S00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
     <MAOAgent name="TRADER_MAO_S01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
     <MAOAgent name="TRADER_MAO_S02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
     <MAOAgent name="TRADER_MAO_S03" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
@@ -101,10 +102,10 @@
     <MAOAgent name="TRADER_MAO_S71" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
     <MAOAgent name="TRADER_MAO_S72" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
     <MAOAgent name="TRADER_MAO_S73" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
-    <MAOAgent name="TRADER_MAO_S74" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
+    <MAOAgent name="TRADER_MAO_S74" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/> -->
 
     <!-- LARGE window MAO agents (75 agents with 2000/4000 windows) -->
-    <MAOAgent name="TRADER_MAO_L00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <!-- <MAOAgent name="TRADER_MAO_L00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
     <MAOAgent name="TRADER_MAO_L01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
     <MAOAgent name="TRADER_MAO_L02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
     <MAOAgent name="TRADER_MAO_L03" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
@@ -178,7 +179,7 @@
     <MAOAgent name="TRADER_MAO_L71" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
     <MAOAgent name="TRADER_MAO_L72" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
     <MAOAgent name="TRADER_MAO_L73" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
-    <MAOAgent name="TRADER_MAO_L74" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
+    <MAOAgent name="TRADER_MAO_L74" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/> -->
 
     <!-- <MomentumAgent name="TRADER_MOMENTUM_0" exchange="MARKET" offset="1" lookback="10" threshold="0.1"/>
     <MomentumAgent name="TRADER_MOMENTUM_1" exchange="MARKET" offset="1" lookback="10" threshold="0.02"/>
@@ -187,7 +188,7 @@
     <MomentumAgent name="TRADER_MOMENTUM_4" exchange="MARKET" offset="1" lookback="100" threshold="0.05"/> -->
 
     <!-- 100 Fundamental agents -->
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_0" exchange="MARKET"/>
+    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_0" exchange="MARKET"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_1" exchange="MARKET"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_2" exchange="MARKET"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_3" exchange="MARKET"/>
@@ -286,7 +287,7 @@
     <FundamentalAgent name="TRADER_FUNDAMENTAL_96" exchange="MARKET"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_97" exchange="MARKET"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_98" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_99" exchange="MARKET"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_99" exchange="MARKET"/> -->
 
     <!-- <QLearningAgent name="TRADER_Q_LEARNING_00" class="QLearningAgent" exchange="MARKET"/> -->
 
