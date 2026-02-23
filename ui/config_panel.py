@@ -1,4 +1,5 @@
 import imgui
+from pathlib import Path
 
 
 class ConfigPanel:
@@ -6,6 +7,19 @@ class ConfigPanel:
         self.sim_manager = sim_manager
         self.chart_panel = chart_panel
         self.agent_count = 5
+        self.simulation_files = []
+        self.selected_simulation = 0
+        self._load_simulation_files()
+
+    def _load_simulation_files(self):
+        """Load list of XML files from simulations folder"""
+        simulations_dir = Path(__file__).parent.parent / "simulations"
+        if simulations_dir.exists():
+            self.simulation_files = sorted([
+                f.name for f in simulations_dir.glob("*.xml")
+            ])
+        if not self.simulation_files:
+            self.simulation_files = ["No simulations found"]
 
     def render(self):
         imgui.set_next_window_position(20, 20, imgui.FIRST_USE_EVER)
@@ -13,16 +27,23 @@ class ConfigPanel:
 
         if imgui.begin("Configuration"):
             imgui.text("Simulation Config")
-            changed, self.agent_count = imgui.slider_int("Agents", self.agent_count, 1, 20)
+
+            # Simulation file selector
+            changed, self.selected_simulation = imgui.combo(
+                "Simulation",
+                self.selected_simulation,
+                self.simulation_files
+            )
 
             sim_running = self.sim_manager.is_running()
 
-            if not sim_running and imgui.button("Start Simulation", 200, 30):
+            if not sim_running and imgui.button("Start Simulation", 320, 30):
                 self.chart_panel.clear()
-                if self.sim_manager.start_simulation("20RandomAgents.xml"):
-                    print(f"Simulation started with {self.agent_count} agents")
+                selected_file = self.simulation_files[self.selected_simulation]
+                if self.sim_manager.start_simulation(selected_file):
+                    print(f"Simulation started using {selected_file}")
 
-            if sim_running and imgui.button("Stop Simulation", 200, 30):
+            if sim_running and imgui.button("Stop Simulation", 320, 30):
                 self.sim_manager.stop_simulation()
 
             status = "Running" if sim_running else "Stopped"
