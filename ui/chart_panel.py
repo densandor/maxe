@@ -18,13 +18,15 @@ class Candle:
 class ChartPanel:
     def __init__(self, data_queue):
         self.data_queue = data_queue
-        self.ticks = []           # raw (time, price) ticks
-        self.candles = []         # aggregated Candle objects
-        self.timeframe = 60       # seconds per candle
+        self.ticks = [] # (time, price) ticks
+        self.candles = [] # aggregated Candle objects
+        self.timeframe = 60 # seconds per candle
         self._prev_timeframe = 10
         self.max_ticks = 50000
-        self.max_visible = 200    # max candles shown at once
-        self._dirty = False       # flag to re-aggregate
+        self.max_visible = 200 # max candles shown at once
+        self._dirty = False # flag to re-aggregate
+        self.chart_modes = ["Candle", "Line"]
+        self.chart_mode_idx = 0   # 0=Candle, 1=Line
 
     def clear(self):
         self.ticks.clear()
@@ -72,7 +74,7 @@ class ChartPanel:
             if len(self.ticks) > self.max_ticks:
                 self.ticks = self.ticks[-self.max_ticks:]
 
-            # --- timeframe selector + OHLC info on the same line ---
+            # --- timeframe selector + chart mode dropdown ---
             imgui.push_item_width(120)
             changed, new_tf = imgui.input_int("Timeframe (s)", self.timeframe, 1, 60)
             imgui.pop_item_width()
@@ -81,6 +83,11 @@ class ChartPanel:
                 if new_tf != self.timeframe:
                     self.timeframe = new_tf
                     self._dirty = True
+
+            imgui.same_line()
+            imgui.push_item_width(90)
+            mode_changed, self.chart_mode_idx = imgui.combo("##chartmode", self.chart_mode_idx, self.chart_modes)
+            imgui.pop_item_width()
 
             if self._dirty:
                 self._aggregate_all()
@@ -99,7 +106,10 @@ class ChartPanel:
                 imgui.text(info)
 
             if self.candles:
-                self._draw_candles(visible)
+                if self.chart_mode_idx == 0:
+                    self._draw_candles(visible)
+                else:
+                    self._draw_line(visible)
             else:
                 imgui.text("Waiting for data...")
 
@@ -157,7 +167,6 @@ class ChartPanel:
         # colours (RGBA)
         col_bull = imgui.get_color_u32_rgba(0.15, 0.75, 0.35, 1.0)
         col_bear = imgui.get_color_u32_rgba(0.85, 0.22, 0.20, 1.0)
-        col_grid = imgui.get_color_u32_rgba(0.30, 0.30, 0.30, 0.50)
         col_label = imgui.get_color_u32_rgba(0.70, 0.70, 0.70, 1.0)
         col_bg = imgui.get_color_u32_rgba(0.10, 0.10, 0.12, 1.0)
 
@@ -217,6 +226,81 @@ class ChartPanel:
         tick = first_label
         while tick <= last_tick:
             # map tick to x position via candle index (fractional)
+            frac = (tick - first_tick) / (last_tick - first_tick) if last_tick != first_tick else 0
+            x = ox + frac * chart_w
+            if ox <= x <= ox + chart_w:
+                lbl = str(tick)
+                text_w = len(lbl) * 3.5
+                draw_list.add_text(x - text_w, time_y, col_label, lbl)
+            tick += tick_step
+
+    def _draw_line(self, candles):
+        """Draw a line chart connecting the close prices of each candle."""
+        draw_list = imgui.get_window_draw_list()
+        import math
+
+        avail = imgui.get_content_region_available()
+        margin_right = 70
+        margin_bottom = 24
+        chart_w = avail.x - margin_right
+        chart_h = avail.y - 30 - margin_bottom
+        if chart_w < 50 or chart_h < 50:
+            return
+
+        origin = imgui.get_cursor_screen_position()
+        ox, oy = origin.x, origin.y
+        imgui.invisible_button("##chart_line", avail.x, avail.y - 30)
+
+        # price range
+        raw_min = min(c.low for c in candles)
+        raw_max = max(c.high for c in candles)
+        p_min = math.floor(raw_min * 0.95 / 10) * 10
+        p_max = math.ceil(raw_max * 1.05 / 10) * 10
+        p_range = p_max - p_min if p_max != p_min else 1.0
+
+        def y_of(price):
+            return oy + chart_h - ((price - p_min) / p_range) * chart_h
+
+        n = len(candles)
+        total_w = chart_w / max(n, 1)
+
+        col_label = imgui.get_color_u32_rgba(0.70, 0.70, 0.70, 1.0)
+        col_bg = imgui.get_color_u32_rgba(0.10, 0.10, 0.12, 1.0)
+        col_line = imgui.get_color_u32_rgba(0.30, 0.60, 1.00, 1.0)
+
+        draw_list.add_rect_filled(ox, oy, ox + chart_w, oy + chart_h, col_bg)
+
+        # price labels on the right
+        price_step = 5
+        first_level = int(p_min / price_step) * price_step
+        if first_level < p_min:
+            first_level += price_step
+        level = first_level
+        while level <= p_max:
+            yy = y_of(level)
+            draw_list.add_text(ox + chart_w + 6, yy - 7, col_label, f"{level:.2f}")
+            level += price_step
+
+        # line segments between close prices
+        for i in range(n - 1):
+            x1 = ox + (i + 0.5) * total_w
+            x2 = ox + (i + 1.5) * total_w
+            y1 = y_of(candles[i].close)
+            y2 = y_of(candles[i + 1].close)
+            draw_list.add_line(x1, y1, x2, y2, col_line, 2.0)
+
+        # time axis labels
+        time_y = oy + chart_h + 4
+        first_tick = int(candles[0].time_start)
+        last_tick = int(candles[-1].time_start) + self.timeframe
+        tick_span = last_tick - first_tick
+        if tick_span <= 0:
+            tick_span = 1
+        raw_step = tick_span / 5
+        tick_step = max(100, int(math.ceil(raw_step / 100) * 100))
+        first_label = int(math.ceil(first_tick / tick_step) * tick_step)
+        tick = first_label
+        while tick <= last_tick:
             frac = (tick - first_tick) / (last_tick - first_tick) if last_tick != first_tick else 0
             x = ox + frac * chart_w
             if ox <= x <= ox + chart_w:

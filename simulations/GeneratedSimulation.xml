@@ -3,11 +3,12 @@
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="2250" askPrice="2250"/>
     <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="10" standardDeviation="0.1" mean="0.0"/>
-    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLogSmall.csv" slowWindowSize="20" fastWindowSize="10"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLog.csv" slowWindowSize="20" fastWindowSize="10"/>
     <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" outputFile="MarketDataLogLarge.csv" slowWindowSize="40" fastWindowSize="20"/>
     <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
     <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
-    <PnLManagerAgent name="PNL_AGENT" exchange="MARKET"/>
+    <PnLManagerAgent name="PNL_AGENT" exchange="MARKET" outputFile="PortfolioHistory.csv"/>
+    <QLearningAgent name="TRADER_QLEARNING_00" exchange="MARKET"/>
     <MAOAgent name="TRADER_MAO_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
     <MAOAgent name="TRADER_MAO_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
     <MAOAgent name="TRADER_MAO_02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>

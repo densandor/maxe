@@ -7,6 +7,8 @@ from queue import Queue
 from simulation_manager import SimulationManager
 from config_panel import ConfigPanel
 from chart_panel import ChartPanel
+from stats_panel import StatsPanel
+from market_analysis_panel import MarketAnalysisPanel
 
 
 def main():
@@ -41,7 +43,9 @@ def main():
 
     # Panels
     chart_panel = ChartPanel(data_queue)
-    config_panel = ConfigPanel(sim_manager, chart_panel)
+    stats_panel = StatsPanel(sim_manager)
+    market_panel = MarketAnalysisPanel(sim_manager)
+    config_panel = ConfigPanel(sim_manager, chart_panel, stats_panel, market_panel)
 
     print("GUI Started")
 
@@ -56,6 +60,8 @@ def main():
 
         config_panel.render()
         chart_panel.render()
+        stats_panel.render()
+        market_panel.render()
 
         # Render
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)

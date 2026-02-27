@@ -3,16 +3,17 @@ from pathlib import Path
 
 
 class ConfigPanel:
-    def __init__(self, sim_manager, chart_panel):
+    def __init__(self, sim_manager, chart_panel, stats_panel=None, market_panel=None):
         self.sim_manager = sim_manager
         self.chart_panel = chart_panel
+        self.stats_panel = stats_panel
+        self.market_panel = market_panel
         self.agent_count = 5
         self.simulation_files = []
         self.selected_simulation = 0
         self._load_simulation_files()
 
     def _load_simulation_files(self):
-        """Load list of XML files from simulations folder"""
         simulations_dir = Path(__file__).parent.parent / "simulations"
         if simulations_dir.exists():
             self.simulation_files = sorted([
@@ -39,6 +40,10 @@ class ConfigPanel:
 
             if not sim_running and imgui.button("Start Simulation", 320, 30):
                 self.chart_panel.clear()
+                if self.stats_panel:
+                    self.stats_panel.clear()
+                if self.market_panel:
+                    self.market_panel.clear()
                 selected_file = self.simulation_files[self.selected_simulation]
                 if self.sim_manager.start_simulation(selected_file):
                     print(f"Simulation started using {selected_file}")
