@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
-<Simulation start="0" duration="2000">
+<Simulation start="0" duration="20000">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="2250" askPrice="2250"/>
-    <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="10" standardDeviation="0.1" mean="0.0"/>
-    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLog.csv" slowWindowSize="20" fastWindowSize="10"/>
-    <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" outputFile="MarketDataLogLarge.csv" slowWindowSize="40" fastWindowSize="20"/>
+    <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="100" standardDeviation="0.1" mean="0.0"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLog.csv" slowWindowSize="200" fastWindowSize="100"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" outputFile="MarketDataLogLarge.csv" slowWindowSize="400" fastWindowSize="200"/>
     <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
     <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
     <PnLManagerAgent name="PNL_AGENT" exchange="MARKET" outputFile="PortfolioHistory.csv"/>

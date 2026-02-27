@@ -16,7 +16,7 @@ class FundamentalAgent:
         self.fundamentalPrice = float(params.get("fundamentalPrice", random.uniform(20, 25))) # the price the agent believes the asset to be worth
         
         self.recentNews = None
-        self.priceUpdateSigma = float(params.get("priceUpdateSigma", 0.2)) # the standard deviation for random updates to fundamental price
+        self.priceUpdateSigma = float(params.get("priceUpdateSigma", 1)) # the standard deviation for random updates to fundamental price
 
         self.marketOrderThreshold = float(params.get("marketOrderThreshold", random.uniform(0.005, 0.25))) # the minimum mispricing required to place a market order - random.uniform(0.005, 0.25)
         self.opinionThreshold = float(params.get("opinionThreshold", random.uniform(0.01, 0.1))) # the minimum mispricing required to place any order (market or limit) - random.uniform(0.01, 0.1)

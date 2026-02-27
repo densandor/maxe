@@ -25,6 +25,10 @@ class MarketAnalysisPanel:
         self.log_returns = None
         self.timeframe = 60  # seconds per candle
 
+        # Histogram controls
+        self.use_log_axis = False
+        self.num_bins = 30
+
     def clear(self):
         """Clear analysis data."""
         self.has_data = False
@@ -170,7 +174,7 @@ class MarketAnalysisPanel:
             self.vol_decay_exp = self._volatility_clustering(log_returns)
             
             # Compute histogram
-            self.hist_bins, self.hist_counts = self._compute_histogram(log_returns)
+            self.hist_bins, self.hist_counts = self._compute_histogram(log_returns, self.num_bins)
             
             self.has_data = True
             print(f"Market analysis complete: {len(log_returns)} returns analyzed")
@@ -187,17 +191,21 @@ class MarketAnalysisPanel:
         
         draw_list = imgui.get_window_draw_list()
         
-        # Chart dimensions
-        chart_w = 500
-        chart_h = 250
-        margin = 40
+        # Chart dimensions – sized to fit the right-hand child panel
+        chart_w = 530
+        chart_h = 220
+        pad_left = 40
+        pad_top = 5
+        pad_bottom = 20
         
         origin = imgui.get_cursor_screen_position()
-        ox, oy = origin.x, origin.y
+        ox, oy = origin.x + pad_left, origin.y + pad_top
         
-        imgui.invisible_button("##histogram", chart_w + margin * 2, chart_h + margin)
+        total_w = chart_w + pad_left + 10
+        total_h = chart_h + pad_top + pad_bottom
+        imgui.invisible_button("##histogram", total_w, total_h)
         
-        # Background
+        # Colours
         col_bg = imgui.get_color_u32_rgba(0.10, 0.10, 0.12, 1.0)
         col_hist = imgui.get_color_u32_rgba(0.85, 0.22, 0.20, 0.7)
         col_normal = imgui.get_color_u32_rgba(0.30, 0.60, 1.00, 1.0)
@@ -207,7 +215,13 @@ class MarketAnalysisPanel:
         
         # Scales
         x_min, x_max = self.hist_bins.min(), self.hist_bins.max()
-        y_max = self.hist_counts.max() * 1.1
+        counts = self.hist_counts.copy()
+        
+        use_log = self.use_log_axis
+        if use_log:
+            counts = np.where(counts > 0, np.log10(counts), 0)
+        
+        y_max = counts.max() * 1.1
         
         if x_max == x_min or y_max == 0:
             return
@@ -220,7 +234,7 @@ class MarketAnalysisPanel:
         
         # Draw histogram bars
         bar_width = chart_w / len(self.hist_bins)
-        for i, (bin_center, count) in enumerate(zip(self.hist_bins, self.hist_counts)):
+        for i, (bin_center, count) in enumerate(zip(self.hist_bins, counts)):
             x = x_of(bin_center)
             y = y_of(count)
             draw_list.add_rect_filled(
@@ -235,6 +249,8 @@ class MarketAnalysisPanel:
         
         x_range = np.linspace(x_min, x_max, 100)
         norm_pdf = (1.0 / (np.sqrt(2 * np.pi) * std)) * np.exp(-0.5 * ((x_range - mean) / std) ** 2)
+        if use_log:
+            norm_pdf = np.where(norm_pdf > 0, np.log10(norm_pdf), 0)
         
         for i in range(len(x_range) - 1):
             x1 = x_of(x_range[i])
@@ -243,13 +259,14 @@ class MarketAnalysisPanel:
             y2 = y_of(norm_pdf[i + 1])
             draw_list.add_line(x1, y1, x2, y2, col_normal, 2.0)
         
-        # Labels
-        draw_list.add_text(ox + chart_w/2 - 50, oy + chart_h + 5, col_label, "Log Returns")
-        draw_list.add_text(ox + 5, oy - 15, col_label, "Distribution")
+        # Axis labels
+        draw_list.add_text(ox + chart_w/2 - 30, oy + chart_h + 2, col_label, "Log Returns")
+        y_label = "log10(density)" if use_log else "Density"
+        draw_list.add_text(ox - 35, oy + chart_h / 2 - 5, col_label, y_label)
 
     def render(self):
         imgui.set_next_window_position(0, 730, imgui.ONCE)
-        imgui.set_next_window_size(320, 330, imgui.ONCE)
+        imgui.set_next_window_size(960, 360, imgui.ONCE)
 
         if imgui.begin("Market Analysis"):
             # Check if simulation just stopped
@@ -259,25 +276,49 @@ class MarketAnalysisPanel:
             self._prev_running = is_running
 
             if not self.has_data:
-                imgui.text("Run a simulation to see")
-                imgui.text("market stylised facts.")
+                imgui.text("Run a simulation to see market stylised facts.")
             else:
+                # ---------- LEFT COLUMN: stats ----------
+                imgui.begin_child("##stats_col", width=310, height=0, border=True)
                 imgui.text("Stylised Facts Summary")
                 imgui.separator()
-                
-                # Metrics table
+
                 imgui.text(f"Volatility (abs):  {self.volatility_abs:.6f}")
                 imgui.text(f"Volatility (sq):   {self.volatility_sq:.6f}")
                 imgui.text(f"Excess Kurtosis:   {self.excess_kurtosis:.4f}")
                 imgui.text(f"Vol. Decay Exp:    {self.vol_decay_exp:.4f}")
-                
+
                 imgui.separator()
                 imgui.text("Return ACF:")
                 for lag, acf in zip(self.acf_lags, self.acf_values):
                     imgui.text(f"  Lag {lag:>3d}:  {acf:>8.6f}")
-                
+                imgui.end_child()
+
+                # ---------- RIGHT COLUMN: histogram ----------
+                imgui.same_line()
+                imgui.begin_child("##hist_col", width=0, height=0, border=True)
+
+                imgui.text("Return Distribution")
                 imgui.separator()
-                imgui.text("Return Distribution:")
+
+                # Controls row
+                changed_log, self.use_log_axis = imgui.checkbox("Log axis", self.use_log_axis)
+                imgui.same_line(spacing=20)
+                imgui.push_item_width(100)
+                changed_bins, self.num_bins = imgui.input_int("Bins", self.num_bins, step=5)
+                imgui.pop_item_width()
+                if self.num_bins < 5:
+                    self.num_bins = 5
+                if self.num_bins > 500:
+                    self.num_bins = 500
+
+                # Recompute histogram when controls change
+                if changed_log or changed_bins:
+                    self.hist_bins, self.hist_counts = self._compute_histogram(
+                        self.log_returns, self.num_bins
+                    )
+
                 self._draw_histogram()
+                imgui.end_child()
 
             imgui.end()
