@@ -1,7 +1,18 @@
 import imgui
 import numpy as np
 import pandas as pd
+import sys
 from pathlib import Path
+
+# Add project root to path for script imports
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.candles import generateCandles
+from scripts.stylisedFacts import (
+    volatility,
+    returnAutocorrelation,
+    volatilityAutocorrelation,
+    heavyTails
+)
 
 
 class MarketAnalysisPanel:
@@ -15,9 +26,9 @@ class MarketAnalysisPanel:
         self.volatility_abs = 0.0
         self.volatility_sq = 0.0
         self.acf_lags = [1, 10, 60, 300]
-        self.acf_values = []
+        self.ret_acf_values = []
+        self.vol_acf_values = []
         self.excess_kurtosis = 0.0
-        self.vol_decay_exp = 0.0
         
         # Histogram data
         self.hist_bins = []
@@ -32,103 +43,11 @@ class MarketAnalysisPanel:
     def clear(self):
         """Clear analysis data."""
         self.has_data = False
-        self.acf_values = []
+        self.ret_acf_values = []
+        self.vol_acf_values = []
         self.hist_bins = []
         self.hist_counts = []
         self.log_returns = None
-
-    def _generate_candles(self, trade_log_path, timeframe_seconds):
-        """Generate OHLC candles from trade log."""
-        df = pd.read_csv(trade_log_path)
-        
-        if 'time' not in df.columns or 'price' not in df.columns:
-            print("Trade log missing 'time' or 'price' columns")
-            return None
-            
-        df = df.sort_values('time')
-        df['bucket'] = (df['time'] // timeframe_seconds) * timeframe_seconds
-        
-        ohlc = df.groupby('bucket').agg(
-            open=('price', 'first'),
-            high=('price', 'max'),
-            low=('price', 'min'),
-            close=('price', 'last')
-        ).reset_index()
-        
-        return ohlc
-
-    def _calculate_volatility(self, log_returns, measure='absolute'):
-        """Calculate volatility of log returns."""
-        if measure == 'absolute':
-            return np.std(np.abs(log_returns), ddof=0)
-        else:  # squared
-            return np.std(log_returns ** 2, ddof=0)
-
-    def _return_autocorrelation(self, log_returns, lags):
-        """Calculate autocorrelation of returns at given lags."""
-        mean = np.mean(log_returns)
-        centered = log_returns - mean
-        variance = np.sum(centered ** 2)
-        
-        results = []
-        for lag in lags:
-            if lag >= len(log_returns):
-                results.append(0.0)
-                continue
-            gamma_k = np.sum(centered[:-lag] * centered[lag:])
-            results.append(gamma_k / variance)
-        return results
-
-    def _excess_kurtosis(self, log_returns):
-        """Calculate excess kurtosis (heavy tails)."""
-        mean = np.mean(log_returns)
-        std = np.std(log_returns, ddof=0)
-        if std == 0:
-            return 0.0
-        z = (log_returns - mean) / std
-        fourth_moment = np.mean(z ** 4)
-        return fourth_moment - 3.0
-
-    def _volatility_clustering(self, log_returns, max_lags=30, measure='absolute'):
-        """Calculate volatility autocorrelation and decay exponent."""
-        if measure == 'absolute':
-            vol = np.abs(log_returns)
-        else:
-            vol = log_returns ** 2
-        
-        n = len(vol)
-        mean = np.mean(vol)
-        centered = vol - mean
-        gamma_0 = np.sum(centered ** 2) / n
-        
-        acf_vol = np.zeros(max_lags + 1)
-        acf_vol[0] = 1.0
-        
-        for k in range(1, max_lags + 1):
-            gamma_k = np.sum(centered[:-k] * centered[k:]) / n
-            acf_vol[k] = gamma_k / gamma_0
-        
-        # Estimate decay exponent
-        lags_for_fit = np.arange(2, min(15, max_lags))
-        acf_for_fit = acf_vol[lags_for_fit]
-        
-        decay_exp = 0.0
-        if np.sum(acf_for_fit > 0.01) > 3:
-            valid_mask = acf_for_fit > 0.01
-            lags_valid = lags_for_fit[valid_mask]
-            acf_valid = acf_for_fit[valid_mask]
-            
-            log_lags = np.log(lags_valid)
-            log_acf = np.log(acf_valid)
-            
-            n_pts = len(log_lags)
-            numerator = n_pts * np.sum(log_lags * log_acf) - np.sum(log_lags) * np.sum(log_acf)
-            denominator = n_pts * np.sum(log_lags**2) - np.sum(log_lags)**2
-            if denominator != 0:
-                slope = numerator / denominator
-                decay_exp = -slope
-        
-        return decay_exp
 
     def _compute_histogram(self, log_returns, num_bins=30):
         """Compute histogram bins and counts."""
@@ -148,8 +67,8 @@ class MarketAnalysisPanel:
             return
 
         try:
-            # Generate candles
-            ohlc = self._generate_candles(self.trade_log_path, self.timeframe)
+            # Generate candles using shared function
+            ohlc = generateCandles(str(self.trade_log_path), self.timeframe)
             if ohlc is None or len(ohlc) < 2:
                 print("Insufficient candle data")
                 return
@@ -166,12 +85,19 @@ class MarketAnalysisPanel:
             
             self.log_returns = log_returns
             
-            # Calculate metrics
-            self.volatility_abs = self._calculate_volatility(log_returns, 'absolute')
-            self.volatility_sq = self._calculate_volatility(log_returns, 'squared')
-            self.acf_values = self._return_autocorrelation(log_returns, self.acf_lags)
-            self.excess_kurtosis = self._excess_kurtosis(log_returns)
-            self.vol_decay_exp = self._volatility_clustering(log_returns)
+            # Calculate metrics using shared functions from stylisedFacts
+            vol_abs = volatility(log_returns, measure="absolute")
+            vol_sq = volatility(log_returns, measure="squared")
+            self.volatility_abs = np.mean(vol_abs)
+            self.volatility_sq = np.mean(vol_sq)
+            
+            acf_results = returnAutocorrelation(log_returns, lags=self.acf_lags)
+            self.ret_acf_values = list(acf_results[1:])  # skip lag-0
+            
+            vol_acf_results = volatilityAutocorrelation(log_returns, lags=self.acf_lags, measure="absolute")
+            self.vol_acf_values = list(vol_acf_results[1:])  # skip lag-0
+            
+            self.excess_kurtosis = heavyTails(log_returns)
             
             # Compute histogram
             self.hist_bins, self.hist_counts = self._compute_histogram(log_returns, self.num_bins)
@@ -205,7 +131,7 @@ class MarketAnalysisPanel:
         total_h = chart_h + pad_top + pad_bottom
         imgui.invisible_button("##histogram", total_w, total_h)
         
-        # Colours
+        # Background
         col_bg = imgui.get_color_u32_rgba(0.10, 0.10, 0.12, 1.0)
         col_hist = imgui.get_color_u32_rgba(0.85, 0.22, 0.20, 0.7)
         col_normal = imgui.get_color_u32_rgba(0.30, 0.60, 1.00, 1.0)
@@ -286,11 +212,14 @@ class MarketAnalysisPanel:
                 imgui.text(f"Volatility (abs):  {self.volatility_abs:.6f}")
                 imgui.text(f"Volatility (sq):   {self.volatility_sq:.6f}")
                 imgui.text(f"Excess Kurtosis:   {self.excess_kurtosis:.4f}")
-                imgui.text(f"Vol. Decay Exp:    {self.vol_decay_exp:.4f}")
 
                 imgui.separator()
                 imgui.text("Return ACF:")
-                for lag, acf in zip(self.acf_lags, self.acf_values):
+                for lag, acf in zip(self.acf_lags, self.ret_acf_values):
+                    imgui.text(f"  Lag {lag:>3d}:  {acf:>8.6f}")
+                imgui.separator()
+                imgui.text("Volatility ACF:")
+                for lag, acf in zip(self.acf_lags, self.vol_acf_values):
                     imgui.text(f"  Lag {lag:>3d}:  {acf:>8.6f}")
                 imgui.end_child()
 

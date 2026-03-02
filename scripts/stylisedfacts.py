@@ -27,11 +27,11 @@ def returnAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
 
 # Autocorrelation of the volatility of the mid-price (volatility clustering)
 def volatilityAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900], measure="absolute"):
-    volatility = volatility(logReturns, measure=measure)
+    vol = volatility(logReturns, measure=measure)
     
-    n = len(volatility)
-    mean = np.mean(volatility)
-    centeredVolatility = volatility - mean
+    n = len(vol)
+    mean = np.mean(vol)
+    centeredVolatility = vol - mean
     
     # Calculate lag-0 autocovariance
     gamma_0 = np.sum(centeredVolatility ** 2) / n
@@ -88,8 +88,8 @@ if __name__ == "__main__":
     closePrices = ohlc["close"].values
     logReturns = np.log(closePrices[1:] / closePrices[:-1])
 
-    volatility = volatility(logReturns)
-    print("Mean Volatility of Returns: " + str(volatility))
+    vol = volatility(logReturns)
+    print("Mean Volatility of Returns: " + str(np.mean(vol)))
 
     lagsToCalculate = [60, 300]
 

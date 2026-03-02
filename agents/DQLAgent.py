@@ -25,11 +25,11 @@ class DQLAgent:
         self.alpha = float(params.get("alpha", 0.1))
         self.gamma = float(params.get("gamma", 0.99))
         self.epsilon = float(params.get("epsilon", 1.0))
-        self.minEpsilon = float(params.get("minEpsilon", 0.01))
+        self.minEpsilon = float(params.get("minEpsilon", 0.1))
         self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
-        self.batchSize = int(params.get("batchSize", 6))
-        self.memoryCapacity = int(params.get("memoryCapacity", 60))
-        self.targetNetworkUpdateFrequency = int(params.get("targetNetworkUpdateFrequency", 10))
+        self.batchSize = int(params.get("batchSize", 50))
+        self.memoryCapacity = int(params.get("memoryCapacity", 10000))
+        self.targetNetworkUpdateFrequency = int(params.get("targetNetworkUpdateFrequency", 100))
         
         # State features
         self.position = 0 # Feature 1: Current position (-1, 0, 1)
@@ -54,7 +54,7 @@ class DQLAgent:
         
         # Initialise optimiser and loss
         self.optimiser = optim.Adam(self.qNetwork.parameters(), lr=self.alpha)
-        self.lossFunction = nn.MSELoss()
+        self.lossFunction = nn.SmoothL1Loss(beta=1.0)
         self.losses = []
         
         # Initialise replay buffer

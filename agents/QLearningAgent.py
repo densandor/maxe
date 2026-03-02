@@ -13,7 +13,7 @@ class QLearningAgent:
         self.pnlAgent = str(params.get("pnlAgent", "PNL_AGENT")) # PnL manager agent name for checking inventory
         
         # Q-learning parameters
-        self.alpha = float(params.get("alpha", 0.1)) # learning rate
+        self.alpha = float(params.get("alpha", 0.05)) # learning rate
         self.gamma = float(params.get("gamma", 0.99)) # discount factor
         self.epsilon = float(params.get("epsilon", 1)) # exploration rate
         self.minEpsilon = float(params.get("minEpsilon", 0.01))

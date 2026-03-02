@@ -2,7 +2,7 @@
 <Simulation start="0" duration="27000">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="2250" askPrice="2250"/>
-    <!-- <NewsAgent name="NEWS_AGENT" offset="1" interval="1" mean="0.0" standardDeviation="0.1"/> -->
+    <MarketDataAgent name="MARKET_DATA_AGENT" exchange="MARKET" fastWindowSize="1000" slowWindowSize="2000" outputFile="MarketDataLog.csv"/>
     <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET"/>

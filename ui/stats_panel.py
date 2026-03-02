@@ -1,7 +1,12 @@
 import imgui
 import numpy as np
 import pandas as pd
+import sys
 from pathlib import Path
+
+# Add project root to path for script imports
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.performanceMetrics import agentPerformanceMetrics
 
 
 class StatsPanel:
@@ -19,45 +24,6 @@ class StatsPanel:
         self.stats_data = []
         self.has_data = False
 
-    def _calculate_metrics(self, portfolio_series):
-        """Calculate performance metrics for each agent."""
-        results = []
-        for agent_id, V_t in portfolio_series.items():
-            if len(V_t) < 2:
-                continue
-            
-            # Per-period returns
-            r_t = np.diff(V_t) / V_t[:-1]
-            
-            # Filter out invalid returns
-            r_t = r_t[np.isfinite(r_t)]
-            if len(r_t) == 0:
-                continue
-
-            # Final total return
-            final_portfolio_value = V_t[-1]
-            
-            # Volatility
-            vol = np.std(r_t, ddof=1) if len(r_t) > 1 else 0.0
-            
-            # Max drawdown
-            running_peak = np.maximum.accumulate(V_t)
-            drawdowns = (V_t - running_peak) / running_peak
-            max_dd = np.min(drawdowns)
-            
-            # Sharpe (assuming rf=0)
-            sharpe = np.mean(r_t) / np.std(r_t) if np.std(r_t) > 0 else 0.0
-
-            results.append({
-                "agent": agent_id,
-                "final_value": final_portfolio_value,
-                "volatility": vol,
-                "max_dd": max_dd,
-                "sharpe": sharpe,
-            })
-        
-        return results
-
     def _load_and_calculate(self):
         """Load portfolio history and calculate metrics."""
         if not self.csv_path.exists():
@@ -71,7 +37,16 @@ class StatsPanel:
                 for col in df.columns 
                 if col.lower() != "time" and col.lower() != "setup_agent"
             }
-            self.stats_data = self._calculate_metrics(portfolio_series)
+            results_df = agentPerformanceMetrics(portfolio_series)
+            self.stats_data = []
+            for _, row in results_df.iterrows():
+                self.stats_data.append({
+                    "agent": row["agent_name"],
+                    "final_value": row["final_portfolio_value"],
+                    "volatility": row["volatility"],
+                    "max_dd": row["max_drawdown"],
+                    "sharpe": row["sharpe_ratio"],
+                })
             self.has_data = True
             self._sort_data()
             print(f"Loaded stats for {len(self.stats_data)} agents")
@@ -88,8 +63,8 @@ class StatsPanel:
         self.stats_data.sort(key=lambda x: x[key], reverse=not self.sort_ascending)
 
     def render(self):
-        imgui.set_next_window_position(320, 730, imgui.ONCE)
-        imgui.set_next_window_size(1280, 330, imgui.ONCE)
+        imgui.set_next_window_position(960, 720, imgui.ONCE)
+        imgui.set_next_window_size(960, 360, imgui.ONCE)
 
         if imgui.begin("Performance Statistics"):
             # Check if simulation just stopped

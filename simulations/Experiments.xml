@@ -1,14 +1,32 @@
 <?xml version="1.0" ?>
-<Simulation start="0" duration="20000">
+<Simulation start="0" duration="2000">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="2250" askPrice="2250"/>
-    <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="20" standardDeviation="0.1" mean="0.0"/>
-    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLog.csv" slowWindowSize="200" fastWindowSize="100"/>
-    <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" outputFile="MarketDataLogLarge.csv" slowWindowSize="400" fastWindowSize="200"/>
-    <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
-    <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
-    <PnLManagerAgent name="PNL_AGENT" exchange="MARKET" outputFile="PortfolioHistory.csv"/>
-    <!-- <QLearningAgent name="TRADER_QLEARNING_00" exchange="MARKET"/> -->
+    <MarketDataAgent name="MARKET_DATA_AGENT" exchange="MARKET" fastWindowSize="1000" slowWindowSize="2000" outputFile="MarketDataLog.csv"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" fastWindowSize="10" slowWindowSize="20" outputFile="MarketDataLogSmall.csv"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" fastWindowSize="20" slowWindowSize="40" outputFile="MarketDataLogLarge.csv"/>
+
+    <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_03" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_04" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_05" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_06" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_07" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_08" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_09" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_10" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_11" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_12" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_13" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_14" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_15" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_16" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_17" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET"/>
+
     <MAOAgent name="TRADER_MAO_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
     <MAOAgent name="TRADER_MAO_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
     <MAOAgent name="TRADER_MAO_02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL"/>
@@ -159,104 +177,13 @@
     <MAOAgent name="TRADER_MAO_147" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
     <MAOAgent name="TRADER_MAO_148" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
     <MAOAgent name="TRADER_MAO_149" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_00" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_01" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_02" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_03" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_04" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_05" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_06" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_07" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_08" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_09" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_10" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_11" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_12" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_13" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_14" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_15" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_16" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_17" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_18" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_19" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_20" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_21" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_22" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_23" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_24" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_25" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_26" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_27" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_28" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_29" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_30" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_31" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_32" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_33" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_34" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_35" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_36" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_37" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_38" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_39" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_40" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_41" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_42" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_43" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_44" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_45" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_46" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_47" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_48" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_49" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_50" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_51" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_52" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_53" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_54" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_55" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_56" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_57" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_58" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_59" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_60" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_61" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_62" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_63" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_64" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_65" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_66" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_67" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_68" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_69" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_70" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_71" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_72" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_73" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_74" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_75" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_76" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_77" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_78" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_79" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_80" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_81" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_82" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_83" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_84" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_85" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_86" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_87" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_88" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_89" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_90" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_91" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_92" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_93" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_94" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_95" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_96" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_97" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_98" exchange="MARKET"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_99" exchange="MARKET"/>
+
+    <!-- <QLearningAgent name="TRADER_Q_LEARNING_00" class="QLearningAgent" exchange="MARKET"/> -->
+
+    <!-- <DQLAgent name="TRADER_DQL_00" class="DQLAgent" exchange="MARKET" offset="1" alpha="0.001" gamma="0.99" epsilon="1.0" epsilonMin="0.01" epsilonDecay="0.995" batchSize="32" memorySize="10000" targetUpdateFrequency="1000"/> -->
+
+    <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
+    <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
+    <!-- <OrderLogAgent name="ORDER_LOGGER" exchange="MARKET"/> -->
+    <PnLManagerAgent name="PNL_AGENT" exchange="MARKET" outputFile="PortfolioHistory.csv"/>
 </Simulation>

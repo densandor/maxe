@@ -13,14 +13,14 @@ class FundamentalAgent:
 
         # FundamentalAgent-specific parameters
         self.newsAgent = str(params.get("newsAgent", "NEWS_AGENT")) # News agent
-        self.fundamentalPrice = float(params.get("fundamentalPrice", random.uniform(20, 25))) # the price the agent believes the asset to be worth
+        self.fundamentalPrice = float(params.get("fundamentalPrice", random.uniform(90, 110))) # the price the agent believes the asset to be worth
         
         self.recentNews = None
         self.priceUpdateSigma = float(params.get("priceUpdateSigma", 1)) # the standard deviation for random updates to fundamental price
 
         self.marketOrderThreshold = float(params.get("marketOrderThreshold", random.uniform(0.005, 0.25))) # the minimum mispricing required to place a market order - random.uniform(0.005, 0.25)
         self.opinionThreshold = float(params.get("opinionThreshold", random.uniform(0.01, 0.1))) # the minimum mispricing required to place any order (market or limit) - random.uniform(0.01, 0.1)
-        self.limitOrderLambda = float(params.get("limitOrderLambda", 3)) # the lambda parameter for the exponential distribution used to determine limit order prices
+        self.limitOrderLambda = float(params.get("limitOrderLambda", 5)) # the lambda parameter for the exponential distribution used to determine limit order prices
 
     # Fundamental price update
     def _update_fundamentalPrice(self):
@@ -71,13 +71,13 @@ class FundamentalAgent:
             plannedPrice = Money(max(round(plannedPrice, 2), 0.01))
 
             if bestAsk > 0 and currentFundamentalPrice > bestAsk * (1 + self.marketOrderThreshold):
-                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Buy, 1))
-                # plannedPrice = Money(round(bestAsk * (1 + self.marketOrderThreshold) * 1.05, 2))
-                # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Buy, 1, plannedPrice))
+                # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Buy, 1))
+                plannedPrice = Money(round(bestAsk * (1 + self.marketOrderThreshold) * np_random.uniform(1,1.05), 2))
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Buy, 1, plannedPrice))
             elif bestBid > 0 and currentFundamentalPrice < bestBid * (1 - self.marketOrderThreshold):
-                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Sell, 1))
-                # plannedPrice = Money(round(bestBid * (1 - self.marketOrderThreshold) * 0.95, 2))
-                # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Sell, 1, plannedPrice))
+                # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Sell, 1))
+                plannedPrice = Money(round(bestBid * (1 - self.marketOrderThreshold) * np_random.uniform(0.95,1), 2))
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Sell, 1, plannedPrice))
             elif bestAsk > 0 and currentFundamentalPrice > bestAsk:
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Buy, 1, plannedPrice))
             elif bestBid > 0 and currentFundamentalPrice < bestBid:

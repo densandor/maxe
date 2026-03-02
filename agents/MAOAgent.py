@@ -14,7 +14,7 @@ class MAOAgent:
         self.pnlAgent = str(params.get("pnlAgent", "PNL_AGENT"))
         self.marketDataAgent = str(params.get("marketDataAgent", "MARKET_DATA_AGENT")) # Market data agent name for checking moving average signals
 
-        self.profitFactor = float(params.get("profitFactor", 0.01)) # factor for taking profits random.uniform(0.01, 0.2)
+        self.profitFactor = float(params.get("profitFactor", random.uniform(0.01, 0.2))) # factor for taking profits random.uniform(0.01, 0.2)
         self.waitTime = int(params.get("waitTime", random.uniform(0, 50))) # time to wait before acting on a moving average signal, in number of simulation steps random.uniform(0, 50)
 
         self.lastTradePrice = None
@@ -62,18 +62,12 @@ class MAOAgent:
         
         if type == "MOVING_AVERAGE_SIGNAL":
             direction = payload.direction
+            simulation.dispatchMessage(currentTimestamp, self.waitTime, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, 1))
+
             # if direction == OrderDirection.Buy:
             #     plannedPrice = float(payload.price.toCentString()) * 1.05
             # else:
             #     plannedPrice = float(payload.price.toCentString()) * 0.95
-            simulation.dispatchMessage(currentTimestamp, self.waitTime, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, 1))
             # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, 1, Money(round(plannedPrice, 2))))
+            
             return
-        
-        # if type == "RESPONSE_PLACE_ORDER_LIMIT":
-        #     orderID = payload.id
-        #     simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "SUBSCRIBE_EVENT_ORDER_TRADE", SubscribeEventTradeByOrderPayload(orderID))
-        #     return
-
-        # if type == "EVENT_TRADE":
-        #     return
