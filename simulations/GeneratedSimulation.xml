@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <Simulation start="0" duration="20000">
     <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
-    <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="2250" askPrice="2250"/>
+    <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000"/>
     <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="20" standardDeviation="0.1" mean="0.0"/>
     <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLog.csv" slowWindowSize="200" fastWindowSize="100"/>
     <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" outputFile="MarketDataLogLarge.csv" slowWindowSize="400" fastWindowSize="200"/>

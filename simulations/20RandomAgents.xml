@@ -30,7 +30,7 @@
     <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET"/>
 
-    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_00" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_00" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_01" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_02" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_03" exchange="MARKET" newsAgent="NEWS_AGENT"/>
@@ -49,7 +49,7 @@
     <FundamentalAgent name="TRADER_FUNDAMENTAL_16" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_17" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_18" exchange="MARKET" newsAgent="NEWS_AGENT"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_19" exchange="MARKET" newsAgent="NEWS_AGENT"/> -->
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_19" exchange="MARKET" newsAgent="NEWS_AGENT"/>
 
     <MAOAgent name="TRADER_MAO_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
     <MAOAgent name="TRADER_MAO_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>

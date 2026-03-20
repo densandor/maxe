@@ -8,6 +8,8 @@
 #include "SetupAgent.h"
 #include "PythonAgent.h"
 #include "MarketDataAgent.h"
+#include "FundamentalAgent.h"
+#include "MAOAgent.h"
 #include "NewsAgent.h"
 
 #include <algorithm>
@@ -167,6 +169,14 @@ void Simulation::setupChildConfiguration(const pugi::xml_node& node, const std::
 			m_agentList.push_back(std::move(eaptr));
 		} else if (nodeName == "PnLManagerAgent") {
 			auto eaptr = std::make_unique<PnLManagerAgent>(this);
+			eaptr->configure(*nit, configurationPath);
+			m_agentList.push_back(std::move(eaptr));
+		} else if (nodeName == "FundamentalAgent") {
+			auto eaptr = std::make_unique<FundamentalAgent>(this);
+			eaptr->configure(*nit, configurationPath);
+			m_agentList.push_back(std::move(eaptr));
+		} else if (nodeName == "MAOAgent") {
+			auto eaptr = std::make_unique<MAOAgent>(this);
 			eaptr->configure(*nit, configurationPath);
 			m_agentList.push_back(std::move(eaptr));
 		} else if (nodeName == "NewsAgent") {
