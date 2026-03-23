@@ -191,8 +191,8 @@ class MarketAnalysisPanel:
         draw_list.add_text(ox - 35, oy + chart_h / 2 - 5, col_label, y_label)
 
     def render(self):
-        imgui.set_next_window_position(0, 730, imgui.ONCE)
-        imgui.set_next_window_size(960, 360, imgui.ONCE)
+        imgui.set_next_window_position(0, 720, imgui.ALWAYS)
+        imgui.set_next_window_size(960, 360, imgui.ALWAYS)
 
         if imgui.begin("Market Analysis"):
             # Check if simulation just stopped

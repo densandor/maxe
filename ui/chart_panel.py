@@ -20,7 +20,7 @@ class ChartPanel:
         self.data_queue = data_queue
         self.ticks = [] # (time, price) ticks
         self.candles = [] # aggregated Candle objects
-        self.timeframe = 60 # seconds per candle
+        self.timeframe = 100 # seconds per candle
         self._prev_timeframe = 10
         self.max_ticks = 50000
         self.max_visible = 200 # max candles shown at once
@@ -57,8 +57,8 @@ class ChartPanel:
             self.candles[-1].update(price)
 
     def render(self):
-        imgui.set_next_window_position(320, 0, imgui.ONCE)
-        imgui.set_next_window_size(1280, 720, imgui.ONCE)
+        imgui.set_next_window_position(320, 0, imgui.ALWAYS)
+        imgui.set_next_window_size(1280, 720, imgui.ALWAYS)
 
         if imgui.begin("Price Chart"):
             while not self.data_queue.empty():
@@ -76,7 +76,7 @@ class ChartPanel:
 
             # --- timeframe selector + chart mode dropdown ---
             imgui.push_item_width(120)
-            changed, new_tf = imgui.input_int("Timeframe (s)", self.timeframe, 1, 60)
+            changed, new_tf = imgui.input_int("Timeframe (simulation steps)", self.timeframe, 1, 60)
             imgui.pop_item_width()
             if changed:
                 new_tf = max(1, new_tf)
@@ -86,7 +86,7 @@ class ChartPanel:
 
             imgui.same_line()
             imgui.push_item_width(90)
-            mode_changed, self.chart_mode_idx = imgui.combo("##chartmode", self.chart_mode_idx, self.chart_modes)
+            mode_changed, self.chart_mode_idx = imgui.combo("Chart Mode", self.chart_mode_idx, self.chart_modes)
             imgui.pop_item_width()
 
             if self._dirty:
@@ -99,7 +99,7 @@ class ChartPanel:
                 c = visible[-1]
                 # fixed-width fields to prevent layout shifts when digits change
                 info = f"Time Step: {len(self.ticks):>8d} | Current Price: {c.close:>10.2f}"
-                margin_right = 70  # must match _draw_candles margin_right
+                margin_right = 77  # must match _draw_candles margin_right
                 right_edge = imgui.get_window_width() - margin_right
                 text_w = imgui.calc_text_size(info).x
                 imgui.same_line(right_edge - text_w)
@@ -111,24 +111,13 @@ class ChartPanel:
                 else:
                     self._draw_line(visible)
             else:
-                imgui.text("Waiting for data...")
+                imgui.text("Run a simulation to see the chart.")
 
             imgui.end()
 
     # ------------------------------------------------------------------
     # Candlestick drawing
     # ------------------------------------------------------------------
-
-    def _format_time(self, seconds):
-        """Format seconds into a readable time string."""
-        s = int(seconds)
-        if s < 60:
-            return f"{s}s"
-        m, s = divmod(s, 60)
-        if m < 60:
-            return f"{m}m{s:02d}s" if s else f"{m}m"
-        h, m = divmod(m, 60)
-        return f"{h}h{m:02d}m" if m else f"{h}h"
 
     def _draw_candles(self, candles):
         draw_list = imgui.get_window_draw_list()

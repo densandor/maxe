@@ -116,16 +116,16 @@ void Simulation::step(Timestamp step) {
 		m_messageQueue->pop(); // ordering intentional
 		deliverMessage(topMessage);
 
-		if (m_durationTimestamp > 0) {
-			double progress = (double)(m_currentTimestamp - m_startTimestamp) / m_durationTimestamp;
-			progress = std::min(1.0, std::max(0.0, progress));
-			int percent = (int)(progress * 100);
-			if (percent >= m_lastProgressPercent + 5) {
-				m_lastProgressPercent = (percent / 5) * 5;
-				printf("\r[%d%%]   ", m_lastProgressPercent);
-				fflush(stdout);
-			}
-		}
+		// if (m_durationTimestamp > 0) {
+		// 	double progress = (double)(m_currentTimestamp - m_startTimestamp) / m_durationTimestamp;
+		// 	progress = std::min(1.0, std::max(0.0, progress));
+		// 	int percent = (int)(progress * 100);
+		// 	if (percent >= m_lastProgressPercent + 5) {
+		// 		m_lastProgressPercent = (percent / 5) * 5;
+		// 		printf("\r[%d%%]   ", m_lastProgressPercent);
+		// 		fflush(stdout);
+		// 	}
+		// }
 	}
 }
 

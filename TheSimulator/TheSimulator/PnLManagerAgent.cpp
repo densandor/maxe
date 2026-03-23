@@ -91,21 +91,21 @@ void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
 		// Write portfolio history CSV
 		writePortfolioCSV();
 		// Snapshot and print final per-agent stats (lazy MTM)
-		std::cout << "\n=== Final PnL summary (agent, inventory, avg_price, realized_pnl, unrealized_pnl, last_price) ===\n";
-		for (const auto& kv : m_states) {
-			const std::string& agent = kv.first;
-			const PnLState& s = kv.second;
+		// std::cout << "\n=== Final PnL summary (agent, inventory, avg_price, realized_pnl, unrealized_pnl, last_price) ===\n";
+		// for (const auto& kv : m_states) {
+		// 	const std::string& agent = kv.first;
+		// 	const PnLState& s = kv.second;
 
-			double unrealized = 0.0;
-			double lastPrice = (double)m_last_trade_price;
-			if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != 0.0) {
-				unrealized = (lastPrice - s.avg_price) * s.inventory;
-			}
+		// 	double unrealized = 0.0;
+		// 	double lastPrice = (double)m_last_trade_price;
+		// 	if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != 0.0) {
+		// 		unrealized = (lastPrice - s.avg_price) * s.inventory;
+		// 	}
 
-			std::cout << agent << ", "
-				<< s.inventory << ", " << std::fixed << std::setprecision(6) << s.avg_price << ", "
-				<< std::fixed << std::setprecision(6) << s.realized_pnl << ", " << unrealized << ", " << lastPrice << std::endl;
-		}
+		// 	std::cout << agent << ", "
+		// 		<< s.inventory << ", " << std::fixed << std::setprecision(6) << s.avg_price << ", "
+		// 		<< std::fixed << std::setprecision(6) << s.realized_pnl << ", " << unrealized << ", " << lastPrice << std::endl;
+		// }
 	}
 }
 

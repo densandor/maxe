@@ -26,6 +26,8 @@ def main():
         glfw.terminate()
         return
 
+    _, title_bar_height, _, _ = glfw.get_window_frame_size(window)
+    glfw.set_window_pos(window, 0, title_bar_height)
     glfw.make_context_current(window)
     glfw.swap_interval(1)
 
@@ -46,8 +48,6 @@ def main():
     stats_panel = StatsPanel(sim_manager)
     market_panel = MarketAnalysisPanel(sim_manager)
     config_panel = ConfigPanel(sim_manager, chart_panel, stats_panel, market_panel)
-
-    print("GUI Started")
 
     while not glfw.window_should_close(window):
         glfw.poll_events()
@@ -72,7 +72,6 @@ def main():
     sim_manager.stop_simulation()
     renderer.shutdown()
     glfw.terminate()
-    print("GUI Closed")
 
 if __name__ == "__main__":
     main()

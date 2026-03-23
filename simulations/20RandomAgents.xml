@@ -7,7 +7,7 @@
     <MarketDataAgent name="MARKET_DATA_AGENT" exchange="MARKET" fastWindowSize="500" slowWindowSize="1000" outputFile="MarketDataLog.csv"/>
     <MarketDataAgent name="MARKET_DATA_AGENT_LONG" exchange="MARKET" fastWindowSize="1000" slowWindowSize="2000" outputFile="MarketDataLogLarge.csv"/>
 
-    <NewsAgent name="NEWS_AGENT" exchange="MARKET" newsInterval="100" outputFile="NewsLog.csv"/>
+    <NewsAgent name="NEWS_AGENT" exchange="MARKET" outputFile="NewsLog.csv"/>
 
     <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET"/>
@@ -35,7 +35,7 @@
     <FundamentalAgent name="TRADER_FUNDAMENTAL_02" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_03" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_04" exchange="MARKET" newsAgent="NEWS_AGENT"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_05" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_05" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_06" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_07" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_08" exchange="MARKET" newsAgent="NEWS_AGENT"/>
@@ -49,7 +49,7 @@
     <FundamentalAgent name="TRADER_FUNDAMENTAL_16" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_17" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_18" exchange="MARKET" newsAgent="NEWS_AGENT"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_19" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_19" exchange="MARKET" newsAgent="NEWS_AGENT"/> -->
 
     <MAOAgent name="TRADER_MAO_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
     <MAOAgent name="TRADER_MAO_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
