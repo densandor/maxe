@@ -43,7 +43,6 @@ def main():
     data_queue = Queue()
     sim_manager = SimulationManager(data_queue)
 
-    # Panels
     chart_panel = ChartPanel(data_queue)
     stats_panel = StatsPanel(sim_manager)
     market_panel = MarketAnalysisPanel(sim_manager)
@@ -63,7 +62,6 @@ def main():
         stats_panel.render()
         market_panel.render()
 
-        # Render
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
         imgui.render()
         renderer.render(imgui.get_draw_data())

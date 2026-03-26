@@ -9,8 +9,6 @@ def volatility(logReturns, measure="absolute"):
         return np.abs(logReturns)
     elif measure == "squared":
         return logReturns ** 2
-    else:
-        raise ValueError("Invalid measure. Use 'absolute' or 'squared'.")
 
 # Autocorrelation of returns (short-term memory)
 def returnAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):

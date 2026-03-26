@@ -1,4 +1,3 @@
-from queue import Queue
 from threading import Thread
 import subprocess
 import os
@@ -14,7 +13,6 @@ class SimulationManager:
         self.last_position = 0
 
     def start_simulation(self, xml_file):
-        """Start simulation as subprocess and begin monitoring log file"""
         if self.process and self.process.poll() is None:
             print("Simulation already running")
             return False

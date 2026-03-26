@@ -1,5 +1,6 @@
 import sys
 import imgui
+import shutil
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
@@ -12,12 +13,17 @@ class ConfigPanel:
         self.chart_panel = chart_panel
         self.stats_panel = stats_panel
         self.market_panel = market_panel
-        self.agent_count = 5
-        self.simulation_files = []
-        self.selected_simulation = 0
-        self._load_simulation_files()
 
-        # Generation inputs
+        self.population_files = []
+        self._load_population_files()
+        self.population_index = 0
+
+        self.result_folders = []
+        self._load_result_folders()
+        self.folder_index = 0
+
+        self.is_saved = False
+        
         self.gen_num_random = 10
         self.gen_num_fundamental = 100
         self.gen_num_mao = 150
@@ -26,16 +32,40 @@ class ConfigPanel:
         self.gen_num_dql = 0
         self.gen_duration = 10000
         self.gen_starting_price = 10000
-        self.gen_status = False
+        self.is_generated = False
 
-    def _load_simulation_files(self):
-        simulations_dir = Path(__file__).parent.parent / "simulations"
-        if simulations_dir.exists():
-            self.simulation_files = sorted([
-                f.name for f in simulations_dir.glob("*.xml")
-            ])
-        if not self.simulation_files:
-            self.simulation_files = ["No simulations found"]
+    def _load_population_files(self):
+        simulations = Path(__file__).parent.parent / "simulations"
+        self.population_files = sorted([f.name for f in simulations.glob("*.xml")])
+
+    def _load_result_folders(self):
+        results = Path(__file__).parent.parent / "results"
+        self.result_folders = sorted([f.name for f in results.glob("*/") if f.is_dir()])
+
+    def _save_results(self):
+        if self.sim_manager.is_running():
+            return
+
+        logs_folder = Path(__file__).parent.parent / "logs"
+        if not logs_folder.exists():
+            return
+
+        save_folder = self.result_folders[self.folder_index]
+        save_path = Path(__file__).parent.parent / "results" / save_folder
+        save_path.mkdir(parents=True, exist_ok=True)
+
+        existing_runs = [int(p.name) for p in save_path.iterdir() if p.is_dir() and p.name.isdigit()]
+        if existing_runs:
+            next_run = max(existing_runs) + 1
+        else:
+            next_run = 1
+
+        run_dir = save_path / str(next_run)
+        run_dir.mkdir(parents=True, exist_ok=False)
+
+        for item in logs_folder.iterdir():
+            if item.is_file():
+                shutil.copy2(item, run_dir / item.name)
 
     def render(self):
         imgui.set_next_window_position(0, 0, imgui.ALWAYS)
@@ -61,20 +91,22 @@ class ConfigPanel:
                 output_path = str(Path(__file__).parent.parent / "simulations" / "GeneratedSimulation.xml")
                 generateSimulation(self.gen_num_random, self.gen_num_fundamental, self.gen_num_mao, self.gen_num_momentum, self.gen_num_qlearning, self.gen_num_dql, duration=self.gen_duration, startingPrice=self.gen_starting_price, output=output_path)
                 self._load_simulation_files()
-                self.gen_status = True
+                self.is_generated = True
 
-            if self.gen_status:
-                imgui.text("Simulation generated successfully")
+            if self.is_generated:
+                imgui.text("Simulation generated successfully.")
             else:
-                imgui.text("")
-
+                imgui.text("Simulation not generated.")
+                
+            imgui.text("")
             imgui.separator()
             imgui.text("Select Simulation")
 
-            # Simulation file selector
-            changed, self.selected_simulation = imgui.combo("Preset", self.selected_simulation, self.simulation_files)
+            _, self.population_index = imgui.combo("Population", self.population_index, self.population_files)
 
             sim_running = self.sim_manager.is_running()
+
+            imgui.text("")
             imgui.separator()
             imgui.text("Run Simulation")
 
@@ -84,7 +116,7 @@ class ConfigPanel:
                     self.stats_panel.clear()
                 if self.market_panel:
                     self.market_panel.clear()
-                selected_file = self.simulation_files[self.selected_simulation]
+                selected_file = self.population_files[self.population_index]
                 if self.sim_manager.start_simulation(selected_file):
                     print(f"Simulation started using {selected_file}")
 
@@ -92,10 +124,23 @@ class ConfigPanel:
                 if imgui.button("Stop Simulation", 306, 30):
                     self.sim_manager.stop_simulation()
 
-            status = f"Status: {'Running' if sim_running else 'Stopped'}"
+            if sim_running:
+                status = "Status: Running"
+            else:
+                status = "Status: Stopped"
             imgui.text(status)
 
+            imgui.text("")
             imgui.separator()
             imgui.text("Save Results")
+
+            _, self.folder_index = imgui.combo("Folder", self.folder_index, self.result_folders)
+
+            if imgui.button("Save Results", 306, 30):
+                self._save_results()
+                self.is_saved = True
+            
+            if self.is_saved:
+                imgui.text("Results saved successfully.")
             
             imgui.end()
