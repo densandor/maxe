@@ -16,10 +16,7 @@ public:
 	void receiveMessage(const MessagePtr& msg) override;
 private:
 	std::string m_exchange;
-
-	std::shared_ptr<RetrieveL1ResponsePayload> m_mostRecentPayload;
+	Timestamp m_interval;
 	std::ofstream m_outputFile;
-	Timestamp m_aggregationPeriod;
-	Timestamp computeNextAggregation(Timestamp current) const;
 	void logData(std::shared_ptr<RetrieveL1ResponsePayload> l1data);
 };

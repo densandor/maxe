@@ -8,11 +8,12 @@ from generateSimulation import generateSimulation
 
 
 class ConfigPanel:
-    def __init__(self, sim_manager, chart_panel, stats_panel=None, market_panel=None):
+    def __init__(self, sim_manager, chart_panel, stats_panel=None, market_panel=None, orderbook_panel=None):
         self.sim_manager = sim_manager
         self.chart_panel = chart_panel
         self.stats_panel = stats_panel
         self.market_panel = market_panel
+        self.orderbook_panel = orderbook_panel
 
         self.population_files = []
         self._load_population_files()
@@ -112,6 +113,8 @@ class ConfigPanel:
 
             if not sim_running and imgui.button("Start Simulation", 306, 30):
                 self.chart_panel.clear()
+                if self.orderbook_panel:
+                    self.orderbook_panel.clear()
                 if self.stats_panel:
                     self.stats_panel.clear()
                 if self.market_panel:

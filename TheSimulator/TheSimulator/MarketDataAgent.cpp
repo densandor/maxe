@@ -114,9 +114,6 @@ void MarketDataAgent::logData(Timestamp timestamp, double price) {
     if (m_outputFile.is_open()) {
         m_outputFile << timestamp << "," << price << "," << m_fastEma << "," << m_slowEma << std::endl;
     }
-
-    // Stream for UI updates.
-    std::cout << "UI_TICK," << static_cast<unsigned long long>(timestamp) << "," << price << '\n';
 }
 
 void MarketDataAgent::notifyMovingAverageSubscribers(Money price, OrderDirection direction) {

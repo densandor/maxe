@@ -31,7 +31,7 @@ private:
 	std::unordered_set<std::string> m_agents_with_positions;
 	Money m_last_trade_price;
 
-	Timestamp m_sample_interval = 50;
+	Timestamp m_sample_interval = 1;
 	std::unordered_map<std::string, std::vector<double>> m_portfolio_history;
 	std::string m_portfolio_output_file = "logs/PortfolioLog.csv";
 };

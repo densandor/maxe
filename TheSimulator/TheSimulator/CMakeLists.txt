@@ -39,6 +39,8 @@ add_executable (TheSimulator
 	"OrderFactory.h"
 	"OrderLogAgent.cpp"
 	"OrderLogAgent.h"
+	"OrderBookLogAgent.cpp"
+	"OrderBookLogAgent.h"
 	"OrderRecord.cpp"
 	"ParameterStorage.cpp"
 	"ParameterStorage.h"

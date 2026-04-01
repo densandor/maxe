@@ -43,10 +43,10 @@ void PortfolioAgent::receiveMessage(const MessagePtr& msg) {
 		// subscribe to trades on configured exchange
 		simulation()->dispatchMessage(currentTimestamp, currentTimestamp, name(), m_exchange, "SUBSCRIBE_EVENT_TRADE", std::make_shared<EmptyPayload>());
 		// schedule first portfolio sample
-		simulation()->dispatchMessage(currentTimestamp, m_sample_interval, name(), name(), "WAKEUP_SAMPLE_PORTFOLIOS", std::make_shared<EmptyPayload>());
+		simulation()->dispatchMessage(currentTimestamp, m_sample_interval, name(), name(), "WAKEUP_SAMPLE_PORTFOLIOS", std::make_shared<EmptyPayload>(), true);
 	} else if (msg->type == "WAKEUP_SAMPLE_PORTFOLIOS") {
 		samplePortfolios(currentTimestamp);
-		simulation()->dispatchMessage(currentTimestamp, m_sample_interval, name(), name(), "WAKEUP_SAMPLE_PORTFOLIOS", std::make_shared<EmptyPayload>());
+		simulation()->dispatchMessage(currentTimestamp, m_sample_interval, name(), name(), "WAKEUP_SAMPLE_PORTFOLIOS", std::make_shared<EmptyPayload>(), true);
 	} else if (msg->type == "EVENT_TRADE") {
 		auto pptr = std::dynamic_pointer_cast<EventTradePayload>(msg->payload);
 		const auto& trade = pptr->trade;

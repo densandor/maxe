@@ -7,58 +7,37 @@
 #include <filesystem>
 
 L1LogAgent::L1LogAgent(const Simulation* simulation)
-	: Agent(simulation), m_outputFile(), m_mostRecentPayload(nullptr), m_aggregationPeriod(0) { }
+	: Agent(simulation), m_exchange(""), m_interval(1), m_outputFile() { }
 
 L1LogAgent::L1LogAgent(const Simulation* simulation, const std::string& name)
-	: Agent(simulation, name), m_outputFile(), m_mostRecentPayload(nullptr), m_aggregationPeriod(0) { }
+	: Agent(simulation, name), m_exchange(""), m_interval(1), m_outputFile() { }
 
 void L1LogAgent::receiveMessage(const MessagePtr& messagePtr) {
 	const Timestamp currentTimestamp = simulation()->currentTimestamp();
 
 	if (messagePtr->type == "EVENT_SIMULATION_START") {
-		if(!m_aggregationPeriod) {
-			simulation()->dispatchMessage(currentTimestamp, 0, name(), m_exchange, "SUBSCRIBE_EVENT_ORDER_LIMIT", std::make_shared<EmptyPayload>());
-			simulation()->dispatchMessage(currentTimestamp, 0, name(), m_exchange, "SUBSCRIBE_EVENT_ORDER_MARKET", std::make_shared<EmptyPayload>());
-		} else {
-			Timestamp nextAggregation = computeNextAggregation(currentTimestamp);
-			simulation()->dispatchMessage(currentTimestamp, nextAggregation - currentTimestamp, name(), name(), "WAKEUP_FOR_AGGREGATION", std::make_shared<EmptyPayload>());
-		}
-	} else if (messagePtr->type == "EVENT_ORDER_LIMIT" || messagePtr->type == "EVENT_ORDER_MARKET" || messagePtr->type == "WAKEUP_FOR_AGGREGATION") {
+		simulation()->dispatchMessage(currentTimestamp, 0, name(), name(), "WAKEUP_FOR_L1_POLL", std::make_shared<EmptyPayload>(), true);
+	} else if (messagePtr->type == "WAKEUP_FOR_L1_POLL") {
 		simulation()->dispatchMessage(currentTimestamp, 0, name(), m_exchange, "RETRIEVE_L1", std::make_shared<EmptyPayload>());
+		simulation()->dispatchMessage(currentTimestamp, m_interval, name(), name(), "WAKEUP_FOR_L1_POLL", std::make_shared<EmptyPayload>(), true);
 	} else if (messagePtr->type == "RESPONSE_RETRIEVE_L1") {
 		auto pptr = std::dynamic_pointer_cast<RetrieveL1ResponsePayload>(messagePtr->payload);
-
-		if(!m_aggregationPeriod) {
-			if (m_mostRecentPayload != nullptr) {
-				if (pptr->bestAskPrice != m_mostRecentPayload->bestAskPrice || pptr->bestBidPrice != m_mostRecentPayload->bestBidPrice) {
-					logData(pptr);
-					m_mostRecentPayload = pptr;
-				}
-			} else {
-				m_mostRecentPayload = pptr;
-			}
-		} else {			
-			Timestamp nextAggregation = computeNextAggregation(currentTimestamp);
-			simulation()->dispatchMessage(currentTimestamp, nextAggregation - currentTimestamp, name(), name(), "WAKEUP_FOR_AGGREGATION", std::make_shared<EmptyPayload>());
-		}
+		logData(pptr);
+		std::cout << "T," << currentTimestamp << "," << pptr->lastTradePrice.toCentString() << std::endl;
 	}
-}
-
-Timestamp L1LogAgent::computeNextAggregation(Timestamp current) const {
-	Timestamp nextAggregation;
-	Timestamp nextAggregationDelta = current % m_aggregationPeriod;
-	if (nextAggregationDelta == 0) {
-		nextAggregation = current + m_aggregationPeriod;
-	} else {
-		nextAggregation = current + m_aggregationPeriod - nextAggregationDelta;
-	}
-
-	return nextAggregation;
 }
 
 void L1LogAgent::logData(std::shared_ptr<RetrieveL1ResponsePayload> pptr) {
-	m_outputFile << std::to_string(pptr->time) << "," << pptr->bestBidPrice.toCentString() << "," << pptr->bestAskPrice.toCentString() << std::endl;
-	// std::cout << std::to_string(pptr->time) << ": BID " << pptr->bestBidPrice.toCentString() << " ASK " << pptr->bestAskPrice.toCentString() << " SPREAD " << ((Money)(pptr->bestAskPrice - pptr->bestBidPrice)).toCentString() << std::endl;
+	m_outputFile
+		<< std::to_string(pptr->time) << ","
+		<< pptr->bestAskPrice.toCentString() << ","
+		<< pptr->bestAskVolume << ","
+		<< pptr->askTotalVolume << ","
+		<< pptr->bestBidPrice.toCentString() << ","
+		<< pptr->bestBidVolume << ","
+		<< pptr->bidTotalVolume << ","
+		<< pptr->lastTradePrice.toCentString()
+		<< std::endl;
 }
 
 #include "ParameterStorage.h"
@@ -71,10 +50,13 @@ void L1LogAgent::configure(const pugi::xml_node& node, const std::string& config
 		m_exchange = simulation()->parameters().processString(att.as_string());
 	}
 
+	if (!(att = node.attribute("interval")).empty()) {
+		m_interval = att.as_ullong();
+	}
+
 	if (!(att = node.attribute("outputFile")).empty()) {
 		std::string filename = simulation()->parameters().processString(att.as_string());
         
-        // If filename doesn't contain a path separator, add logs/
         namespace fs = std::filesystem;
         fs::path filePath(filename);
         if (filePath.parent_path().empty()) {
@@ -84,13 +66,9 @@ void L1LogAgent::configure(const pugi::xml_node& node, const std::string& config
         m_outputFile.open(filePath.string());
 
 		if (m_outputFile.is_open()) {
-            m_outputFile << "time,bid,ask\n";
+			m_outputFile << "time,bestAskPrice,bestAskVolume,askTotalVolume,bestBidPrice,bestBidVolume,bidTotalVolume,lastTradePrice\n";
         } else {
             std::cerr << name() << ": Failed to open L1 CSV file: " << att.as_string() << std::endl;
         }
-	}
-
-	if (!(att = node.attribute("aggregationPeriod")).empty()) {
-		m_aggregationPeriod = att.as_ullong();
 	}
 }

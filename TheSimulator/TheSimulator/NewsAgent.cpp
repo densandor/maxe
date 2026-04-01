@@ -38,7 +38,7 @@ void NewsAgent::receiveMessage(const MessagePtr& msg) {
     if (msg->type == "WAKE_UP") {
         unsigned long long stepsUntilNextNews = std::poisson_distribution<unsigned long long>(m_newsPoissonLambda)(simulation()->randomGenerator());
         stepsUntilNextNews = std::max(1ULL, stepsUntilNextNews);
-        simulation()->dispatchMessage(simulation()->currentTimestamp(), stepsUntilNextNews, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>());
+        simulation()->dispatchMessage(simulation()->currentTimestamp(), stepsUntilNextNews, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>(), true);
         std::normal_distribution<double> normalDistribution(m_mean, m_standardDeviation);
         std::uniform_real_distribution<double> uniformDistribution(-1.0 * m_standardDeviation, m_standardDeviation);
         if (m_mode == "uniform") {

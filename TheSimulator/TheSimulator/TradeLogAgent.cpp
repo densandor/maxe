@@ -16,17 +16,11 @@ void TradeLogAgent::receiveMessage(const MessagePtr& messagePtr) {
 	const Timestamp currentTimestamp = simulation()->currentTimestamp();
 	
 	if (messagePtr->type == "EVENT_SIMULATION_START") {
-		simulation()->dispatchMessage(currentTimestamp, currentTimestamp, name(), m_exchange, "SUBSCRIBE_EVENT_TRADE", std::make_shared<EmptyPayload>());
+		simulation()->dispatchMessage(currentTimestamp, currentTimestamp, name(), m_exchange, "SUBSCRIBE_EVENT_TRADE", std::make_shared<EmptyPayload>(), true);
 	} else if (messagePtr->type == "EVENT_TRADE") {
 		auto pptr = std::dynamic_pointer_cast<EventTradePayload>(messagePtr->payload);
 		const auto& trade = pptr->trade;
 		
-        // Print trade info
-		// std::cout << name() << ": ";
-		// trade.printHuman();
-		// std::cout << std::endl;
-
-		// write CSV row: time, price (use Money::toCentString like L1LogAgent)
         if (m_outputFile.is_open()) {
             m_outputFile
             << std::to_string(trade.id()) << ","
@@ -56,7 +50,6 @@ void TradeLogAgent::configure(const pugi::xml_node& node, const std::string& con
 	if (!(att = node.attribute("outputFile")).empty()) {
         std::string filename = simulation()->parameters().processString(att.as_string());
         
-        // If filename doesn't contain a path separator, add logs/
         namespace fs = std::filesystem;
         fs::path filePath(filename);
         if (filePath.parent_path().empty()) {

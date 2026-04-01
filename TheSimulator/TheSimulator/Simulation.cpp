@@ -5,6 +5,7 @@
 #include "PortfolioAgent.h"
 #include "OrderLogAgent.h"
 #include "L1LogAgent.h"
+#include "OrderBookLogAgent.h"
 #include "SetupAgent.h"
 #include "PythonAgent.h"
 #include "MarketDataAgent.h"
@@ -145,6 +146,10 @@ void Simulation::setupChildConfiguration(const pugi::xml_node& node, const std::
 			m_agentList.push_back(std::move(eaptr));
 		} else if (nodeName == "OrderLogAgent") {
 			auto eaptr = std::make_unique<OrderLogAgent>(this);
+			eaptr->configure(*nit, configurationPath);
+			m_agentList.push_back(std::move(eaptr));
+		} else if (nodeName == "OrderBookLogAgent") {
+			auto eaptr = std::make_unique<OrderBookLogAgent>(this);
 			eaptr->configure(*nit, configurationPath);
 			m_agentList.push_back(std::move(eaptr));
 		} else if (nodeName == "L1LogAgent") {

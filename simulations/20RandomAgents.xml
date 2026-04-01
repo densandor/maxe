@@ -8,6 +8,7 @@
     <MarketDataAgent name="MARKET_DATA_AGENT_LONG" exchange="MARKET" fastWindowSize="1000" slowWindowSize="2000" outputFile="MarketDataLogLarge.csv"/>
 
     <NewsAgent name="NEWS_AGENT" exchange="MARKET" outputFile="NewsLog.csv"/>
+    <OrderBookLogAgent name="ORDER_BOOK_LOGGER" exchange="MARKET" outputFile="OrderBookLog.csv"/>
 
     <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET"/>
@@ -30,11 +31,11 @@
     <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET"/>
     <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET"/>
 
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_00" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_00" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_01" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_02" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_03" exchange="MARKET" newsAgent="NEWS_AGENT"/>
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_04" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_04" exchange="MARKET" newsAgent="NEWS_AGENT"/> -->
     <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_05" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_06" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_07" exchange="MARKET" newsAgent="NEWS_AGENT"/>
@@ -51,7 +52,7 @@
     <FundamentalAgent name="TRADER_FUNDAMENTAL_18" exchange="MARKET" newsAgent="NEWS_AGENT"/>
     <FundamentalAgent name="TRADER_FUNDAMENTAL_19" exchange="MARKET" newsAgent="NEWS_AGENT"/> -->
 
-    <MAOAgent name="TRADER_MAO_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <!-- <MAOAgent name="TRADER_MAO_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
     <MAOAgent name="TRADER_MAO_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
     <MAOAgent name="TRADER_MAO_02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
     <MAOAgent name="TRADER_MAO_03" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
@@ -91,7 +92,7 @@
     <MAOAgent name="TRADER_MAO_66" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
     <MAOAgent name="TRADER_MAO_67" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
     <MAOAgent name="TRADER_MAO_68" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
-    <MAOAgent name="TRADER_MAO_69" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_69" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/> -->
 
 
     <!-- <QLearningAgent name="TRADER_Q_LEARNING_00" class="QLearningAgent" exchange="MARKET"/> -->
@@ -104,5 +105,5 @@
 
     <!-- <OrderLogAgent name="ORDER_LOGGER" exchange="MARKET"/> -->
 
-    <PnLManagerAgent name="PNL_AGENT" exchange="MARKET" outputFile="PortfolioHistory.csv"/>
+    <PortfolioAgent name="PNL_AGENT" exchange="MARKET" outputFile="PortfolioHistory.csv"/>
 </Simulation>
