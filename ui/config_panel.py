@@ -90,7 +90,7 @@ class ConfigPanel:
             if imgui.button("Generate Simulation", 306, 30):
                 output_path = str(Path(__file__).parent.parent / "simulations" / "GeneratedSimulation.xml")
                 generateSimulation(self.gen_num_random, self.gen_num_fundamental, self.gen_num_mao, self.gen_num_momentum, self.gen_num_qlearning, self.gen_num_dql, duration=self.gen_duration, startingPrice=self.gen_starting_price, output=output_path)
-                self._load_simulation_files()
+                self._load_population_files()
                 self.is_generated = True
 
             if self.is_generated:

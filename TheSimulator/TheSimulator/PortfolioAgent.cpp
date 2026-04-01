@@ -1,4 +1,4 @@
-#include "PnLManagerAgent.h"
+#include "PortfolioAgent.h"
 
 #include "Simulation.h"
 #include "ExchangeAgentMessagePayloads.h"
@@ -8,13 +8,13 @@
 #include <filesystem>
 #include <algorithm>
 
-PnLManagerAgent::PnLManagerAgent(const Simulation* simulation)
+PortfolioAgent::PortfolioAgent(const Simulation* simulation)
 	: Agent(simulation), m_exchange(""), m_last_trade_price(Money(0)) { }
 
-PnLManagerAgent::PnLManagerAgent(const Simulation* simulation, const std::string& name)
+PortfolioAgent::PortfolioAgent(const Simulation* simulation, const std::string& name)
 	: Agent(simulation, name), m_exchange(""), m_last_trade_price(Money(0)) { }
 
-void PnLManagerAgent::configure(const pugi::xml_node& node, const std::string& configurationPath) {
+void PortfolioAgent::configure(const pugi::xml_node& node, const std::string& configurationPath) {
 	Agent::configure(node, configurationPath);
 
 	pugi::xml_attribute att;
@@ -36,7 +36,7 @@ void PnLManagerAgent::configure(const pugi::xml_node& node, const std::string& c
 	}
 }
 
-void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
+void PortfolioAgent::receiveMessage(const MessagePtr& msg) {
 	const Timestamp currentTimestamp = simulation()->currentTimestamp();
 	
 	if (msg->type == "EVENT_SIMULATION_START") {
@@ -90,26 +90,10 @@ void PnLManagerAgent::receiveMessage(const MessagePtr& msg) {
 		samplePortfolios(currentTimestamp);
 		// Write portfolio history CSV
 		writePortfolioCSV();
-		// Snapshot and print final per-agent stats (lazy MTM)
-		// std::cout << "\n=== Final PnL summary (agent, inventory, avg_price, realized_pnl, unrealized_pnl, last_price) ===\n";
-		// for (const auto& kv : m_states) {
-		// 	const std::string& agent = kv.first;
-		// 	const PnLState& s = kv.second;
-
-		// 	double unrealized = 0.0;
-		// 	double lastPrice = (double)m_last_trade_price;
-		// 	if (s.inventory != 0 && m_last_trade_price != Money(0) && s.avg_price != 0.0) {
-		// 		unrealized = (lastPrice - s.avg_price) * s.inventory;
-		// 	}
-
-		// 	std::cout << agent << ", "
-		// 		<< s.inventory << ", " << std::fixed << std::setprecision(6) << s.avg_price << ", "
-		// 		<< std::fixed << std::setprecision(6) << s.realized_pnl << ", " << unrealized << ", " << lastPrice << std::endl;
-		// }
 	}
 }
 
-void PnLManagerAgent::updateOnFill(const std::string& owner, const Money& fill_price, Volume fill_volume, OrderDirection direction) {
+void PortfolioAgent::updateOnFill(const std::string& owner, const Money& fill_price, Volume fill_volume, OrderDirection direction) {
 	if (fill_volume == 0) return;
 
 	long long dq = (direction == OrderDirection::Buy) ? (long long)fill_volume : -(long long)fill_volume;
@@ -168,7 +152,7 @@ void PnLManagerAgent::updateOnFill(const std::string& owner, const Money& fill_p
 	}
 }
 
-void PnLManagerAgent::samplePortfolios(Timestamp t) {
+void PortfolioAgent::samplePortfolios(Timestamp t) {
 	double lastPrice = (double)m_last_trade_price;
 
 	for (const auto& kv : m_states) {
@@ -185,7 +169,7 @@ void PnLManagerAgent::samplePortfolios(Timestamp t) {
 	}
 }
 
-void PnLManagerAgent::writePortfolioCSV() {
+void PortfolioAgent::writePortfolioCSV() {
 	std::ofstream out(m_portfolio_output_file);
 	if (!out.is_open()) {
 		std::cerr << name() << ": Failed to open portfolio CSV: " << m_portfolio_output_file << std::endl;
@@ -229,5 +213,4 @@ void PnLManagerAgent::writePortfolioCSV() {
 	}
 
 	out.close();
-	std::cout << name() << ": Portfolio history written to " << m_portfolio_output_file << std::endl;
 }

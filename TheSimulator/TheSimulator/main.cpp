@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <cstdio>
 
 #include "Simulation.h"
 #include "SimulationException.h"
@@ -22,6 +23,8 @@ void invokeInteractiveMode(Simulation* simulation);
 void runSimulations(std::pair<unsigned int, unsigned int> runIndexRange, bool interactive, pugi::xml_node configurationNode, const ParameterStorage& parameterBase);
 
 int main(int argc, char* argv[]) {
+	setvbuf(stdout, nullptr, _IONBF, 0);
+
 	// start the interpreter and keep it alive
 	py::scoped_interpreter guard {};
 

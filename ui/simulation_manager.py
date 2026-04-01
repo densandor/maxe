@@ -7,10 +7,8 @@ import time
 class SimulationManager:
     def __init__(self, data_queue):
         self.data_queue = data_queue
-        self.log_file = "logs/MarketDataLog.csv"
         self.process = None
         self.running = False
-        self.last_position = 0
 
     def start_simulation(self, xml_file):
         if self.process and self.process.poll() is None:
@@ -24,11 +22,6 @@ class SimulationManager:
                 print("Simulator executable not found")
                 return False
 
-            # Delete old log file so we only read fresh data
-            if os.path.exists(self.log_file):
-                os.remove(self.log_file)
-                print(f"Cleared old log: {self.log_file}")
-
             # Drain any stale data from queue
             while not self.data_queue.empty():
                 try:
@@ -37,13 +30,16 @@ class SimulationManager:
                     break
 
             self.process = subprocess.Popen(
-                [sim_exe, "-f", f"simulations/{xml_file}"]
+                [sim_exe, "-f", f"simulations/{xml_file}"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,
             )
             self.running = True
-            self.last_position = 0
 
-            Thread(target=self._monitor_log_file, daemon=True).start()
-            print(f"Simulation started, monitoring: {self.log_file}")
+            Thread(target=self._monitor_stdout, daemon=True).start()
+            print("Simulation started, monitoring stdout")
             return True
         except Exception as e:
             print(f"Error starting simulation: {e}")
@@ -55,34 +51,36 @@ class SimulationManager:
             self.process.terminate()
             self.running = False
 
-    def _monitor_log_file(self):
-        """Tail the log file and send new data to queue"""
+    def _monitor_stdout(self):
+        """Read simulator stdout stream and send live ticks to queue."""
+        if not self.process or not self.process.stdout:
+            return
+
         while self.running:
             try:
-                if not os.path.exists(self.log_file):
-                    time.sleep(0.1)
+                line = self.process.stdout.readline()
+                if not line:
+                    if self.process.poll() is not None:
+                        break
+                    time.sleep(0.01)
                     continue
 
-                with open(self.log_file, 'r') as f:
-                    f.seek(self.last_position)
-                    lines = f.readlines()
-                    self.last_position = f.tell()
+                line = line.strip()
+                if not line.startswith("UI_TICK,"):
+                    continue
 
-                    for line in lines:
-                        line = line.strip()
-                        if line and not line.startswith("time"):
-                            try:
-                                parts = line.split(',')
-                                if len(parts) >= 2:
-                                    time_sec = float(parts[0])
-                                    price = float(parts[1])
-                                    self.data_queue.put((time_sec, price))
-                            except ValueError:
-                                pass
+                parts = line.split(',')
+                if len(parts) != 3:
+                    continue
 
-                time.sleep(0.05)
+                try:
+                    time_sec = float(parts[1])
+                    price = float(parts[2])
+                    self.data_queue.put((time_sec, price))
+                except ValueError:
+                    pass
             except Exception as e:
-                print(f"Log monitoring error: {e}")
+                print(f"Stream monitoring error: {e}")
                 time.sleep(0.1)
 
     def is_running(self):

@@ -93,13 +93,12 @@ class ChartPanel:
                 self._aggregate_all()
                 self._dirty = False
 
-            # OHLC + stats on the same line, right-aligned to chart edge
             if self.candles:
                 visible = self.candles[-self.max_visible:]
                 c = visible[-1]
-                # fixed-width fields to prevent layout shifts when digits change
-                info = f"Time Step: {len(self.ticks):>8d} | Current Price: {c.close:>10.2f}"
-                margin_right = 77  # must match _draw_candles margin_right
+                current_step = int(self.ticks[-1][0]) if self.ticks else 0
+                info = f"Time Step: {current_step:>8d} | Current Price: {c.close:>10.2f}"
+                margin_right = 77 
                 right_edge = imgui.get_window_width() - margin_right
                 text_w = imgui.calc_text_size(info).x
                 imgui.same_line(right_edge - text_w)

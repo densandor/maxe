@@ -37,9 +37,7 @@ void L1LogAgent::receiveMessage(const MessagePtr& messagePtr) {
 			} else {
 				m_mostRecentPayload = pptr;
 			}
-		} else {
-			logData(pptr);
-			
+		} else {			
 			Timestamp nextAggregation = computeNextAggregation(currentTimestamp);
 			simulation()->dispatchMessage(currentTimestamp, nextAggregation - currentTimestamp, name(), name(), "WAKEUP_FOR_AGGREGATION", std::make_shared<EmptyPayload>());
 		}

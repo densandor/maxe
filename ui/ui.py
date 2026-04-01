@@ -40,7 +40,7 @@ def main():
     io.display_size = 1920, 1080
 
     # Shared state
-    data_queue = Queue()
+    data_queue = Queue(maxsize=8)
     sim_manager = SimulationManager(data_queue)
 
     chart_panel = ChartPanel(data_queue)

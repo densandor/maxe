@@ -19,15 +19,16 @@ namespace py = pybind11;
 
 enum class SimulationState {
 	INACTIVE,
-
 	STARTED,
 	STOPPED
 };
 
 struct CompareArrival {
 	bool operator()(const MessagePtr& a, const MessagePtr& b) {
-		// return true if b arrives before a
-		return a->arrival > b->arrival;
+		if (a->arrival != b->arrival) {
+			return a->arrival > b->arrival;
+		}
+		return a->isLogging > b->isLogging;
 	}
 };
 
@@ -43,11 +44,11 @@ public:
 	void simulate(Timestamp howMuch);
 
 	void queueMessage(const MessagePtr& messagePtr) const { m_messageQueue->push(messagePtr); }
-	void dispatchMessage(Timestamp occurrence, Timestamp delay, const std::string& source, const std::string& target, const std::string& type, MessagePayloadPtr payload) const {
-		queueMessage(MessagePtr(new Message(occurrence, occurrence + delay, source, target, type, payload)));
+	void dispatchMessage(Timestamp occurrence, Timestamp delay, const std::string& source, const std::string& target, const std::string& type, MessagePayloadPtr payload, bool isLogging = false) const {
+		queueMessage(MessagePtr(new Message(occurrence, occurrence + delay, source, target, type, payload, isLogging)));
 	}
-	void dispatchGenericMessage(Timestamp occurrence, Timestamp delay, const std::string& source, const std::string& target, const std::string& type, const std::map<std::string, std::string>& payload) {
-		queueMessage(MessagePtr(new Message(occurrence, occurrence + delay, source, target, type, std::make_unique<GenericPayload>(payload))));
+	void dispatchGenericMessage(Timestamp occurrence, Timestamp delay, const std::string& source, const std::string& target, const std::string& type, const std::map<std::string, std::string>& payload, bool isLogging = false) const {
+		queueMessage(MessagePtr(new Message(occurrence, occurrence + delay, source, target, type, std::make_unique<GenericPayload>(payload), isLogging)));
 	}
 
 	void deliverMessage(const MessagePtr& messagePtr);

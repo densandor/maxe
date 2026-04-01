@@ -2,7 +2,7 @@
 
 #include "ExchangeAgent.h"
 #include "TradeLogAgent.h"
-#include "PnLManagerAgent.h"
+#include "PortfolioAgent.h"
 #include "OrderLogAgent.h"
 #include "L1LogAgent.h"
 #include "SetupAgent.h"
@@ -111,21 +111,9 @@ void Simulation::step(Timestamp step) {
 	Timestamp topMessageTimestamp;
 	while (!m_messageQueue->empty() && (topMessageTimestamp = m_messageQueue->top()->arrival) < cutoff) {
 		m_currentTimestamp = topMessageTimestamp;
-
 		MessagePtr topMessage = m_messageQueue->top();
 		m_messageQueue->pop(); // ordering intentional
 		deliverMessage(topMessage);
-
-		// if (m_durationTimestamp > 0) {
-		// 	double progress = (double)(m_currentTimestamp - m_startTimestamp) / m_durationTimestamp;
-		// 	progress = std::min(1.0, std::max(0.0, progress));
-		// 	int percent = (int)(progress * 100);
-		// 	if (percent >= m_lastProgressPercent + 5) {
-		// 		m_lastProgressPercent = (percent / 5) * 5;
-		// 		printf("\r[%d%%]   ", m_lastProgressPercent);
-		// 		fflush(stdout);
-		// 	}
-		// }
 	}
 }
 
@@ -167,8 +155,8 @@ void Simulation::setupChildConfiguration(const pugi::xml_node& node, const std::
 			auto eaptr = std::make_unique<MarketDataAgent>(this);
 			eaptr->configure(*nit, configurationPath);
 			m_agentList.push_back(std::move(eaptr));
-		} else if (nodeName == "PnLManagerAgent") {
-			auto eaptr = std::make_unique<PnLManagerAgent>(this);
+		} else if (nodeName == "PortfolioAgent") {
+			auto eaptr = std::make_unique<PortfolioAgent>(this);
 			eaptr->configure(*nit, configurationPath);
 			m_agentList.push_back(std::move(eaptr));
 		} else if (nodeName == "FundamentalAgent") {

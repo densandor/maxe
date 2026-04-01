@@ -49,12 +49,12 @@ void MarketDataAgent::receiveMessage(const MessagePtr& msg) {
     const Timestamp currentTimestamp = simulation()->currentTimestamp();
 
     if (msg->type == "EVENT_SIMULATION_START") {
-	    simulation()->dispatchMessage(simulation()->currentTimestamp(), m_offset, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>());
+	    simulation()->dispatchMessage(simulation()->currentTimestamp(), m_offset, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>(), true);
         return;
     }
 
     if (msg->type == "WAKE_UP") {
-        simulation()->dispatchMessage(simulation()->currentTimestamp(), m_interval, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>());
+        simulation()->dispatchMessage(simulation()->currentTimestamp(), m_interval, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>(), true);
         // Request L1 data to calculate MAO
         simulation()->dispatchMessage(currentTimestamp, 0, name(), m_exchange, "RETRIEVE_L1", std::make_shared<EmptyPayload>());
         return;
@@ -114,6 +114,9 @@ void MarketDataAgent::logData(Timestamp timestamp, double price) {
     if (m_outputFile.is_open()) {
         m_outputFile << timestamp << "," << price << "," << m_fastEma << "," << m_slowEma << std::endl;
     }
+
+    // Stream for UI updates.
+    std::cout << "UI_TICK," << static_cast<unsigned long long>(timestamp) << "," << price << '\n';
 }
 
 void MarketDataAgent::notifyMovingAverageSubscribers(Money price, OrderDirection direction) {

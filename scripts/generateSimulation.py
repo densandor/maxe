@@ -10,9 +10,8 @@ def generateSimulation(numRandom, numFundamental, numMao,  numMomentum, numQLear
     ET.SubElement(root, "NewsAgent", name="NEWS_AGENT", offset="1", newsPoissonLambda="20", standardDeviation="0.1", mean="0.0")
     ET.SubElement(root, "MarketDataAgent", name="MARKET_DATA_AGENT_SMALL", exchange="MARKET", outputFile="MarketDataLog.csv", slowWindowSize="200", fastWindowSize="100")
     ET.SubElement(root, "MarketDataAgent", name="MARKET_DATA_AGENT_LARGE", exchange="MARKET", outputFile="MarketDataLogLarge.csv", slowWindowSize="400", fastWindowSize="200")
-    ET.SubElement(root, "L1LogAgent", name="L1_LOGGER", exchange="MARKET", outputFile="L1Log.csv")
     ET.SubElement(root, "TradeLogAgent", name="TRADE_LOGGER", exchange="MARKET", outputFile="TradeLog.csv")
-    ET.SubElement(root, "PnLManagerAgent", name="PNL_AGENT", exchange="MARKET", outputFile="PortfolioHistory.csv")
+    ET.SubElement(root, "PortfolioAgent", name="PORTFOLIO_AGENT", exchange="MARKET", outputFile="PortfolioHistory.csv")
  
     for i in range(numRandom):
         ET.SubElement(root, "RandomAgent", name=f"TRADER_RANDOM_{i:02d}", exchange="MARKET")
