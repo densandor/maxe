@@ -2,7 +2,7 @@ import argparse
 import mplfinance as mpf
 import pandas as pd
 
-def generateCandles(csv, timeframeSeconds=60):
+def generateCandles(csv, timeframeSeconds=10):
     df = pd.read_csv(csv)
     df.columns = ["id", "time", "price", "aggressing", "aggressingOwner", "direction", "resting", "restingOwner", "volume"]
     
@@ -27,7 +27,7 @@ def generateCandles(csv, timeframeSeconds=60):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("chart")
-    parser.add_argument("timeframe", nargs="?", default=60, type=int, help="The time (in seconds) that each candle should track.")
+    parser.add_argument("timeframe", nargs="?", default=10, type=int, help="The time (in seconds) that each candle should track.")
     args = parser.parse_args()
 
     df = generateCandles("logs/TradeLog.csv", timeframeSeconds=args.timeframe)

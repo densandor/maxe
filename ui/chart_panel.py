@@ -114,10 +114,6 @@ class ChartPanel:
 
             imgui.end()
 
-    # ------------------------------------------------------------------
-    # Candlestick drawing
-    # ------------------------------------------------------------------
-
     def _draw_candles(self, candles):
         draw_list = imgui.get_window_draw_list()
 

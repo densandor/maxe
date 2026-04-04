@@ -2,11 +2,12 @@ import numpy as np
 import pandas as pd
 import argparse
 
+
 def agentPerformanceMetrics(portfolioSeries):
     results = []
     for agentName, portfolioValueSeries in portfolioSeries.items():
         # Per-period returns (for calculating other metrics)
-        returnSeries = np.diff(portfolioValueSeries) / portfolioValueSeries[:-1]
+        returnSeries = np.diff(portfolioValueSeries)
 
         # Final total return
         finalPortfolioValue = portfolioValueSeries[-1]
@@ -16,7 +17,7 @@ def agentPerformanceMetrics(portfolioSeries):
         
         # Max drawdown
         runningPeak = np.maximum.accumulate(portfolioValueSeries)
-        drawdowns = (portfolioValueSeries - runningPeak) / runningPeak
+        drawdowns = portfolioValueSeries - runningPeak
         maxDrawdown = np.min(drawdowns)
         
         # Sharpe (assuming rf=0)

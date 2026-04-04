@@ -6,10 +6,10 @@
 #include <iostream>
 
 OrderBookLogAgent::OrderBookLogAgent(const Simulation* simulation)
-	: Agent(simulation), m_exchange(""), m_interval(1), m_depth(100), m_outputFile() { }
+	: Agent(simulation), m_exchange(""), m_interval(1), m_depth(1000), m_outputFile() { }
 
 OrderBookLogAgent::OrderBookLogAgent(const Simulation* simulation, const std::string& name)
-	: Agent(simulation, name), m_exchange(""), m_interval(1), m_depth(100), m_outputFile() { }
+	: Agent(simulation, name), m_exchange(""), m_interval(1), m_depth(1000), m_outputFile() { }
 
 void OrderBookLogAgent::receiveMessage(const MessagePtr& msg) {
 	const Timestamp currentTimestamp = simulation()->currentTimestamp();
@@ -50,14 +50,14 @@ void OrderBookLogAgent::logBookSide(const std::shared_ptr<RetrieveBookResponsePa
 			<< levelVolume
 			<< std::endl;
 
-		if (m_outputFile.is_open()) {
-			m_outputFile
-				<< payload->time << ","
-				<< side << ","
-				<< price << ","
-				<< levelVolume
-				<< std::endl;
-		}
+		// if (m_outputFile.is_open()) {
+		// 	m_outputFile
+		// 		<< payload->time << ","
+		// 		<< side << ","
+		// 		<< price << ","
+		// 		<< levelVolume
+		// 		<< std::endl;
+		// }
 	}
 
 	for (const auto& prev : *prevLevels) {
@@ -67,13 +67,13 @@ void OrderBookLogAgent::logBookSide(const std::shared_ptr<RetrieveBookResponsePa
 				<< prev.first << ",0"
 				<< std::endl;
 
-			if (m_outputFile.is_open()) {
-				m_outputFile
-					<< payload->time << ","
-					<< side << ","
-					<< prev.first << ",0"
-					<< std::endl;
-			}
+			// if (m_outputFile.is_open()) {
+			// 	m_outputFile
+			// 		<< payload->time << ","
+			// 		<< side << ","
+			// 		<< prev.first << ",0"
+			// 		<< std::endl;
+			// }
 		}
 	}
 
@@ -107,11 +107,11 @@ void OrderBookLogAgent::configure(const pugi::xml_node& node, const std::string&
 			filePath = fs::path("logs") / filePath;
 		}
 
-		m_outputFile.open(filePath.string());
-		if (m_outputFile.is_open()) {
-			m_outputFile << "time,side,price,volume\n";
-		} else {
-			std::cerr << name() << ": Failed to open order book CSV file: " << att.as_string() << std::endl;
-		}
+		// m_outputFile.open(filePath.string());
+		// if (m_outputFile.is_open()) {
+		// 	m_outputFile << "time,side,price,volume\n";
+		// } else {
+		// 	std::cerr << name() << ": Failed to open order book CSV file: " << att.as_string() << std::endl;
+		// }
 	}
 }

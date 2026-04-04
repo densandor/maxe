@@ -2,13 +2,13 @@
 <Simulation start="0" duration="10000">
     <ExchangeAgent name="MARKET" algorithm="PriceTime" />
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000" />
-    <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="20" standardDeviation="0.1" mean="0.0" />
-    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLog.csv" slowWindowSize="200" fastWindowSize="100" />
+    <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="20" standardDeviation="5" mean="0.0" />
+    <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLogSmall.csv" slowWindowSize="200" fastWindowSize="100" />
     <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" outputFile="MarketDataLogLarge.csv" slowWindowSize="400" fastWindowSize="200" />
-    <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv" offset="10" interval="10" />
-    <OrderBookLogAgent name="ORDER_BOOK_LOGGER" exchange="MARKET" outputFile="OrderBookLog.csv" offset="10" interval="10" depth="10" />
+    <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv" />
+    <OrderBookLogAgent name="ORDER_BOOK_LOGGER" exchange="MARKET" outputFile="OrderBookLog.csv" />
     <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv" />
-    <PortfolioAgent name="PORTFOLIO_AGENT" exchange="MARKET" outputFile="PortfolioHistory.csv" />
+    <PortfolioAgent name="PORTFOLIO_AGENT" exchange="MARKET" outputFile="PortfolioLog.csv" />
     <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET" />
     <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET" />
     <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET" />

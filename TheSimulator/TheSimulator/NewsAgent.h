@@ -15,11 +15,10 @@ public:
 
 private:
     unsigned long long m_offset = 1;
-    unsigned long long m_newsPoissonLambda = 100;
-    std::string m_mode = "normal";
+    unsigned long long m_newsPoissonLambda = 20;
 
     double m_mean = 0.0;
-    double m_standardDeviation = 0.5;
+    double m_standardDeviation = 5;
     double m_news = 0.0;
 
     std::list<std::string> m_newsSubscribers;

@@ -1,8 +1,11 @@
 import imgui
 import numpy as np
-import pandas as pd
 import sys
 from pathlib import Path
+from OpenGL import GL as gl
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+import matplotlib.pyplot as plt
+
 
 # Add project root to path for script imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -11,7 +14,8 @@ from scripts.stylisedFacts import (
     volatility,
     returnAutocorrelation,
     volatilityAutocorrelation,
-    heavyTails
+    heavyTails,
+    plotReturnsWithNormal,
 )
 
 
@@ -21,174 +25,87 @@ class MarketAnalysisPanel:
         self.has_data = False
         self.trade_log_path = Path("logs/TradeLog.csv")
         self._prev_running = False
+        self.use_log_axis = False
+        self._hist_texture_id = None
+        self._hist_texture_size = (0, 0)
         
         # Metrics
         self.volatility_abs = 0.0
-        self.volatility_sq = 0.0
-        self.acf_lags = [1, 10, 60, 300]
+        self.acf_lags = [1, 6, 30, 90]
         self.ret_acf_values = []
         self.vol_acf_values = []
         self.excess_kurtosis = 0.0
-        
-        # Histogram data
-        self.hist_bins = []
-        self.hist_counts = []
         self.log_returns = None
-        self.timeframe = 60  # seconds per candle
-
-        # Histogram controls
-        self.use_log_axis = False
-        self.num_bins = 30
 
     def clear(self):
         """Clear analysis data."""
         self.has_data = False
         self.ret_acf_values = []
         self.vol_acf_values = []
-        self.hist_bins = []
-        self.hist_counts = []
         self.log_returns = None
+        self._delete_hist_texture()
 
-    def _compute_histogram(self, log_returns, num_bins=30):
-        """Compute histogram bins and counts."""
-        counts, bin_edges = np.histogram(log_returns, bins=num_bins)
-        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
-        
-        # Normalize to density
-        bin_width = bin_edges[1] - bin_edges[0]
-        density = counts / (len(log_returns) * bin_width)
-        
-        return bin_centers, density
+    def _delete_hist_texture(self):
+        if self._hist_texture_id is not None:
+            gl.glDeleteTextures(int(self._hist_texture_id))
+            self._hist_texture_id = None
+            self._hist_texture_size = (0, 0)
+
+    def _update_hist_texture(self, log_returns):
+        fig = plotReturnsWithNormal(
+            log_returns,
+            logScale=self.use_log_axis,
+            show=False,
+            returnFigure=True,
+        )
+
+        canvas = FigureCanvasAgg(fig)
+        canvas.draw()
+        width, height = canvas.get_width_height()
+        rgba = np.asarray(canvas.buffer_rgba(), dtype=np.uint8)
+
+        self._delete_hist_texture()
+
+        texture_id = gl.glGenTextures(1)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, texture_id)
+        gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
+        gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
+        gl.glPixelStorei(gl.GL_UNPACK_ALIGNMENT, 1)
+        gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, width, height, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, rgba)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
+
+        self._hist_texture_id = texture_id
+        self._hist_texture_size = (width, height)
+        plt.close(fig)
 
     def _load_and_analyze(self):
-        """Load trade log and calculate stylised facts."""
-        if not self.trade_log_path.exists():
-            print(f"Trade log not found: {self.trade_log_path}")
-            return
-
-        try:
-            # Generate candles using shared function
-            ohlc = generateCandles(str(self.trade_log_path), self.timeframe)
-            if ohlc is None or len(ohlc) < 2:
-                print("Insufficient candle data")
-                return
-            
-            # Calculate log returns
-            close_prices = ohlc['close'].values
-            log_returns = np.log(close_prices[1:] / close_prices[:-1])
-            
-            # Filter out invalid returns
-            log_returns = log_returns[np.isfinite(log_returns)]
-            if len(log_returns) < 10:
-                print("Insufficient valid returns")
-                return
-            
-            self.log_returns = log_returns
-            
-            # Calculate metrics using shared functions from stylisedFacts
-            vol_abs = volatility(log_returns, measure="absolute")
-            vol_sq = volatility(log_returns, measure="squared")
-            self.volatility_abs = np.mean(vol_abs)
-            self.volatility_sq = np.mean(vol_sq)
-            
-            acf_results = returnAutocorrelation(log_returns, lags=self.acf_lags)
-            self.ret_acf_values = list(acf_results[1:])  # skip lag-0
-            
-            vol_acf_results = volatilityAutocorrelation(log_returns, lags=self.acf_lags, measure="absolute")
-            self.vol_acf_values = list(vol_acf_results[1:])  # skip lag-0
-            
-            self.excess_kurtosis = heavyTails(log_returns)
-            
-            # Compute histogram
-            self.hist_bins, self.hist_counts = self._compute_histogram(log_returns, self.num_bins)
-            
-            self.has_data = True
-            print(f"Market analysis complete: {len(log_returns)} returns analyzed")
-            
-        except Exception as e:
-            print(f"Error in market analysis: {e}")
-            import traceback
-            traceback.print_exc()
-
-    def _draw_histogram(self):
-        """Draw histogram with normal overlay using imgui draw list."""
-        if self.log_returns is None or len(self.hist_bins) == 0:
-            return
+        # Generate candles using shared function
+        ohlc = generateCandles(str(self.trade_log_path))
         
-        draw_list = imgui.get_window_draw_list()
+        # Calculate log returns
+        close_prices = ohlc['close'].values
+        log_returns = np.log(close_prices[1:] / close_prices[:-1])
         
-        # Chart dimensions – sized to fit the right-hand child panel
-        chart_w = 530
-        chart_h = 220
-        pad_left = 40
-        pad_top = 5
-        pad_bottom = 20
+        # Filter out invalid returns
+        log_returns = log_returns[np.isfinite(log_returns)]
         
-        origin = imgui.get_cursor_screen_position()
-        ox, oy = origin.x + pad_left, origin.y + pad_top
+        self.log_returns = log_returns
         
-        total_w = chart_w + pad_left + 10
-        total_h = chart_h + pad_top + pad_bottom
-        imgui.invisible_button("##histogram", total_w, total_h)
+        # Calculate metrics using shared functions from stylisedFacts
+        vol_abs = volatility(log_returns)
+        self.volatility_abs = np.mean(vol_abs)
         
-        # Background
-        col_bg = imgui.get_color_u32_rgba(0.10, 0.10, 0.12, 1.0)
-        col_hist = imgui.get_color_u32_rgba(0.85, 0.22, 0.20, 0.7)
-        col_normal = imgui.get_color_u32_rgba(0.30, 0.60, 1.00, 1.0)
-        col_label = imgui.get_color_u32_rgba(0.70, 0.70, 0.70, 1.0)
+        acf_results = returnAutocorrelation(log_returns, lags=self.acf_lags)
+        self.ret_acf_values = list(acf_results[1:])  # skip lag-0
         
-        draw_list.add_rect_filled(ox, oy, ox + chart_w, oy + chart_h, col_bg)
+        vol_acf_results = volatilityAutocorrelation(log_returns, lags=self.acf_lags)
+        self.vol_acf_values = list(vol_acf_results[1:])  # skip lag-0
         
-        # Scales
-        x_min, x_max = self.hist_bins.min(), self.hist_bins.max()
-        counts = self.hist_counts.copy()
+        self.excess_kurtosis = heavyTails(log_returns)
+        self._update_hist_texture(log_returns)
         
-        use_log = self.use_log_axis
-        if use_log:
-            counts = np.where(counts > 0, np.log10(counts), 0)
-        
-        y_max = counts.max() * 1.1
-        
-        if x_max == x_min or y_max == 0:
-            return
-        
-        def x_of(val):
-            return ox + ((val - x_min) / (x_max - x_min)) * chart_w
-        
-        def y_of(val):
-            return oy + chart_h - (val / y_max) * chart_h
-        
-        # Draw histogram bars
-        bar_width = chart_w / len(self.hist_bins)
-        for i, (bin_center, count) in enumerate(zip(self.hist_bins, counts)):
-            x = x_of(bin_center)
-            y = y_of(count)
-            draw_list.add_rect_filled(
-                x - bar_width/2, y,
-                x + bar_width/2, oy + chart_h,
-                col_hist
-            )
-        
-        # Draw normal distribution overlay
-        mean = np.mean(self.log_returns)
-        std = np.std(self.log_returns, ddof=0)
-        
-        x_range = np.linspace(x_min, x_max, 100)
-        norm_pdf = (1.0 / (np.sqrt(2 * np.pi) * std)) * np.exp(-0.5 * ((x_range - mean) / std) ** 2)
-        if use_log:
-            norm_pdf = np.where(norm_pdf > 0, np.log10(norm_pdf), 0)
-        
-        for i in range(len(x_range) - 1):
-            x1 = x_of(x_range[i])
-            y1 = y_of(norm_pdf[i])
-            x2 = x_of(x_range[i + 1])
-            y2 = y_of(norm_pdf[i + 1])
-            draw_list.add_line(x1, y1, x2, y2, col_normal, 2.0)
-        
-        # Axis labels
-        draw_list.add_text(ox + chart_w/2 - 30, oy + chart_h + 2, col_label, "Log Returns")
-        y_label = "log10(density)" if use_log else "Density"
-        draw_list.add_text(ox - 35, oy + chart_h / 2 - 5, col_label, y_label)
+        self.has_data = True
+        print(f"Market analysis complete: {len(log_returns)} returns analyzed.")
 
     def render(self):
         imgui.set_next_window_position(0, 720, imgui.ALWAYS)
@@ -210,7 +127,6 @@ class MarketAnalysisPanel:
                 imgui.separator()
 
                 imgui.text(f"Volatility (abs):  {self.volatility_abs:.6f}")
-                imgui.text(f"Volatility (sq):   {self.volatility_sq:.6f}")
                 imgui.text(f"Excess Kurtosis:   {self.excess_kurtosis:.4f}")
 
                 imgui.separator()
@@ -223,31 +139,33 @@ class MarketAnalysisPanel:
                     imgui.text(f"  Lag {lag:>3d}:  {acf:>8.6f}")
                 imgui.end_child()
 
-                # ---------- RIGHT COLUMN: histogram ----------
+                # ---------- RIGHT COLUMN: histogram image ----------
                 imgui.same_line()
                 imgui.begin_child("##hist_col", width=0, height=0, border=True)
+                header_start_x = imgui.get_cursor_pos_x()
+                available_width = imgui.get_content_region_available().x
+                checkbox_width = imgui.calc_text_size("Log axis").x + imgui.get_frame_height() + 14
 
                 imgui.text("Return Distribution")
+                imgui.same_line(0, 0)
+                imgui.set_cursor_pos_x(max(header_start_x, header_start_x + available_width - checkbox_width))
+                changed_log, self.use_log_axis = imgui.checkbox("Log axis", self.use_log_axis)
                 imgui.separator()
 
-                # Controls row
-                changed_log, self.use_log_axis = imgui.checkbox("Log axis", self.use_log_axis)
-                imgui.same_line(spacing=20)
-                imgui.push_item_width(100)
-                changed_bins, self.num_bins = imgui.input_int("Bins", self.num_bins, step=5)
-                imgui.pop_item_width()
-                if self.num_bins < 5:
-                    self.num_bins = 5
-                if self.num_bins > 500:
-                    self.num_bins = 500
+                if changed_log and self.log_returns is not None:
+                    self._update_hist_texture(self.log_returns)
 
-                # Recompute histogram when controls change
-                if changed_log or changed_bins:
-                    self.hist_bins, self.hist_counts = self._compute_histogram(
-                        self.log_returns, self.num_bins
-                    )
+                if self._hist_texture_id is None:
+                    imgui.text("Histogram unavailable.")
+                else:
+                    avail = imgui.get_content_region_available()
+                    tex_w, tex_h = self._hist_texture_size
+                    scale = min(avail.x / max(tex_w, 1), avail.y / max(tex_h, 1))
+                    scale = max(scale, 0.1)
+                    draw_w = tex_w * scale
+                    draw_h = tex_h * scale
+                    imgui.image(self._hist_texture_id, draw_w, draw_h, (0, 0), (1, 1))
 
-                self._draw_histogram()
                 imgui.end_child()
 
             imgui.end()

@@ -3,15 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scripts.candles import generateCandles
 
-# Volatility of the mid-price
-def volatility(logReturns, measure="absolute"):
-    if measure == "absolute":
-        return np.abs(logReturns)
-    elif measure == "squared":
-        return logReturns ** 2
+
+# Volatility of the returns (estimated as the absolute value)
+def volatility(logReturns):
+    return np.abs(logReturns)
 
 # Autocorrelation of returns (short-term memory)
-def returnAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
+def returnAutocorrelation(logReturns, lags=[1, 10, 30, 90]):
     mean = np.mean(logReturns)
     centeredLogReturns = logReturns - mean
 
@@ -23,24 +21,24 @@ def returnAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
         results[i+1] = np.sum(centeredLogReturns[:-lag] * centeredLogReturns[lag:]) / variance
     return results
 
-# Autocorrelation of the volatility of the mid-price (volatility clustering)
-def volatilityAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900], measure="absolute"):
-    vol = volatility(logReturns, measure=measure)
+# Autocorrelation of the volatility of the returns (volatility clustering)
+def volatilityAutocorrelation(logReturns, lags=[1, 10, 30, 90]):
+    vol = volatility(logReturns)
     
     n = len(vol)
     mean = np.mean(vol)
     centeredVolatility = vol - mean
     
     # Calculate lag-0 autocovariance
-    gamma_0 = np.sum(centeredVolatility ** 2) / n
+    lag0 = np.sum(centeredVolatility ** 2) / n
     
     # Calculate ACF at each lag
     results = np.zeros(len(lags) + 1)
     results[0] = 1.0
     
     for i, lag in enumerate(lags):
-        gamma_k = np.sum(centeredVolatility[:-lag] * centeredVolatility[lag:]) / n
-        results[i+1] = gamma_k / gamma_0
+        lagK = np.sum(centeredVolatility[:-lag] * centeredVolatility[lag:]) / n
+        results[i+1] = lagK / lag0
     
     return results
 
@@ -53,12 +51,12 @@ def heavyTails(logReturns):
     excessKurtosis = fourthMoment - 3.0
     return excessKurtosis
 
-def plotReturnsWithNormal(logReturns, bins=20, title="Log Returns (Normal Distribution for Reference)", logScale=True):
+def plotReturnsWithNormal(logReturns, bins=50, title="Log Returns (Normal Distribution for Reference)", logScale=True, show=True, returnFigure=False):
     logReturns = np.asarray(logReturns)
     mean = np.mean(logReturns)
     standardDeviation = np.std(logReturns)
 
-    plt.figure(figsize=(8, 5))
+    fig = plt.figure(figsize=(8, 5))
 
     plt.hist(logReturns, bins=bins, density=True, alpha=0.5, color="red", label="Empirical returns", histtype="step")
 
@@ -74,7 +72,12 @@ def plotReturnsWithNormal(logReturns, bins=20, title="Log Returns (Normal Distri
     plt.tight_layout()
     if logScale:
         plt.yscale("log")
-    plt.show()
+    if show:
+        plt.show()
+    if returnFigure:
+        return fig
+    if not show:
+        plt.close(fig)
 
 
 if __name__ == "__main__":
@@ -89,7 +92,7 @@ if __name__ == "__main__":
     vol = volatility(logReturns)
     print("Mean Volatility of Returns: " + str(np.mean(vol)))
 
-    lagsToCalculate = [60, 300]
+    lagsToCalculate = [1, 10, 30, 90]
 
     returnACF = returnAutocorrelation(logReturns, lags=lagsToCalculate)
     print("Autocorrelation Function (ACF) of Returns:")

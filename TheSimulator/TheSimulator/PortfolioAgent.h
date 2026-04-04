@@ -3,14 +3,15 @@
 #include "Agent.h"
 #include "Trade.h"
 #include <unordered_map>
-#include <unordered_set>
 #include <string>
 #include <fstream>
+#include <vector>
 
 struct PnLState {
-	int inventory = 0; // signed position
-	double avg_price = 0.0;  // average entry price (float representation)
+	int inventory = 0;
+	double avg_price = 0.0;
 	double realized_pnl = 0.0;
+	std::vector<double> history;
 };
 
 class PortfolioAgent : public Agent {
@@ -23,15 +24,15 @@ public:
 
 private:
 	void updateOnFill(const std::string& owner, const Money& price, Volume volume, OrderDirection direction);
-	void samplePortfolios(Timestamp t);
+	void samplePortfolios();
 	void writePortfolioCSV();
+	void ensureAgentHistoryAligned(const std::string& agent);
 
 	std::string m_exchange;
-	std::unordered_map<std::string, PnLState> m_states;
-	std::unordered_set<std::string> m_agents_with_positions;
-	Money m_last_trade_price;
-
 	Timestamp m_sample_interval = 1;
-	std::unordered_map<std::string, std::vector<double>> m_portfolio_history;
 	std::string m_portfolio_output_file = "logs/PortfolioLog.csv";
+
+	size_t m_sample_count = 0;
+	std::unordered_map<std::string, PnLState> m_states;
+	Money m_last_trade_price;
 };
