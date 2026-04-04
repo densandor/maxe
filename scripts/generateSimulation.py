@@ -8,7 +8,7 @@ def generateSimulation(numRandom, numFundamental, numMao, numQLearning, numDQL, 
     ET.SubElement(root, "ExchangeAgent", name="MARKET", algorithm="PriceTime")
     ET.SubElement(root, "SetupAgent", name="SETUP_AGENT", exchange="MARKET", setupTime="0", bidVolume="1", askVolume="1", bidPrice=str(startingPrice), askPrice=str(startingPrice))
     ET.SubElement(root, "NewsAgent", name="NEWS_AGENT", offset="1", newsPoissonLambda="20", standardDeviation="5", mean="0.0")
-    ET.SubElement(root, "MarketDataAgent", name="MARKET_DATA_AGENT_SMALL", exchange="MARKET", outputFile="MarketDataLog.csv", slowWindowSize="200", fastWindowSize="100")
+    ET.SubElement(root, "MarketDataAgent", name="MARKET_DATA_AGENT_SMALL", exchange="MARKET", outputFile="MarketDataLogSmall.csv", slowWindowSize="200", fastWindowSize="100")
     ET.SubElement(root, "MarketDataAgent", name="MARKET_DATA_AGENT_LARGE", exchange="MARKET", outputFile="MarketDataLogLarge.csv", slowWindowSize="400", fastWindowSize="200")
     ET.SubElement(root, "L1LogAgent", name="L1_LOGGER", exchange="MARKET", outputFile="L1Log.csv")
     ET.SubElement(root, "OrderBookLogAgent", name="ORDER_BOOK_LOGGER", exchange="MARKET", outputFile="OrderBookLog.csv")
@@ -54,6 +54,6 @@ if __name__ == "__main__":
     parser.add_argument("--output", default="simulations/GeneratedSimulation.xml", help="Output file path")
     args = parser.parse_args()
 
-    generateSimulation(args.random, args.fundamental, args.mao, args.momentum, args.qlearning, args.dql, duration=args.duration, startingPrice=args.startingPrice, output=args.output)
+    generateSimulation(args.random, args.fundamental, args.mao, args.qlearning, args.dql, duration=args.duration, startingPrice=args.startingPrice, output=args.output)
 
     

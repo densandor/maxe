@@ -24,9 +24,6 @@ void NewsAgent::configure(const pugi::xml_node& node, const std::string& configu
     if (!(att = node.attribute("newsPoissonLambda")).empty()) {
         m_newsPoissonLambda = std::stod(simulation()->parameters().processString(att.as_string()));
     }
-    if (!(att = node.attribute("mode")).empty()) {
-        m_mode = simulation()->parameters().processString(att.as_string());
-    }
 }
 
 void NewsAgent::receiveMessage(const MessagePtr& msg) {
@@ -43,12 +40,7 @@ void NewsAgent::receiveMessage(const MessagePtr& msg) {
         stepsUntilNextNews = std::max(1ULL, stepsUntilNextNews);
         simulation()->dispatchMessage(simulation()->currentTimestamp(), stepsUntilNextNews, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>(), true);
         std::normal_distribution<double> normalDistribution(m_mean, m_standardDeviation);
-        std::uniform_real_distribution<double> uniformDistribution(-1.0 * m_standardDeviation, m_standardDeviation);
-        if (m_mode == "uniform") {
-            m_news = uniformDistribution(simulation()->randomGenerator());
-        } else {
-            m_news = normalDistribution(simulation()->randomGenerator());
-        }
+        m_news = normalDistribution(simulation()->randomGenerator());
         notifyNewsSubscribers();
         return;
     }

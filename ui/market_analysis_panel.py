@@ -1,10 +1,11 @@
 import imgui
 import numpy as np
-import pandas as pd
-import OpenGL.GL as gl
-import matplotlib.pyplot as plt
 import sys
 from pathlib import Path
+from OpenGL import GL as gl
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+import matplotlib.pyplot as plt
+
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.candles import generateCandles
@@ -17,6 +18,9 @@ class MarketAnalysisPanel:
         self.has_data = False
         self.trade_log_path = Path("logs/TradeLog.csv")
         self._prev_running = False
+        self.use_log_axis = False
+        self._hist_texture_id = None
+        self._hist_texture_size = (0, 0)
         
         # Metrics
         self.volatility_abs = 0.0
@@ -158,6 +162,9 @@ class MarketAnalysisPanel:
 
                 imgui.same_line()
                 imgui.begin_child("##hist_col", width=0, height=0, border=True)
+                header_start_x = imgui.get_cursor_pos_x()
+                available_width = imgui.get_content_region_available().x
+                checkbox_width = imgui.calc_text_size("Log axis").x + imgui.get_frame_height() + 14
 
                 child_width = imgui.get_content_region_available_width()
                 checkbox_width = imgui.calc_text_size("Log axis").x + imgui.get_frame_height() + imgui.get_style().item_inner_spacing.x

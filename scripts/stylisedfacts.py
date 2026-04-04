@@ -36,15 +36,12 @@ def volatilityAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 90
     centeredVolatility = vol - mean
     
     # Calculate lag-0 autocovariance
-    gamma_0 = np.sum(centeredVolatility ** 2) / n
+    lag0 = np.sum(centeredVolatility ** 2) / n
     
     # Calculate ACF at each lag
     for i, lag in enumerate(lags):
-        if lag <= 0 or lag >= n:
-            results[i + 1] = np.nan
-            continue
-        gamma_k = np.sum(centeredVolatility[:-lag] * centeredVolatility[lag:]) / n
-        results[i+1] = gamma_k / gamma_0
+        lagK = np.sum(centeredVolatility[:-lag] * centeredVolatility[lag:]) / n
+        results[i+1] = lagK / lag0
     
     return results
 
