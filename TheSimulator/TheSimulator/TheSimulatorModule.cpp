@@ -9,28 +9,22 @@ namespace py = pybind11;
 PYBIND11_EMBEDDED_MODULE(thesimulator, m) {
 	py::class_<Simulation>(m, "Simulation")
 		.def("currentTimestamp", &Simulation::currentTimestamp)
-		.def(
-			"dispatchGenericMessage",
-			&Simulation::dispatchGenericMessage,
+		.def("dispatchGenericMessage", &Simulation::dispatchGenericMessage,
 			py::arg("occurrence"),
 			py::arg("delay"),
 			py::arg("source"),
 			py::arg("target"),
 			py::arg("type"),
 			py::arg("payload"),
-			py::arg("isLogging") = false
-		)
-		.def(
-			"dispatchMessage",
-			&Simulation::dispatchMessage,
+			py::arg("isLogging") = false)
+		.def("dispatchMessage", &Simulation::dispatchMessage,
 			py::arg("occurrence"),
 			py::arg("delay"),
 			py::arg("source"),
 			py::arg("target"),
 			py::arg("type"),
 			py::arg("payload"),
-			py::arg("isLogging") = false
-		)
+			py::arg("isLogging") = false)
 		.def("queueMessage", &Simulation::queueMessage)
 		;
 

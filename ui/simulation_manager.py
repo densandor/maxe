@@ -64,7 +64,7 @@ class SimulationManager:
             self.running = True
 
             Thread(target=self._monitor_stdout, daemon=True).start()
-            print("Simulation started, monitoring stdout")
+            print("Simulation started, monitoring stdout.")
             return True
         except Exception as e:
             print(f"Error starting simulation: {e}")

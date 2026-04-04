@@ -6,10 +6,10 @@
 #include <iostream>
 
 OrderBookLogAgent::OrderBookLogAgent(const Simulation* simulation)
-	: Agent(simulation), m_exchange(""), m_interval(1), m_depth(100), m_outputFile() { }
+	: Agent(simulation), m_exchange(""), m_interval(1), m_depth(1000), m_outputFile() { }
 
 OrderBookLogAgent::OrderBookLogAgent(const Simulation* simulation, const std::string& name)
-	: Agent(simulation, name), m_exchange(""), m_interval(1), m_depth(100), m_outputFile() { }
+	: Agent(simulation, name), m_exchange(""), m_interval(1), m_depth(1000), m_outputFile() { }
 
 void OrderBookLogAgent::receiveMessage(const MessagePtr& msg) {
 	const Timestamp currentTimestamp = simulation()->currentTimestamp();

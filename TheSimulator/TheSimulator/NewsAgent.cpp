@@ -15,9 +15,11 @@ void NewsAgent::configure(const pugi::xml_node& node, const std::string& configu
     }
     if (!(att = node.attribute("mean")).empty()) {
         m_mean = std::stod(simulation()->parameters().processString(att.as_string()));
+        std::cout << "NewsAgent: configured mean news value: " << m_mean << std::endl;
     }
     if (!(att = node.attribute("standardDeviation")).empty()) {
         m_standardDeviation = std::stod(simulation()->parameters().processString(att.as_string()));
+        std::cout << "NewsAgent: configured standard deviation: " << m_standardDeviation << std::endl;
     }
     if (!(att = node.attribute("newsPoissonLambda")).empty()) {
         m_newsPoissonLambda = std::stod(simulation()->parameters().processString(att.as_string()));
@@ -32,6 +34,7 @@ void NewsAgent::receiveMessage(const MessagePtr& msg) {
 
     if (msg->type == "EVENT_SIMULATION_START") {
 	    simulation()->dispatchMessage(simulation()->currentTimestamp(), m_offset, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>());
+        std::cout << "NewsAgent: scheduled first wake-up at timestamp " << currentTimestamp + m_offset << std::endl;
         return;
     }
 
@@ -42,9 +45,9 @@ void NewsAgent::receiveMessage(const MessagePtr& msg) {
         std::normal_distribution<double> normalDistribution(m_mean, m_standardDeviation);
         std::uniform_real_distribution<double> uniformDistribution(-1.0 * m_standardDeviation, m_standardDeviation);
         if (m_mode == "uniform") {
-            m_news = normalDistribution(simulation()->randomGenerator());
-        } else {
             m_news = uniformDistribution(simulation()->randomGenerator());
+        } else {
+            m_news = normalDistribution(simulation()->randomGenerator());
         }
         notifyNewsSubscribers();
         return;

@@ -20,7 +20,7 @@ class ChartPanel:
         self.data_queue = data_queue
         self.ticks = [] # (time, price) ticks
         self.candles = [] # aggregated Candle objects
-        self.timeframe = 100 # seconds per candle
+        self.timeframe = 60 # seconds per candle
         self._prev_timeframe = 10
         self.max_ticks = 50000
         self.max_visible = 200 # max candles shown at once

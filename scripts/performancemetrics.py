@@ -2,25 +2,29 @@ import numpy as np
 import pandas as pd
 import argparse
 
+
 def agentPerformanceMetrics(portfolioSeries):
     results = []
-    for agentName, portfolioValueSeries in portfolioSeries.items():
+    for agentName, portfolio in portfolioSeries.items():
+
+        portfolio = np.asarray(portfolio, dtype=float)
+
         # Per-period returns (for calculating other metrics)
-        returnSeries = np.diff(portfolioValueSeries) / portfolioValueSeries[:-1]
+        returns = np.diff(portfolio)
 
         # Final total return
-        finalPortfolioValue = portfolioValueSeries[-1]
+        finalPortfolioValue = portfolio[-1]
                 
         # Volatility
-        volatility = np.std(returnSeries, ddof=1)
+        volatility = np.std(returns, ddof=1)
         
         # Max drawdown
-        runningPeak = np.maximum.accumulate(portfolioValueSeries)
-        drawdowns = (portfolioValueSeries - runningPeak) / runningPeak
-        maxDrawdown = np.min(drawdowns)
+        runningPeak = np.maximum.accumulate(portfolio)
+        drawdowns = runningPeak - portfolio
+        maxDrawdown = np.max(drawdowns)
         
         # Sharpe (assuming rf=0)
-        sharpe = np.mean(returnSeries) / np.std(returnSeries)
+        sharpe = np.mean(returns) / np.std(returns)
 
         results.append({
             "agent_name": agentName,
@@ -34,7 +38,7 @@ def agentPerformanceMetrics(portfolioSeries):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("mao")
-    parser.add_argument("input", nargs="?", default="logs/PortfolioHistory.csv")
+    parser.add_argument("input", nargs="?", default="logs/PortfolioLog.csv")
     args = parser.parse_args()
 
     df = pd.read_csv(args.input)

@@ -3,8 +3,8 @@ import imgui
 import shutil
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
-from generateSimulation import generateSimulation
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from scripts.generateSimulation import generateSimulation
 
 
 class ConfigPanel:
@@ -28,7 +28,6 @@ class ConfigPanel:
         self.gen_num_random = 10
         self.gen_num_fundamental = 100
         self.gen_num_mao = 150
-        self.gen_num_momentum = 0
         self.gen_num_qlearning = 0
         self.gen_num_dql = 0
         self.gen_duration = 10000
@@ -79,7 +78,6 @@ class ConfigPanel:
             _, self.gen_num_random = imgui.input_int("Random", self.gen_num_random)
             _, self.gen_num_fundamental = imgui.input_int("Fundamental", self.gen_num_fundamental)
             _, self.gen_num_mao = imgui.input_int("MAO", self.gen_num_mao)
-            _, self.gen_num_momentum = imgui.input_int("Momentum", self.gen_num_momentum)
             _, self.gen_num_qlearning = imgui.input_int("QLearning", self.gen_num_qlearning)
             _, self.gen_num_dql = imgui.input_int("DQL", self.gen_num_dql)
 
@@ -90,7 +88,7 @@ class ConfigPanel:
 
             if imgui.button("Generate Simulation", 306, 30):
                 output_path = str(Path(__file__).parent.parent / "simulations" / "GeneratedSimulation.xml")
-                generateSimulation(self.gen_num_random, self.gen_num_fundamental, self.gen_num_mao, self.gen_num_momentum, self.gen_num_qlearning, self.gen_num_dql, duration=self.gen_duration, startingPrice=self.gen_starting_price, output=output_path)
+                generateSimulation(self.gen_num_random, self.gen_num_fundamental, self.gen_num_mao, self.gen_num_qlearning, self.gen_num_dql, duration=self.gen_duration, startingPrice=self.gen_starting_price, output=output_path)
                 self._load_population_files()
                 self.is_generated = True
 
@@ -120,8 +118,7 @@ class ConfigPanel:
                 if self.market_panel:
                     self.market_panel.clear()
                 selected_file = self.population_files[self.population_index]
-                if self.sim_manager.start_simulation(selected_file):
-                    print(f"Simulation started using {selected_file}")
+                self.sim_manager.start_simulation(selected_file)
 
             if sim_running:
                 if imgui.button("Stop Simulation", 306, 30):

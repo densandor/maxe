@@ -4,7 +4,6 @@ import pandas as pd
 import sys
 from pathlib import Path
 
-# Add project root to path for script imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.performanceMetrics import agentPerformanceMetrics
 
@@ -13,10 +12,10 @@ class StatsPanel:
     def __init__(self, sim_manager):
         self.sim_manager = sim_manager
         self.stats_data = []
-        self.sort_column = 0  # 0=agent, 1=final_value, 2=volatility, 3=max_dd, 4=sharpe
+        self.sort_column = 0
         self.sort_ascending = True
         self.has_data = False
-        self.csv_path = Path("logs/PortfolioHistory.csv")
+        self.csv_path = Path("logs/PortfolioLog.csv")
         self._prev_running = False
 
     def clear(self):
@@ -26,38 +25,28 @@ class StatsPanel:
 
     def _load_and_calculate(self):
         """Load portfolio history and calculate metrics."""
-        if not self.csv_path.exists():
-            print(f"Portfolio history file not found: {self.csv_path}")
-            return
-
-        try:
-            df = pd.read_csv(self.csv_path)
-            portfolio_series = {
-                col: df[col].values 
-                for col in df.columns 
-                if col.lower() != "time" and col.lower() != "setup_agent"
-            }
-            results_df = agentPerformanceMetrics(portfolio_series)
-            self.stats_data = []
-            for _, row in results_df.iterrows():
-                self.stats_data.append({
-                    "agent": row["agent_name"],
-                    "final_value": row["final_portfolio_value"],
-                    "volatility": row["volatility"],
-                    "max_dd": row["max_drawdown"],
-                    "sharpe": row["sharpe_ratio"],
-                })
-            self.has_data = True
-            self._sort_data()
-            print(f"Loaded stats for {len(self.stats_data)} agents")
-        except Exception as e:
-            print(f"Error loading portfolio history: {e}")
+        df = pd.read_csv(self.csv_path)
+        portfolio_series = {
+            col: df[col].values 
+            for col in df.columns 
+            if col.lower() != "time" and col.lower() != "setup_agent"
+        }
+        results_df = agentPerformanceMetrics(portfolio_series)
+        self.stats_data = []
+        for _, row in results_df.iterrows():
+            self.stats_data.append({
+                "agent": row["agent_name"],
+                "final_value": row["final_portfolio_value"],
+                "volatility": row["volatility"],
+                "max_dd": row["max_drawdown"],
+                "sharpe": row["sharpe_ratio"],
+            })
+        self.has_data = True
+        self._sort_data()
+        print(f"Loaded stats for {len(self.stats_data)} agents")
 
     def _sort_data(self):
-        """Sort stats data by current column."""
-        if not self.stats_data:
-            return
-        
+        """Sort stats data by current column."""        
         key_map = ["agent", "final_value", "volatility", "max_dd", "sharpe"]
         key = key_map[self.sort_column]
         self.stats_data.sort(key=lambda x: x[key], reverse=not self.sort_ascending)
@@ -99,7 +88,7 @@ class StatsPanel:
                         imgui.table_set_column_index(col_idx)
                         # Add sort indicator
                         if self.sort_column == col_idx:
-                            indicator = " ▼" if not self.sort_ascending else " ▲"
+                            indicator = " (Desc.)" if not self.sort_ascending else " (Asc.)"
                         else:
                             indicator = ""
                         if imgui.selectable(f"{header}{indicator}##header{col_idx}", False)[0]:
@@ -124,7 +113,7 @@ class StatsPanel:
                         imgui.text(f"{row['volatility']:.4f}")
                         
                         imgui.table_set_column_index(3)
-                        imgui.text(f"{row['max_dd']:.2%}")
+                        imgui.text(f"{row['max_dd']:.2f}")
                         
                         imgui.table_set_column_index(4)
                         imgui.text(f"{row['sharpe']:.4f}")
