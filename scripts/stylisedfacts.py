@@ -8,7 +8,7 @@ def volatility(logReturns):
     return np.abs(logReturns)
 
 # Autocorrelation of returns (short-term memory)
-def returnAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
+def returnAutocorrelation(logReturns, lags=[1, 10, 30, 90]):
     mean = np.mean(logReturns)
     centeredLogReturns = logReturns - mean
     variance = np.sum(centeredLogReturns ** 2)
