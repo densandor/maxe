@@ -32,6 +32,8 @@ class ConfigPanel:
         self.genNumDQL = 0
         self.genDuration = 10000
         self.genStartingPrice = 10000
+        self.genAlgorithm = 1  # 0=PureProRata, 1=PriceTime, 2=TimeProRata
+        self.algorithmOptions = ["PureProRata", "PriceTime", "TimeProRata"]
         self.isGenerated = False
 
     def _loadPopulationFiles(self):
@@ -85,10 +87,12 @@ class ConfigPanel:
 
             _, self.genDuration = imgui.input_int("Duration", self.genDuration)
             _, self.genStartingPrice = imgui.input_int("Start Price", self.genStartingPrice)
+            _, self.genAlgorithm = imgui.combo("Algorithm", self.genAlgorithm, self.algorithmOptions)
 
             if imgui.button("Generate Simulation", 306, 30):
                 outputPath = str(Path(__file__).parent.parent / "simulations" / "GeneratedSimulation.xml")
-                generateSimulation(self.genNumRandom, self.genNumFundamental, self.genNumMao, self.genNumQLearning, self.genNumDQL, duration=self.genDuration, startingPrice=self.genStartingPrice, output=outputPath)
+                selectedAlgorithm = self.algorithmOptions[self.genAlgorithm]
+                generateSimulation(self.genNumRandom, self.genNumFundamental, self.genNumMao, self.genNumQLearning, self.genNumDQL, duration=self.genDuration, startingPrice=self.genStartingPrice, algorithm=selectedAlgorithm, output=outputPath)
                 self._loadPopulationFiles()
                 self.isGenerated = True
 

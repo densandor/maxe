@@ -2,10 +2,10 @@ import argparse
 import xml.etree.ElementTree as ET
 
 
-def generateSimulation(numRandom, numFundamental, numMao, numQLearning, numDQL, duration=10000, startingPrice=10000, output="simulations/GeneratedSimulation.xml"):
+def generateSimulation(numRandom, numFundamental, numMao, numQLearning, numDQL, duration=10000, startingPrice=10000, algorithm="PriceTime", output="simulations/GeneratedSimulation.xml"):
     root = ET.Element("Simulation", start="0", duration=str(duration))
 
-    ET.SubElement(root, "ExchangeAgent", name="MARKET", algorithm="PriceTime")
+    ET.SubElement(root, "ExchangeAgent", name="MARKET", algorithm=algorithm)
     ET.SubElement(root, "SetupAgent", name="SETUP_AGENT", exchange="MARKET", setupTime="0", bidVolume="1", askVolume="1", bidPrice=str(startingPrice), askPrice=str(startingPrice))
     ET.SubElement(root, "NewsAgent", name="NEWS_AGENT", offset="1", newsPoissonLambda="20", standardDeviation="5", mean="0.0")
     ET.SubElement(root, "MarketDataAgent", name="MARKET_DATA_AGENT_SMALL", exchange="MARKET", outputFile="MarketDataLogSmall.csv", slowWindowSize="200", fastWindowSize="100")
@@ -51,9 +51,10 @@ if __name__ == "__main__":
     parser.add_argument("--dql", type=int, default=0, help="Number of DQL agents")
     parser.add_argument("--duration", type=int, default=10000, help="Simulation duration")
     parser.add_argument("--startingPrice", type=int, default=10000, help="Starting bid/ask price (in cents)")
+    parser.add_argument("--algorithm", type=str, default="PriceTime", choices=["PureProRata", "PriceTime", "TimeProRata"], help="Order matching algorithm")
     parser.add_argument("--output", default="simulations/GeneratedSimulation.xml", help="Output file path")
     args = parser.parse_args()
 
-    generateSimulation(args.random, args.fundamental, args.mao, args.qlearning, args.dql, duration=args.duration, startingPrice=args.startingPrice, output=args.output)
+    generateSimulation(args.random, args.fundamental, args.mao, args.qlearning, args.dql, duration=args.duration, startingPrice=args.startingPrice, algorithm=args.algorithm, output=args.output)
 
     

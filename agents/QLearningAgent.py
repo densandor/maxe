@@ -20,15 +20,17 @@ class QLearningAgent:
         self.minEpsilon = float(params.get("minEpsilon", 0.01))
         self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
 
-        # State space: (positionIndex * 3 + trendIndex) in [0, 8]
-        self.positions = [-1, 0, 1]
+        # State space: position discretized to [-1, 0, 1] and trend in [-1, 0, 1]
+        # This gives 9 total states (positionIndex * 3 + trendIndex) in [0, 8]
+        self.positions = [-1, 0, 1]  # for state encoding only
         self.trends = [-1, 0, 1]
 
-        # Action space: 0 = go short 1, 1 = go flat, 2 = go long 1
-        self.actionSpace = [0, 1, 2]
+        # Action space: target positions the agent can move to
+        # 0 = go short 5, 1 = go short 1, 2 = go flat, 3 = go long 1, 4 = go long 5
+        self.targetPositions = [-5, -1, 0, 1, 5]
 
-        # Q-table: 9 states x 3 actions
-        self.Q = np.zeros((len(self.positions) * len(self.trends), len(self.actionSpace)))
+        # Q-table: 9 states x 5 actions
+        self.Q = np.zeros((len(self.positions) * len(self.trends), len(self.targetPositions)))
         self.previousState = None
         self.previousAction = None
 
@@ -39,8 +41,23 @@ class QLearningAgent:
 
         self.pendingState = None # placeholder for pending state when awaiting PnL response
 
+        self.largeMoves = 0 # count how many times the agent makes large moves (5 units)
+        self.moves = 0 # count total moves made by the agent
+        
+        # Tracking exploration vs exploitation
+        self.explorationSteps = []  # list of 0s (exploit) and 1s (explore) for each action taken
+
     # Helper methods for state and action encoding
-    def _discretiseTrend(self, oldPrice, currentPrice, threshold=0.0001):
+    def _discretizePosition(self, position):
+        """Discretize actual position to state space [-1, 0, 1]"""
+        if position < 0:
+            return -1
+        elif position > 0:
+            return 1
+        else:
+            return 0
+
+    def _discretiseTrend(self, oldPrice, currentPrice, threshold=0.05):
         if oldPrice is None or oldPrice <= 0:
             return 0
         relativeChange = (currentPrice - oldPrice) / oldPrice
@@ -52,15 +69,20 @@ class QLearningAgent:
             return 0
 
     def _stateToIndex(self, position, trend):
-        positionIndex = self.positions.index(position)
+        discretizedPos = self._discretizePosition(position)
+        positionIndex = self.positions.index(discretizedPos)
         trendIndex = self.trends.index(trend)
         return positionIndex * len(self.trends) + trendIndex
 
     def _epsilonGreedy(self, stateIndex):
         if random.random() < self.epsilon:
-            return random.choice(self.actionSpace) # explore with random action with probability epsilon
+            # explore with random action with probability epsilon
+            action = random.choice(range(len(self.targetPositions)))
+            return action, 1  # return (action, is_exploration=1)
         else:
-            return int(np.argmax(self.Q[stateIndex, :])) # exploit best known action with probability 1 - epsilon
+            # exploit best known action with probability 1 - epsilon
+            action = int(np.argmax(self.Q[stateIndex, :]))
+            return action, 0  # return (action, is_exploration=0)
     
     # Q-learning update
     def _updateQ(self, reward, newStateIndex):
@@ -126,7 +148,8 @@ class QLearningAgent:
                 self._updateQ(reward, stateIndex)
 
             # Choose new action
-            action = self._epsilonGreedy(stateIndex)
+            action, isExploration = self._epsilonGreedy(stateIndex)
+            self.explorationSteps.append(isExploration)
 
             # Store previous state/action for next update
             self.previousState = stateIndex
@@ -137,7 +160,7 @@ class QLearningAgent:
                 self.epsilon *= self.epsilonDecay
 
             # Translate action to target position
-            targetPosition = self.positions[action]
+            targetPosition = self.targetPositions[action]
 
             # Decide order direction and volume to move from current position to target
             positionChange = targetPosition - self.position
@@ -149,7 +172,25 @@ class QLearningAgent:
             else:
                 direction = OrderDirection.Sell
             volume = abs(positionChange)
-
+            if volume == 5:
+                self.largeMoves += 1
+            self.moves += 1
             # Place market order to change position
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, volume))
             return
+        
+        if type == "EVENT_SIMULATION_STOP":
+            print(f"QLearningAgent {self.name()} finished with final position {self.position}, total PnL {self.oldPnl}, and made {self.largeMoves} large moves.")
+            print(f"QLearningAgent {self.name()} made a total of {self.moves} moves.")
+            
+            # Save exploration vs exploitation data in bundles of 50 steps
+            from pathlib import Path
+            explorationDataPath = Path(__file__).parent.parent / "logs" / f"{self.name()}_exploration_data.csv"
+            with open(explorationDataPath, "w") as f:
+                f.write("step_bundle,exploration_count,exploitation_count\n")
+                for i in range(0, len(self.explorationSteps), 50):
+                    bundle = self.explorationSteps[i:i+50]
+                    explorationCount = sum(bundle)
+                    exploitationCount = len(bundle) - explorationCount
+                    bundleIndex = i // 50
+                    f.write(f"{bundleIndex},{explorationCount},{exploitationCount}\n")

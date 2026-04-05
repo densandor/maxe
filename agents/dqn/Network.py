@@ -3,12 +3,12 @@ import torch.nn as nn
 
 
 class Network(nn.Module):
-    def __init__(self, state_size=4, action_size=3, hidden_size=128):
+    def __init__(self, state_size=2, action_size=5, hidden_size=32):
         super(Network, self).__init__()
-        self.layer1 = nn.Linear(state_size, 64)
+        self.layer1 = nn.Linear(state_size, hidden_size)
         self.dropout = nn.Dropout(0.1)
-        self.layer2 = nn.Linear(64, 32)
-        self.layer3 = nn.Linear(32, action_size)
+        self.layer2 = nn.Linear(hidden_size, hidden_size)
+        self.layer3 = nn.Linear(hidden_size, action_size)
 
         # Initialise weights with small values
         self._initialiseWeights()
