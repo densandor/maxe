@@ -117,6 +117,7 @@ class ConfigPanel:
                     self.statsPanel.clear()
                 if self.marketPanel:
                     self.marketPanel.clear()
+                self.isSaved = False
                 selectedFile = self.populationFiles[self.populationIndex]
                 self.simManager.startSimulation(selectedFile)
 

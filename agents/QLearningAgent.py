@@ -2,6 +2,7 @@ from thesimulator import *
 import random
 import numpy as np
 
+
 class QLearningAgent:
     def configure(self, params):
         # Generic parameters

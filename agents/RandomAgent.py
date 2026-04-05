@@ -1,6 +1,7 @@
 from thesimulator import *
 import random
 
+
 class RandomAgent:
     def configure(self, params):
         # Generic parameters
@@ -55,14 +56,6 @@ class RandomAgent:
                 else:
                     plannedPrice = lastTradePrice * (1.0 + abs(delta))
 
-                # Ensure limit price is on the correct side of the book and within delta of last trade price
-                # bestAsk = float(payload.bestAskPrice.toCentString())
-                # bestBid = float(payload.bestBidPrice.toCentString())
-                # plannedPrice = lastTradePrice * (1.0 + delta)
-                # if direction == OrderDirection.Buy and (plannedPrice > bestAsk) and bestAsk > 0:
-                #     plannedPrice = bestAsk
-                # elif direction == OrderDirection.Sell and (plannedPrice < bestBid) and bestBid > 0:
-                #     plannedPrice = bestBid
             plannedPrice = max(plannedPrice, 0.01) # Ensure price is positive
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.volume, Money(plannedPrice)))
             return
