@@ -4,12 +4,12 @@ import OpenGL.GL as gl
 from imgui.integrations.glfw import GlfwRenderer
 from queue import Queue
 
-from simulation_manager import SimulationManager
-from config_panel import ConfigPanel
-from chart_panel import ChartPanel
-from orderbook_panel import OrderBookPanel
-from stats_panel import StatsPanel
-from market_analysis_panel import MarketAnalysisPanel
+from ui.SimulationManager import SimulationManager
+from ui.ConfigPanel import ConfigPanel
+from ui.ChartPanel import ChartPanel
+from ui.OrderBookPanel import OrderBookPanel
+from ui.StatsPanel import StatsPanel
+from ui.MarketAnalysisPanel import MarketAnalysisPanel
 
 
 def main():
@@ -27,8 +27,8 @@ def main():
         glfw.terminate()
         return
 
-    _, title_bar_height, _, _ = glfw.get_window_frame_size(window)
-    glfw.set_window_pos(window, 0, title_bar_height)
+    _, titleBarHeight, _, _ = glfw.get_window_frame_size(window)
+    glfw.set_window_pos(window, 0, titleBarHeight)
     glfw.make_context_current(window)
     glfw.swap_interval(1)
 
@@ -40,16 +40,15 @@ def main():
     renderer = GlfwRenderer(window)
     io.display_size = 1920, 1080
 
-    # Shared state
-    data_queue = Queue(maxsize=8)
-    order_book_queue = Queue(maxsize=2048)
-    sim_manager = SimulationManager(data_queue, order_book_queue)
+    dataQueue = Queue(maxsize=8)
+    orderBookQueue = Queue(maxsize=2048)
+    simManager = SimulationManager(dataQueue, orderBookQueue)
 
-    chart_panel = ChartPanel(data_queue)
-    orderbook_panel = OrderBookPanel(sim_manager, order_book_queue)
-    stats_panel = StatsPanel(sim_manager)
-    market_panel = MarketAnalysisPanel(sim_manager)
-    config_panel = ConfigPanel(sim_manager, chart_panel, stats_panel, market_panel, orderbook_panel)
+    chartPanel = ChartPanel(dataQueue)
+    orderbookPanel = OrderBookPanel(simManager, orderBookQueue)
+    statsPanel = StatsPanel(simManager)
+    marketPanel = MarketAnalysisPanel(simManager)
+    configPanel = ConfigPanel(simManager, chartPanel, statsPanel, marketPanel, orderbookPanel)
 
     while not glfw.window_should_close(window):
         glfw.poll_events()
@@ -60,18 +59,18 @@ def main():
 
         imgui.new_frame()
 
-        config_panel.render()
-        chart_panel.render()
-        orderbook_panel.render()
-        stats_panel.render()
-        market_panel.render()
+        configPanel.render()
+        chartPanel.render()
+        orderbookPanel.render()
+        statsPanel.render()
+        marketPanel.render()
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
         imgui.render()
         renderer.render(imgui.get_draw_data())
         glfw.swap_buffers(window)
 
-    sim_manager.stop_simulation()
+    simManager.stopSimulation()
     renderer.shutdown()
     glfw.terminate()
 

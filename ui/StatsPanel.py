@@ -1,5 +1,4 @@
 import imgui
-import numpy as np
 import pandas as pd
 import sys
 from pathlib import Path
@@ -9,47 +8,44 @@ from scripts.performanceMetrics import agentPerformanceMetrics
 
 
 class StatsPanel:
-    def __init__(self, sim_manager):
-        self.sim_manager = sim_manager
-        self.stats_data = []
-        self.sort_column = 0
-        self.sort_ascending = True
-        self.has_data = False
-        self.csv_path = Path("logs/PortfolioLog.csv")
-        self._prev_running = False
+    def __init__(self, simManager):
+        self.simManager = simManager
+        self.statsData = []
+        self.sortColumn = 0
+        self.sortAscending = True
+        self.hasData = False
+        self.csvPath = Path("logs/PortfolioLog.csv")
+        self._prevRunning = False
 
     def clear(self):
-        """Clear stats data."""
-        self.stats_data = []
-        self.has_data = False
+        self.statsData = []
+        self.hasData = False
 
-    def _load_and_calculate(self):
-        """Load portfolio history and calculate metrics."""
-        df = pd.read_csv(self.csv_path)
-        portfolio_series = {
+    def _loadAndCalculate(self):
+        df = pd.read_csv(self.csvPath)
+        portfolioSeries = {
             col: df[col].values 
             for col in df.columns 
             if col.lower() != "time" and col.lower() != "setup_agent"
         }
-        results_df = agentPerformanceMetrics(portfolio_series)
-        self.stats_data = []
-        for _, row in results_df.iterrows():
-            self.stats_data.append({
+        resultsDF = agentPerformanceMetrics(portfolioSeries)
+        self.statsData = []
+        for _, row in resultsDF.iterrows():
+            self.statsData.append({
                 "agent": row["agent_name"],
                 "final_value": row["final_portfolio_value"],
                 "volatility": row["volatility"],
                 "max_dd": row["max_drawdown"],
                 "sharpe": row["sharpe_ratio"],
             })
-        self.has_data = True
-        self._sort_data()
-        print(f"Loaded stats for {len(self.stats_data)} agents")
+        self.hasData = True
+        self._sortData()
+        print(f"Loaded stats for {len(self.statsData)} agents")
 
-    def _sort_data(self):
-        """Sort stats data by current column."""        
-        key_map = ["agent", "final_value", "volatility", "max_dd", "sharpe"]
-        key = key_map[self.sort_column]
-        self.stats_data.sort(key=lambda x: x[key], reverse=not self.sort_ascending)
+    def _sortData(self):      
+        keyMap = ["agent", "final_value", "volatility", "max_dd", "sharpe"]
+        key = keyMap[self.sortColumn]
+        self.statsData.sort(key=lambda x: x[key], reverse=not self.sortAscending)
 
     def render(self):
         imgui.set_next_window_position(960, 720, imgui.ALWAYS)
@@ -57,13 +53,13 @@ class StatsPanel:
 
         if imgui.begin("Performance Statistics"):
             # Check if simulation just stopped
-            is_running = self.sim_manager.is_running()
-            if self._prev_running and not is_running:
+            isRunning = self.simManager.is_running()
+            if self._prevRunning and not isRunning:
                 # Simulation just finished
-                self._load_and_calculate()
-            self._prev_running = is_running
+                self._loadAndCalculate()
+            self._prevRunning = isRunning
 
-            if not self.has_data:
+            if not self.hasData:
                 imgui.text("Run a simulation to see performance statistics.")
             else:
                 # Table header
@@ -84,23 +80,23 @@ class StatsPanel:
                     # Header row with clickable sorting
                     imgui.table_next_row(imgui.TABLE_ROW_HEADERS)
                     headers = ["Agent", "Final Value", "Volatility", "Max Drawdown", "Sharpe"]
-                    for col_idx, header in enumerate(headers):
-                        imgui.table_set_column_index(col_idx)
+                    for colIdx, header in enumerate(headers):
+                        imgui.table_set_column_index(colIdx)
                         # Add sort indicator
-                        if self.sort_column == col_idx:
-                            indicator = " (Desc.)" if not self.sort_ascending else " (Asc.)"
+                        if self.sortColumn == colIdx:
+                            indicator = " (Desc.)" if not self.sortAscending else " (Asc.)"
                         else:
                             indicator = ""
-                        if imgui.selectable(f"{header}{indicator}##header{col_idx}", False)[0]:
-                            if self.sort_column == col_idx:
-                                self.sort_ascending = not self.sort_ascending
+                        if imgui.selectable(f"{header}{indicator}##header{colIdx}", False)[0]:
+                            if self.sortColumn == colIdx:
+                                self.sortAscending = not self.sortAscending
                             else:
-                                self.sort_column = col_idx
-                                self.sort_ascending = True
-                            self._sort_data()
+                                self.sortColumn = colIdx
+                                self.sortAscending = True
+                            self._sortData()
 
                     # Data rows
-                    for row in self.stats_data:
+                    for row in self.statsData:
                         imgui.table_next_row()
                         
                         imgui.table_set_column_index(0)

@@ -28,16 +28,7 @@ void L1LogAgent::receiveMessage(const MessagePtr& messagePtr) {
 }
 
 void L1LogAgent::logData(std::shared_ptr<RetrieveL1ResponsePayload> pptr) {
-	m_outputFile
-		<< std::to_string(pptr->time) << ","
-		<< pptr->bestAskPrice.toCentString() << ","
-		<< pptr->bestAskVolume << ","
-		<< pptr->askTotalVolume << ","
-		<< pptr->bestBidPrice.toCentString() << ","
-		<< pptr->bestBidVolume << ","
-		<< pptr->bidTotalVolume << ","
-		<< pptr->lastTradePrice.toCentString()
-		<< std::endl;
+	m_outputFile << std::to_string(pptr->time) << "," << pptr->bestAskPrice.toCentString() << "," << pptr->bestAskVolume << "," << pptr->askTotalVolume << "," << pptr->bestBidPrice.toCentString() << "," << pptr->bestBidVolume << "," << pptr->bidTotalVolume << "," << pptr->lastTradePrice.toCentString() << std::endl;
 }
 
 #include "ParameterStorage.h"

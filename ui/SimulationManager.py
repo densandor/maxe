@@ -6,56 +6,56 @@ import queue
 
 
 class SimulationManager:
-    def __init__(self, data_queue, order_book_queue=None):
-        self.data_queue = data_queue
-        self.order_book_queue = order_book_queue
+    def __init__(self, dataQueue, orderBookQueue=None):
+        self.dataQueue = dataQueue
+        self.orderBookQueue = orderBookQueue
         self.process = None
         self.running = False
-        self.latest_trade_price = None
+        self.latestTradePrice = None
 
-    def _put_latest(self, target_queue, item):
+    def _putLatest(self, targetQueue, item):
         """Push item to bounded queue, dropping oldest item if full."""
-        if target_queue is None:
+        if targetQueue is None:
             return
         try:
-            target_queue.put_nowait(item)
+            targetQueue.put_nowait(item)
         except queue.Full:
             try:
-                target_queue.get_nowait()
+                targetQueue.get_nowait()
             except queue.Empty:
                 pass
             try:
-                target_queue.put_nowait(item)
+                targetQueue.put_nowait(item)
             except queue.Full:
                 pass
 
-    def start_simulation(self, xml_file):
+    def startSimulation(self, xmlFile):
         if self.process and self.process.poll() is None:
             print("Simulation already running")
             return False
 
         try:
             if os.path.exists("build/TheSimulator/TheSimulator/Debug/TheSimulator.exe"):
-                sim_exe = "build/TheSimulator/TheSimulator/Debug/TheSimulator.exe"
+                simExe = "build/TheSimulator/TheSimulator/Debug/TheSimulator.exe"
             else:
                 print("Simulator executable not found")
                 return False
 
             # Drain any stale data from queue
-            while not self.data_queue.empty():
+            while not self.dataQueue.empty():
                 try:
-                    self.data_queue.get_nowait()
+                    self.dataQueue.get_nowait()
                 except:
                     break
-            if self.order_book_queue is not None:
-                while not self.order_book_queue.empty():
+            if self.orderBookQueue is not None:
+                while not self.orderBookQueue.empty():
                     try:
-                        self.order_book_queue.get_nowait()
+                        self.orderBookQueue.get_nowait()
                     except:
                         break
 
             self.process = subprocess.Popen(
-                [sim_exe, "-f", f"simulations/{xml_file}"],
+                [simExe, "-f", f"simulations/{xmlFile}"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -63,20 +63,20 @@ class SimulationManager:
             )
             self.running = True
 
-            Thread(target=self._monitor_stdout, daemon=True).start()
+            Thread(target=self._monitorStdout, daemon=True).start()
             print("Simulation started, monitoring stdout.")
             return True
         except Exception as e:
             print(f"Error starting simulation: {e}")
             return False
 
-    def stop_simulation(self):
+    def stopSimulation(self):
         """Stop the running simulation"""
         if self.process:
             self.process.terminate()
             self.running = False
 
-    def _monitor_stdout(self):
+    def _monitorStdout(self):
         """Read simulator stdout stream and send live ticks to queue."""
         if not self.process or not self.process.stdout:
             return
@@ -95,39 +95,39 @@ class SimulationManager:
                 if not parts:
                     continue
 
-                record_type = parts[0]
+                recordType = parts[0]
 
                 # Tick update: T,time,last_price
-                if record_type == "T" and len(parts) >= 3:
+                if recordType == "T" and len(parts) >= 3:
                     try:
-                        time_sec = float(parts[1])
+                        timeSec = float(parts[1])
                         price = float(parts[2])
-                        self.latest_trade_price = price
-                        self._put_latest(self.data_queue, (time_sec, price))
+                        self.latestTradePrice = price
+                        self._putLatest(self.dataQueue, (timeSec, price))
                     except ValueError:
                         pass
                     continue
 
                 # Book level update: B,time,side,price,qty
-                if record_type == "B" and len(parts) >= 5:
+                if recordType == "B" and len(parts) >= 5:
                     try:
-                        time_sec = float(parts[1])
+                        timeSec = float(parts[1])
                         side = parts[2].strip().upper()
                         if side:
                             side = side[0]
                         price = float(parts[3])
                         qty = float(parts[4])
                         if side in ("B", "A"):
-                            self._put_latest(self.order_book_queue, (time_sec, side, price, qty))
+                            self._putLatest(self.orderBookQueue, (timeSec, side, price, qty))
                     except ValueError:
                         pass
                     continue
 
                 # Reset marker: R,time
-                if record_type == "R" and len(parts) >= 2:
+                if recordType == "R" and len(parts) >= 2:
                     try:
-                        time_sec = float(parts[1])
-                        self._put_latest(self.order_book_queue, ("R", time_sec))
+                        timeSec = float(parts[1])
+                        self._putLatest(self.orderBookQueue, ("R", timeSec))
                     except ValueError:
                         pass
             except Exception as e:

@@ -28,7 +28,6 @@ void MarketDataAgent::configure(const pugi::xml_node& node, const std::string& c
     if (!(att = node.attribute("outputFile")).empty()) {
         std::string filename = simulation()->parameters().processString(att.as_string());
         
-        // If filename doesn't contain a path separator, add logs/
         namespace fs = std::filesystem;
         fs::path filePath(filename);
         if (filePath.parent_path().empty()) {
@@ -55,7 +54,6 @@ void MarketDataAgent::receiveMessage(const MessagePtr& msg) {
 
     if (msg->type == "WAKE_UP") {
         simulation()->dispatchMessage(simulation()->currentTimestamp(), m_interval, name(), name(), "WAKE_UP", std::make_shared<EmptyPayload>(), true);
-        // Request L1 data to calculate MAO
         simulation()->dispatchMessage(currentTimestamp, 0, name(), m_exchange, "RETRIEVE_L1", std::make_shared<EmptyPayload>());
         return;
     }
@@ -86,10 +84,8 @@ void MarketDataAgent::receiveMessage(const MessagePtr& msg) {
         logData(currentTimestamp, price);
         
         if (oldFastEma > oldSlowEma && m_fastEma <= m_slowEma) {
-            // std::cout << "Fast EMA crossed below Slow EMA at timestamp " << currentTimestamp << ": " << m_fastEma << " <= " << m_slowEma << std::endl;
             notifyMovingAverageSubscribers(Money(price), OrderDirection::Sell);
         } else if (oldFastEma < oldSlowEma && m_fastEma >= m_slowEma) {
-            // std::cout << "Fast EMA crossed above Slow EMA at timestamp " << currentTimestamp << ": " << m_fastEma << " >= " << m_slowEma << std::endl;
             notifyMovingAverageSubscribers(Money(price), OrderDirection::Buy);
         }
         return;
