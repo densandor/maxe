@@ -72,7 +72,7 @@ class DQLAgent:
         # Price trend
         if len(self.priceHistory) >= 2:
             ret = (self.priceHistory[-1] - self.priceHistory[-2]) / (self.priceHistory[-2] + 1e-8)
-            self.priceTrend = 1.0 if ret > 0.0001 else (-1.0 if ret < -0.0001 else 0.0)
+            self.priceTrend = 1.0 if ret > 0.1 else (-1.0 if ret < -0.1 else 0.0)
         
         # Volatility
         if len(self.priceHistory) >= 2:

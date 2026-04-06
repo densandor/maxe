@@ -6,7 +6,6 @@ class Network(nn.Module):
     def __init__(self, state_size=2, action_size=5, hidden_size=32):
         super(Network, self).__init__()
         self.layer1 = nn.Linear(state_size, hidden_size)
-        self.dropout = nn.Dropout(0.1)
         self.layer2 = nn.Linear(hidden_size, hidden_size)
         self.layer3 = nn.Linear(hidden_size, action_size)
 
@@ -20,6 +19,5 @@ class Network(nn.Module):
 
     def forward(self, state):
         x = torch.relu(self.layer1(state))
-        x = self.dropout(x)
         x = torch.relu(self.layer2(x))
         return self.layer3(x)
