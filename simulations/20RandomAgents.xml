@@ -1,0 +1,109 @@
+<?xml version="1.0" ?>
+<Simulation start="0" duration="10000">
+    <ExchangeAgent name="MARKET" algorithm="PriceTime"/>
+
+    <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000"/>
+
+    <MarketDataAgent name="MARKET_DATA_AGENT" exchange="MARKET" fastWindowSize="500" slowWindowSize="1000" outputFile="MarketDataLog.csv"/>
+    <MarketDataAgent name="MARKET_DATA_AGENT_LONG" exchange="MARKET" fastWindowSize="1000" slowWindowSize="2000" outputFile="MarketDataLogLarge.csv"/>
+
+    <NewsAgent name="NEWS_AGENT" exchange="MARKET" outputFile="NewsLog.csv"/>
+    <OrderBookLogAgent name="ORDER_BOOK_LOGGER" exchange="MARKET" outputFile="OrderBookLog.csv"/>
+
+    <RandomAgent name="TRADER_RANDOM_00" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_01" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_03" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_04" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_05" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_06" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_07" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_08" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_09" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_10" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_11" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_12" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_13" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_14" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_15" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_16" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_17" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_18" exchange="MARKET"/>
+    <RandomAgent name="TRADER_RANDOM_19" exchange="MARKET"/>
+
+    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_00" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_01" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_02" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_03" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_04" exchange="MARKET" newsAgent="NEWS_AGENT"/> -->
+    <!-- <FundamentalAgent name="TRADER_FUNDAMENTAL_05" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_06" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_07" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_08" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_09" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_10" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_11" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_12" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_13" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_14" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_15" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_16" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_17" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_18" exchange="MARKET" newsAgent="NEWS_AGENT"/>
+    <FundamentalAgent name="TRADER_FUNDAMENTAL_19" exchange="MARKET" newsAgent="NEWS_AGENT"/> -->
+
+    <!-- <MAOAgent name="TRADER_MAO_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_03" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_04" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_05" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_06" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_07" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_08" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_09" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_10" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_11" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_12" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_13" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_14" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_15" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_16" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_17" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_18" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+    <MAOAgent name="TRADER_MAO_19" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT"/>
+
+    <MAOAgent name="TRADER_MAO_50" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_51" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_52" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_53" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_54" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_55" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_56" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_57" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_58" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_59" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_60" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_61" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_62" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_63" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_64" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_65" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_66" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_67" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_68" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/>
+    <MAOAgent name="TRADER_MAO_69" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LONG"/> -->
+
+
+    <!-- <QLearningAgent name="TRADER_Q_LEARNING_00" class="QLearningAgent" exchange="MARKET"/> -->
+
+    <!-- <DQLAgent name="TRADER_DQL_00" class="DQLAgent" exchange="MARKET"/> -->
+
+    <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv"/>
+
+    <TradeLogAgent name="TRADE_LOGGER" exchange="MARKET" outputFile="TradeLog.csv"/>
+
+    <!-- <OrderLogAgent name="ORDER_LOGGER" exchange="MARKET"/> -->
+
+    <PortfolioAgent name="PNL_AGENT" exchange="MARKET" outputFile="PortfolioHistory.csv"/>
+</Simulation>

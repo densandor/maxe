@@ -55,6 +55,7 @@ class FundamentalAgent:
             else:
                 midPrice = self.fundamentalPrice
 
+            # If our fundamental price is very different from the market price, adjust it towards the market price
             if abs(1 - self.fundamentalPrice / midPrice) > self.opinionThreshold:
                 if self.fundamentalPrice >= midPrice:
                     self.fundamentalPrice = midPrice * (1 + self.opinionThreshold)
@@ -67,15 +68,12 @@ class FundamentalAgent:
             exp_sample = np_random.exponential(scale=1.0/self.limitOrderLambda)
             sign = np_random.choice([-1, 1])
             plannedPrice = midPrice + sign * exp_sample
-            # print("[{}] Current fundamental price: {}, best bid: {}, best ask: {}, planned order price: {}".format(self.name(),currentFundamentalPrice, bestBid, bestAsk, plannedPrice))
             plannedPrice = Money(max(round(plannedPrice, 2), 0.01))
 
             if bestAsk > 0 and currentFundamentalPrice > bestAsk * (1 + self.marketOrderThreshold):
-                # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Buy, 1))
                 plannedPrice = Money(round(bestAsk * (1 + self.marketOrderThreshold) * np_random.uniform(1,1.05), 2))
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Buy, 1, plannedPrice))
             elif bestBid > 0 and currentFundamentalPrice < bestBid * (1 - self.marketOrderThreshold):
-                # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Sell, 1))
                 plannedPrice = Money(round(bestBid * (1 - self.marketOrderThreshold) * np_random.uniform(0.95,1), 2))
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Sell, 1, plannedPrice))
             elif bestAsk > 0 and currentFundamentalPrice > bestAsk:

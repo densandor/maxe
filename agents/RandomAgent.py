@@ -11,7 +11,6 @@ class RandomAgent:
         self.pTrade = float(params.get("pTrade", random.uniform(0.2, 0.4)))
 
         # RandomAgent-specific parameters
-        self.pMarketOrder = float(params.get("pMarketOrder", 1))
         self.volume = int(params.get("volume", 1))
 
     def receiveMessage(self, simulation, type, payload):
@@ -41,20 +40,13 @@ class RandomAgent:
                 direction = OrderDirection.Sell
 
             # Up to 1% away from last trade price
-            delta = random.uniform(-0.01, 0.01)
+            delta = random.uniform(0.0, 0.01)
 
-            if random.random() < self.pMarketOrder:
-                # Inefficient limit order (simulates a market order but only within detla of last trade price)
-                if direction == OrderDirection.Buy:
-                    plannedPrice = lastTradePrice * (1.0 + abs(delta))
-                else:
-                    plannedPrice = lastTradePrice * (1.0 - abs(delta))
+            # Inefficient limit order (simulates a market order but only within detla of last trade price)
+            if direction == OrderDirection.Buy:
+                plannedPrice = lastTradePrice * (1.0 + abs(delta))
             else:
-                # Efficient limit order
-                if direction == OrderDirection.Buy:
-                    plannedPrice = lastTradePrice * (1.0 - abs(delta))
-                else:
-                    plannedPrice = lastTradePrice * (1.0 + abs(delta))
+                plannedPrice = lastTradePrice * (1.0 - abs(delta))
 
             plannedPrice = max(plannedPrice, 0.01) # Ensure price is positive
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.volume, Money(plannedPrice)))
