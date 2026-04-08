@@ -35,7 +35,7 @@ void MAOAgent::configure(const pugi::xml_node& node, const std::string& configur
     if (!(att = node.attribute("waitTime")).empty()) {
         m_waitTime = std::stoull(simulation()->parameters().processString(att.as_string()));
     } else {
-        m_waitTime = static_cast<unsigned long long>(std::uniform_real_distribution<double>(0.0, 50.0)(rng));
+        m_waitTime = static_cast<unsigned long long>(std::uniform_real_distribution<double>(0.0, 20.0)(rng));
     }
 }
 

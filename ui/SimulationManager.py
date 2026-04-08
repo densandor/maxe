@@ -37,6 +37,8 @@ class SimulationManager:
         try:
             if os.path.exists("build/TheSimulator/TheSimulator/Debug/TheSimulator.exe"):
                 simExe = "build/TheSimulator/TheSimulator/Debug/TheSimulator.exe"
+            elif os.path.exists("build/TheSimulator/TheSimulator/Release/TheSimulator.exe"):
+                simExe = "build/TheSimulator/TheSimulator/Release/TheSimulator.exe"
             else:
                 print("Simulator executable not found")
                 return False

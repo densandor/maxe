@@ -15,7 +15,7 @@ class MAOAgent:
         self.marketDataAgent = str(params.get("marketDataAgent", "MARKET_DATA_AGENT")) # Market data agent name for checking moving average signals
 
         self.profitFactor = float(params.get("profitFactor", random.uniform(0.01, 0.2))) # factor for taking profits random.uniform(0.01, 0.2)
-        self.waitTime = int(params.get("waitTime", random.uniform(0, 50))) # time to wait before acting on a moving average signal, in number of simulation steps random.uniform(0, 50)
+        self.waitTime = int(params.get("waitTime", random.uniform(0, 20))) # time to wait before acting on a moving average signal, in number of simulation steps random.uniform(0, 20)
 
         self.lastTradePrice = None
 
@@ -45,29 +45,21 @@ class MAOAgent:
             inventory = payload.inventory
             avgPrice = float(payload.avgPrice)
 
+            # Check the price we can take profits at based on our inventory and the last trade price
             if inventory > 0:
                 profitTargetPrice = avgPrice * (1 + self.profitFactor)
             elif inventory < 0:
                 profitTargetPrice = avgPrice * (1 - self.profitFactor)
             
+            # Place market order to take profits if the last trade price has reached our profit target price
             if inventory > 0 and self.lastTradePrice > profitTargetPrice:
-                # print("Taking profit on long position: inventory={}, avgPrice={}, currentPrice={}, targetPrice={}".format(inventory, avgPrice, self.lastTradePrice, profitTargetPrice))
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Sell, math.floor(abs(inventory))))
-                # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Sell, math.floor(abs(inventory)), Money(round(profitTargetPrice * 0.95, 2))))
             if inventory < 0 and self.lastTradePrice < profitTargetPrice:
-                # print("Taking profit on short position: inventory={}, avgPrice={}, currentPrice={}, targetPrice={}".format(inventory, avgPrice, self.lastTradePrice, profitTargetPrice))
                 simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Buy, math.floor(abs(inventory))))
-                # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(OrderDirection.Buy, math.floor(abs(inventory)), Money(round(profitTargetPrice * 1.05, 2))))
             return
         
         if type == "MOVING_AVERAGE_SIGNAL":
+            # Place a market order in the direction of the moving average signal after waiting for the specified wait time
             direction = payload.direction
             simulation.dispatchMessage(currentTimestamp, self.waitTime, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, 1))
-
-            # if direction == OrderDirection.Buy:
-            #     plannedPrice = float(payload.price.toCentString()) * 1.05
-            # else:
-            #     plannedPrice = float(payload.price.toCentString()) * 0.95
-            # simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, 1, Money(round(plannedPrice, 2))))
-            
             return

@@ -20,9 +20,11 @@ class QLearningAgent:
         self.minEpsilon = float(params.get("minEpsilon", 0.1))
         self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
 
+        self.trendThreshold = float(params.get("trendThreshold", 0.01)) # threshold for discretizing price trend, as a fraction of price (e.g. 0.01 for 1%)
+
         # State space
         self.numTrends = 7 # discretized price trend (0 = no change or insufficient data, 1 = small upward trend, 2 = medium upward trend, 3 = large upward trend, 4 = small downward trend, 5 = medium downward trend, 6 = large downward trend)
-        self.numPositions = 3 # discretized position (0 = negative position, 1 = no existing position, 2 = positive position)
+        self.numPositions = 3 # discretized inventory (0 = negative inventory, 1 = no existing inventory, 2 = positive inventory)
 
         # Action space 
         self.numActions = 5 # (0 =  do nothing, 1 = buy 1 unit, 2 = buy 5 units, 3 = sell 1 unit, 4 = sell 5 units)
@@ -38,34 +40,34 @@ class QLearningAgent:
         self.trend = 0 # placeholder for current trend
 
     # Helper methods for state and encoding
-    def _discretizePosition(self, position):
-        if position < 0:
+    def _discretizePosition(self, inventory):
+        if inventory < 0:
             return 0
-        elif position > 0:
+        elif inventory > 0:
             return 1
         else:
             return 2
 
-    def _discretiseTrend(self, oldPrice, currentPrice, threshold=0.01):
+    def _discretiseTrend(self, oldPrice, currentPrice):
         if oldPrice is None or oldPrice == 0 or currentPrice == oldPrice:
             return 0
         relativeChange = (currentPrice - oldPrice) / oldPrice
-        if relativeChange > 2 * threshold:
+        if relativeChange > 2 * self.trendThreshold:
             return 3  # Large upward
-        elif relativeChange > threshold:
+        elif relativeChange > self.trendThreshold:
             return 2  # Medium upward
         elif relativeChange > 0:
             return 1  # Small upward
-        elif relativeChange >= -threshold:
+        elif relativeChange >= -self.trendThreshold:
             return 4  # Small downward
-        elif relativeChange >= -2 * threshold:
+        elif relativeChange >= -2 * self.trendThreshold:
             return 5  # Medium downward
         else:
             return 6  # Large downward
 
-    def _stateToIndex(self, position, trend):
-        positionIndex = self._discretizePosition(position)
-        return positionIndex * 7 + trend
+    def _stateToIndex(self, inventory, trend):
+        inventoryIndex = self._discretizePosition(inventory)
+        return inventoryIndex * 7 + trend
 
     def _epsilonGreedy(self, stateIndex):
         if random.random() < self.epsilon:
