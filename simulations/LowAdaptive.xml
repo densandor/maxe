@@ -269,7 +269,7 @@
     <MAOAgent name="TRADER_MAO_LARGE_72" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
     <MAOAgent name="TRADER_MAO_LARGE_73" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
     <MAOAgent name="TRADER_MAO_LARGE_74" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <!-- <QLearningAgent name="TRADER_QL_00" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_00" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_01" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_02" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_03" exchange="MARKET" />
@@ -278,8 +278,8 @@
     <QLearningAgent name="TRADER_QL_06" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_07" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_08" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_09" exchange="MARKET" /> -->
-    <DQLAgent name="TRADER_DQL_00" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_09" exchange="MARKET" />
+    <!-- <DQLAgent name="TRADER_DQL_00" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_01" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_02" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_03" exchange="MARKET" />
@@ -288,5 +288,5 @@
     <DQLAgent name="TRADER_DQL_06" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_07" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_08" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_09" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_09" exchange="MARKET" /> -->
 </Simulation>

@@ -8,81 +8,74 @@ class QLearningAgent:
         # Generic parameters
         self.exchange = str(params["exchange"])
         self.offset = int(params.get("offset", 1))
-        self.interval = int(params.get("interval", 1))
+        self.interval = int(params.get("interval", 10))
 
         # QLearningAgent-specific parameters
         self.pnlAgent = str(params.get("pnlAgent", "PNL_AGENT")) # PnL manager agent name for checking inventory
         
         # Q-learning parameters
-        self.alpha = float(params.get("alpha", 0.05)) # learning rate
-        self.gamma = float(params.get("gamma", 0.99)) # discount factor
+        self.alpha = float(params.get("alpha", 0.03)) # learning rate
+        self.gamma = float(params.get("gamma", 0.97)) # discount factor
         self.epsilon = float(params.get("epsilon", 1)) # exploration rate
-        self.minEpsilon = float(params.get("minEpsilon", 0.01))
+        self.minEpsilon = float(params.get("minEpsilon", 0.1))
         self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
 
-        # State space: position discretized to [-1, 0, 1] and trend in [-1, 0, 1]
-        # This gives 9 total states (positionIndex * 3 + trendIndex) in [0, 8]
-        self.positions = [-1, 0, 1]  # for state encoding only
-        self.trends = [-1, 0, 1]
+        # State space
+        self.numTrends = 7 # discretized price trend (0 = no change or insufficient data, 1 = small upward trend, 2 = medium upward trend, 3 = large upward trend, 4 = small downward trend, 5 = medium downward trend, 6 = large downward trend)
+        self.numPositions = 3 # discretized position (0 = negative position, 1 = no existing position, 2 = positive position)
 
-        # Action space: target positions the agent can move to
-        # 0 = go short 5, 1 = go short 1, 2 = go flat, 3 = go long 1, 4 = go long 5
-        self.targetPositions = [-5, -1, 0, 1, 5]
+        # Action space 
+        self.numActions = 5 # (0 =  do nothing, 1 = buy 1 unit, 2 = buy 5 units, 3 = sell 1 unit, 4 = sell 5 units)
 
-        # Q-table: 9 states x 5 actions
-        self.Q = np.zeros((len(self.positions) * len(self.trends), len(self.targetPositions)))
+        # Q-table
+        self.Q = np.zeros((self.numTrends * self.numPositions, self.numActions))
         self.previousState = None
         self.previousAction = None
 
-        # Book-keeping
-        self.position = 0 # current signed position (−1, 0, +1)
         self.oldPrice = None # last trade price seen
         self.oldPnl = 0
 
-        self.pendingState = None # placeholder for pending state when awaiting PnL response
+        self.trend = 0 # placeholder for current trend
 
-        self.largeMoves = 0 # count how many times the agent makes large moves (5 units)
-        self.moves = 0 # count total moves made by the agent
-        
-        # Tracking exploration vs exploitation
-        self.explorationSteps = []  # list of 0s (exploit) and 1s (explore) for each action taken
-
-    # Helper methods for state and action encoding
+    # Helper methods for state and encoding
     def _discretizePosition(self, position):
-        """Discretize actual position to state space [-1, 0, 1]"""
         if position < 0:
-            return -1
+            return 0
         elif position > 0:
             return 1
         else:
-            return 0
+            return 2
 
-    def _discretiseTrend(self, oldPrice, currentPrice, threshold=0.05):
-        if oldPrice is None or oldPrice <= 0:
+    def _discretiseTrend(self, oldPrice, currentPrice, threshold=0.01):
+        if oldPrice is None or oldPrice == 0 or currentPrice == oldPrice:
             return 0
         relativeChange = (currentPrice - oldPrice) / oldPrice
-        if relativeChange > threshold:
-            return 1
-        elif relativeChange < -threshold:
-            return -1
+        if relativeChange > 2 * threshold:
+            return 3  # Large upward
+        elif relativeChange > threshold:
+            return 2  # Medium upward
+        elif relativeChange > 0:
+            return 1  # Small upward
+        elif relativeChange >= -threshold:
+            return 4  # Small downward
+        elif relativeChange >= -2 * threshold:
+            return 5  # Medium downward
         else:
-            return 0
+            return 6  # Large downward
 
     def _stateToIndex(self, position, trend):
-        discretizedPos = self._discretizePosition(position)
-        positionIndex = self.positions.index(discretizedPos)
-        trendIndex = self.trends.index(trend)
-        return positionIndex * len(self.trends) + trendIndex
+        positionIndex = self._discretizePosition(position)
+        return positionIndex * 7 + trend
 
     def _epsilonGreedy(self, stateIndex):
         if random.random() < self.epsilon:
-            # explore with random action with probability epsilon
-            action = random.choice(range(len(self.targetPositions)))
-            return action, 1  # return (action, is_exploration=1)
+            # Explore with random action with probability epsilon
+            action = random.choice(range(self.numActions))
+            return action
         else:
-            # exploit best known action with probability 1 - epsilon
+            # Exploit best known action with probability 1 - epsilon
             action = int(np.argmax(self.Q[stateIndex, :]))
-            return action, 0  # return (action, is_exploration=0)
+            return action
     
     # Q-learning update
     def _updateQ(self, reward, newStateIndex):
@@ -116,15 +109,10 @@ class QLearningAgent:
             if currentPrice <= 0 or (bestAsk <= 0 and bestBid <= 0):
                 return
 
-            # Compute simple trend
-            trend = self._discretiseTrend(self.oldPrice, currentPrice)
+            # Compute simple trend and store it for when PnL response arrives (since we need to wait for PnL response to do the Q-learning update)
+            self.trend = self._discretiseTrend(self.oldPrice, currentPrice)
             self.oldPrice = currentPrice
 
-            # Current state index
-            stateIndex = self._stateToIndex(self.position, trend)
-
-            # Store pending state for continuation when RESPONSE_PNL arrives
-            self.pendingState = stateIndex
             # Request PnL snapshot from PnL manager and wait for RESPONSE_PNL
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.pnlAgent, "REQUEST_PNL", EmptyPayload())
             return
@@ -133,23 +121,22 @@ class QLearningAgent:
             # Received PnL response from PnLManagerAgent
             realized = payload.realizedPnl
             unrealized = payload.unrealizedPnl
+            inventory = payload.inventory
 
+            # Current state index
+            stateIndex = self._stateToIndex(inventory, self.trend)
+
+            # Calculate reward as change in total PnL since last update
             totalPnl = realized + unrealized
             reward = totalPnl - self.oldPnl
             self.oldPnl = totalPnl
 
-            # Continue Q-learning update using pending state
-            if self.pendingState is None:
-                return
-            stateIndex = self.pendingState
-            self.pendingState = None
-
+            # Update Q-table
             if self.previousState is not None and self.previousAction is not None:
                 self._updateQ(reward, stateIndex)
 
             # Choose new action
-            action, isExploration = self._epsilonGreedy(stateIndex)
-            self.explorationSteps.append(isExploration)
+            action = self._epsilonGreedy(stateIndex)
 
             # Store previous state/action for next update
             self.previousState = stateIndex
@@ -159,38 +146,15 @@ class QLearningAgent:
             if self.epsilon > self.minEpsilon:
                 self.epsilon *= self.epsilonDecay
 
-            # Translate action to target position
-            targetPosition = self.targetPositions[action]
-
-            # Decide order direction and volume to move from current position to target
-            positionChange = targetPosition - self.position
-            if positionChange == 0:
-                return
-            
-            if positionChange > 0:
-                direction = OrderDirection.Buy
-            else:
-                direction = OrderDirection.Sell
-            volume = abs(positionChange)
-            if volume == 5:
-                self.largeMoves += 1
-            self.moves += 1
-            # Place market order to change position
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, volume))
+            # Execute action
+            if action == 0:  # Do Nothing
+                pass
+            elif action == 1:  # Buy 1
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Buy, 1))
+            elif action == 2:  # Buy 5
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Buy, 5))
+            elif action == 3:  # Sell 1
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Sell, 1))
+            elif action == 4:  # Sell 5
+                simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(OrderDirection.Sell, 5))
             return
-        
-        if type == "EVENT_SIMULATION_STOP":
-            print(f"QLearningAgent {self.name()} finished with final position {self.position}, total PnL {self.oldPnl}, and made {self.largeMoves} large moves.")
-            print(f"QLearningAgent {self.name()} made a total of {self.moves} moves.")
-            
-            # Save exploration vs exploitation data in bundles of 50 steps
-            from pathlib import Path
-            explorationDataPath = Path(__file__).parent.parent / "logs" / f"{self.name()}_exploration_data.csv"
-            with open(explorationDataPath, "w") as f:
-                f.write("step_bundle,exploration_count,exploitation_count\n")
-                for i in range(0, len(self.explorationSteps), 50):
-                    bundle = self.explorationSteps[i:i+50]
-                    explorationCount = sum(bundle)
-                    exploitationCount = len(bundle) - explorationCount
-                    bundleIndex = i // 50
-                    f.write(f"{bundleIndex},{explorationCount},{exploitationCount}\n")

@@ -15,11 +15,9 @@ void NewsAgent::configure(const pugi::xml_node& node, const std::string& configu
     }
     if (!(att = node.attribute("mean")).empty()) {
         m_mean = std::stod(simulation()->parameters().processString(att.as_string()));
-        std::cout << "NewsAgent: configured mean news value: " << m_mean << std::endl;
     }
     if (!(att = node.attribute("standardDeviation")).empty()) {
         m_standardDeviation = std::stod(simulation()->parameters().processString(att.as_string()));
-        std::cout << "NewsAgent: configured standard deviation: " << m_standardDeviation << std::endl;
     }
     if (!(att = node.attribute("newsPoissonLambda")).empty()) {
         m_newsPoissonLambda = std::stod(simulation()->parameters().processString(att.as_string()));
