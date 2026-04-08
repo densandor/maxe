@@ -107,6 +107,10 @@ void OrderBookLogAgent::configure(const pugi::xml_node& node, const std::string&
 			filePath = fs::path("logs") / filePath;
 		}
 
+		if (!fs::exists(filePath.parent_path())) {
+			fs::create_directories(filePath.parent_path());
+		}
+
 		// m_outputFile.open(filePath.string());
 		// if (m_outputFile.is_open()) {
 		// 	m_outputFile << "time,side,price,volume\n";

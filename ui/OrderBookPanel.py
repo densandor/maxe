@@ -5,8 +5,8 @@ class OrderBookPanel:
     def __init__(self, simManager, orderBookQueue):
         self.simManager = simManager
         self.orderBookQueue = orderBookQueue
-        self.asks = {}  # price -> volume
-        self.bids = {}  # price -> volume
+        self.asks = {}
+        self.bids = {}
 
     def clear(self):
         self.asks.clear()

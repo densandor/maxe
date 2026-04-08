@@ -34,6 +34,10 @@ void MarketDataAgent::configure(const pugi::xml_node& node, const std::string& c
             filePath = fs::path("logs") / filePath;
         }
         
+        if (!fs::exists(filePath.parent_path())) {
+            fs::create_directories(filePath.parent_path());
+        }
+        
         m_outputFile.open(filePath.string());
 
         if (m_outputFile.is_open()) {

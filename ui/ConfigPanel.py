@@ -1,10 +1,6 @@
-import sys
 import imgui
 import shutil
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from scripts.generateSimulation import generateSimulation
 
 
 class ConfigPanel:

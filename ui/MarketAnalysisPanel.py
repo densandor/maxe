@@ -1,13 +1,9 @@
 import imgui
 import numpy as np
-import sys
 from pathlib import Path
 from OpenGL import GL as gl
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 import matplotlib.pyplot as plt
 
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from scripts.candles import generateCandles
 from scripts.stylisedFacts import (volatility, returnAutocorrelation, volatilityAutocorrelation, heavyTails, plotReturnsWithNormal)
 
