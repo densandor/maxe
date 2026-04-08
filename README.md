@@ -1,48 +1,53 @@
 # Agent-Based Market Simulator
 
-An interactive agent-based trading simulator with real-time visualization and performance analysis used to analyse the impact of order-matching algorithms and agent populations on adaptive strategies.
+An interactive agent-based trading simulator with real-time visualisation and performance analysis used to analyse the impact of order-matching algorithms and agent populations on adaptive strategies.
 
 The project was developed using the [MAXE framework](https://github.com/maxe-team/maxe).
 
-## Installation
+## 1 Installation
 
-### Software Requirements
+### 1.1 Software Requirements
 
-Development was done on Windows with the following software versions:
+**Windows** requirements:
 
 - CMake 4.2.0
 - Python 3.10.11
 - Microsoft Visual Studio Community 2026 18.4.3 (with the 'Desktop Development with C++' toolset)
 
-However, these are not hard requirements. For more information about the software requirements on different platforms, take a look at the following requirements, which were taken directly from the [README of the MAXE repository](https://github.com/maxe-team/maxe/blob/master/README.md):
+Developement and testing was done using the above setup.
 
-On Windows you need:
+For other platforms, take a look at the following instructions (which were taken directly from the [README of the MAXE repository](https://github.com/maxe-team/maxe/blob/master/README.md)).
 
-- `cmake` 3.15+
-- MSVC 15.7+
-- `python` on your system (tick the Python C headers options in the installation if not automatically included in your python version)
+On **Linux** (tested with Ubuntu) you need:
 
-On Linux (tested with Ubuntu) you need:
+> Please make sure that the tools you are using are compatible with pybind11 version 3.0.1.
 
-- `cmake` 3.15+
+- `cmake` 3.15+ (4.2.0 recommended for pybind11 compatibility)
 - GCC 9.0+ (similarly slave `g++` of the same version, or manually add `filesystem` dependency, i.e. `#include <experimental/filesystem>` and compile with `-lstdc++fs`), _or_ LLVM Clang 9.0+ (or LLVM 7.0+ and LLVM 8.0+ with the aforementioned experimental and `stdc++fs` fix)
-- `python` on your system (preferably with `python-all` or at least `distutils`)
+- `python` on your system (preferably with `python-all` or at least `distutils`) (version 3.10.11 recommended)
 - `python-dev` for Python C headers
 - Remember that if you're using Python 3, you will need the `python3` equivalents of everything (i.e. `python3-all`, `python3-dev`).
 
-On MacOS you need:
+On **MacOS** you need:
+
+> Please make sure that the tools you are using are compatible with pybind11 version 3.0.1.
 
 - MacOS 10.15 Catalina or newer (for `std::filesystem::path` support)
 - Xcode 11.0+ (for `#include <filesystem>` to work, otherwise see the note for LLVM 9.0 above)
 - LLVM Clang 9.0+
 
-### Package Requirements
+### 1.2 Environment Variables
 
-Python package requirements can be found in `requirements.txt`.
+Add the following environment variable:
 
-The project was developed using PyTorch with CUDA. However, PyTorch with CUDA is not strictly necessary, therefore only the base PyTorch is listed in `requirements.txt`.
+Name: `PYTHONPATH`  
+Value: `<python install folder>\Lib;<python install folder>\DLLs`
 
-### Build
+Example value on Windows:
+
+`C:\Program Files\Python310\Lib;C:\Program Files\Python310\DLLs`
+
+### 1.3 Build
 
 To build the simulator:
 
@@ -61,11 +66,27 @@ cmake ../
 cmake --build .
 ```
 
+If you encounter the following issue while running `cmake --build .`
+
+`LINK : fatal error LNK1104: cannot open file 'python310.lib' [C:\thesimulator\build\TheSimulator\TheSimulator\TheSimulator.vcxproj]`
+
+try building in release mode using the following command
+
+`cmake --build . --config Release`
+
+### 1.4 Package Requirements
+
+1. Create a virtual environment using `virtualenv venv` (optional).
+
+2. Activate the virtual environment using `venv\Scripts\activate` (optional).
+
 3. Install the Python packages in `requirements.txt` using `pip install -r requirements.txt` or your preferred Python package manager.
+
+The project was developed using PyTorch with CUDA. However, PyTorch with CUDA is not strictly necessary, therefore only the base PyTorch is listed in `requirements.txt`.
 
 4. Done! For details on how to use the simulator, take a look at [Usage](#usage)!
 
-## Usage
+## 2 Usage
 
 Once you have built the project:
 
@@ -81,7 +102,7 @@ Once you have built the project:
 
 4. Save the results to the chosen folder (found in the `results` folder).
 
-## Simulation Files
+## 3 Simulation Files
 
 Simulation files are XML-based configurations that define the structure of a market simulation, including the exchange properties, market participants, and data logging agents. Below is a detailed breakdown of the format and available agent options.
 
