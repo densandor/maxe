@@ -51,7 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("--dql", type=int, default=0, help="Number of DQL agents")
     parser.add_argument("--duration", type=int, default=10000, help="Simulation duration")
     parser.add_argument("--startingPrice", type=int, default=10000, help="Starting bid/ask price (in cents)")
-    parser.add_argument("--algorithm", type=str, default="PriceTime", choices=["PureProRata", "PriceTime", "TimeProRata"], help="Order matching algorithm")
+    parser.add_argument("--algorithm", type=str, default="PriceTime", choices=["PureProRata", "PriceTime", "PriorityProRata", "TimeProRata"], help="Order matching algorithm")
     parser.add_argument("--output", default="simulations/GeneratedSimulation.xml", help="Output file path")
     args = parser.parse_args()
 

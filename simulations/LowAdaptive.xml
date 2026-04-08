@@ -279,7 +279,7 @@
     <QLearningAgent name="TRADER_QL_07" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_08" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_09" exchange="MARKET" />
-    <!-- <DQLAgent name="TRADER_DQL_00" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_00" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_01" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_02" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_03" exchange="MARKET" />
@@ -288,5 +288,5 @@
     <DQLAgent name="TRADER_DQL_06" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_07" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_08" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_09" exchange="MARKET" /> -->
+    <DQLAgent name="TRADER_DQL_09" exchange="MARKET" />
 </Simulation>

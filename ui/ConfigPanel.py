@@ -2,6 +2,8 @@ import imgui
 import shutil
 from pathlib import Path
 
+from scripts.generateSimulation import generateSimulation
+
 
 class ConfigPanel:
     def __init__(self, simManager, chartPanel, statsPanel=None, marketPanel=None, orderbookPanel=None):
@@ -28,8 +30,8 @@ class ConfigPanel:
         self.genNumDQL = 0
         self.genDuration = 10000
         self.genStartingPrice = 10000
-        self.genAlgorithm = 1  # 0=PureProRata, 1=PriceTime, 2=TimeProRata
-        self.algorithmOptions = ["PureProRata", "PriceTime", "TimeProRata"]
+        self.genAlgorithm = 1  # 0=PureProRata, 1=PriceTime, 2=PriorityProRata, 3=TimeProRata
+        self.algorithmOptions = ["PureProRata", "PriceTime", "PriorityProRata", "TimeProRata"]
         self.isGenerated = False
 
     def _loadPopulationFiles(self):

@@ -1,6 +1,6 @@
 from thesimulator import *
-from dqn.Network import Network
-from dqn.ReplayMemory import ReplayMemory
+from .dqn.Network import Network
+from .dqn.ReplayMemory import ReplayMemory
 
 import numpy as np
 import collections
@@ -22,13 +22,13 @@ class DQLAgent:
         self.pnlAgent = str(params.get("pnlAgent", "PNL"))
         
         # DQN hyperparameters
-        self.alpha = float(params.get("alpha", 0.1))
-        self.gamma = float(params.get("gamma", 0.99))
+        self.alpha = float(params.get("alpha", 0.01))
+        self.gamma = float(params.get("gamma", 0.95))
         self.epsilon = float(params.get("epsilon", 1.0))
         self.minEpsilon = float(params.get("minEpsilon", 0.1))
         self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
-        self.batchSize = int(params.get("batchSize", 50))
-        self.memoryCapacity = int(params.get("memoryCapacity", 10000))
+        self.batchSize = int(params.get("batchSize", 5))
+        self.memoryCapacity = int(params.get("memoryCapacity", 60))
         self.targetNetworkUpdateFrequency = int(params.get("targetNetworkUpdateFrequency", 100))
         
         # State features
