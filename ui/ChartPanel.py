@@ -60,13 +60,13 @@ class ChartPanel:
         imgui.set_next_window_size(1280, 720, imgui.ALWAYS)
 
         if imgui.begin("Price Chart"):
-            while not self.dataQueue.empty():
+            while len(self.dataQueue) > 0:
                 try:
-                    time, price = self.dataQueue.get_nowait()
+                    time, price = self.dataQueue.popleft()
                     self.ticks.append((time, price))
                     if not self._dirty:
                         self._processTick(time, price)
-                except Exception:
+                except IndexError:
                     break
 
             # Timeframe and chart mode

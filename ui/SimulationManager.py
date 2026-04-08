@@ -2,38 +2,18 @@ from threading import Thread
 import subprocess
 import os
 import time
-import queue
+from collections import deque
 
 
 class SimulationManager:
-    def __init__(self, dataQueue, orderBookQueue=None):
-        self.dataQueue = dataQueue
-        self.orderBookQueue = orderBookQueue
+    def __init__(self, dataQueue=None, orderBookQueue=None):
+        self.dataQueue = dataQueue if dataQueue is not None else deque(maxlen=10000)
+        self.orderBookQueue = orderBookQueue if orderBookQueue is not None else deque(maxlen=10000)
         self.process = None
         self.running = False
         self.latestTradePrice = None
 
-    def _putLatest(self, targetQueue, item):
-        """Push item to bounded queue, dropping oldest item if full."""
-        if targetQueue is None:
-            return
-        try:
-            targetQueue.put_nowait(item)
-        except queue.Full:
-            try:
-                targetQueue.get_nowait()
-            except queue.Empty:
-                pass
-            try:
-                targetQueue.put_nowait(item)
-            except queue.Full:
-                pass
-
     def startSimulation(self, xmlFile):
-        if self.process and self.process.poll() is None:
-            print("Simulation already running")
-            return False
-
         try:
             if os.path.exists("build/TheSimulator/TheSimulator/Debug/TheSimulator.exe"):
                 simExe = "build/TheSimulator/TheSimulator/Debug/TheSimulator.exe"
@@ -43,18 +23,9 @@ class SimulationManager:
                 print("Simulator executable not found")
                 return False
 
-            # Drain any stale data from queue
-            while not self.dataQueue.empty():
-                try:
-                    self.dataQueue.get_nowait()
-                except:
-                    break
-            if self.orderBookQueue is not None:
-                while not self.orderBookQueue.empty():
-                    try:
-                        self.orderBookQueue.get_nowait()
-                    except:
-                        break
+            # Drain any stale data from deque
+            self.dataQueue.clear()
+            self.orderBookQueue.clear()
 
             self.process = subprocess.Popen(
                 [simExe, "-f", f"simulations/{xmlFile}"],
@@ -73,13 +44,11 @@ class SimulationManager:
             return False
 
     def stopSimulation(self):
-        """Stop the running simulation"""
         if self.process:
             self.process.terminate()
             self.running = False
 
     def _monitorStdout(self):
-        """Read simulator stdout stream and send live ticks to queue."""
         if not self.process or not self.process.stdout:
             return
 
@@ -105,7 +74,7 @@ class SimulationManager:
                         timeSec = float(parts[1])
                         price = float(parts[2])
                         self.latestTradePrice = price
-                        self._putLatest(self.dataQueue, (timeSec, price))
+                        self.dataQueue.append((timeSec, price))
                     except ValueError:
                         pass
                     continue
@@ -120,7 +89,7 @@ class SimulationManager:
                         price = float(parts[3])
                         qty = float(parts[4])
                         if side in ("B", "A"):
-                            self._putLatest(self.orderBookQueue, (timeSec, side, price, qty))
+                            self.orderBookQueue.append((timeSec, side, price, qty))
                     except ValueError:
                         pass
                     continue
@@ -129,7 +98,7 @@ class SimulationManager:
                 if recordType == "R" and len(parts) >= 2:
                     try:
                         timeSec = float(parts[1])
-                        self._putLatest(self.orderBookQueue, ("R", timeSec))
+                        self.orderBookQueue.append(("R", timeSec))
                     except ValueError:
                         pass
             except Exception as e:
@@ -137,7 +106,6 @@ class SimulationManager:
                 time.sleep(0.1)
 
     def is_running(self):
-        """Check if simulation process is still running"""
         if self.process is None:
             return False
         return self.process.poll() is None

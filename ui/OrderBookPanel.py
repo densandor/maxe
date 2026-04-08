@@ -13,10 +13,10 @@ class OrderBookPanel:
         self.bids.clear()
 
     def _drainUpdates(self):
-        while not self.orderBookQueue.empty():
+        while len(self.orderBookQueue) > 0:
             try:
-                msg = self.orderBookQueue.get_nowait()
-            except Exception:
+                msg = self.orderBookQueue.popleft()
+            except IndexError:
                 break
 
             if not msg:

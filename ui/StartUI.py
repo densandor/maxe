@@ -2,7 +2,7 @@ import imgui
 import glfw
 import OpenGL.GL as gl
 from imgui.integrations.glfw import GlfwRenderer
-from queue import Queue
+from collections import deque
 
 from ui.SimulationManager import SimulationManager
 from ui.ConfigPanel import ConfigPanel
@@ -40,8 +40,8 @@ def main():
     renderer = GlfwRenderer(window)
     io.display_size = 1920, 1080
 
-    dataQueue = Queue(maxsize=8)
-    orderBookQueue = Queue(maxsize=2048)
+    dataQueue = deque(maxlen=8)
+    orderBookQueue = deque(maxlen=2048)
     simManager = SimulationManager(dataQueue, orderBookQueue)
 
     chartPanel = ChartPanel(dataQueue)
