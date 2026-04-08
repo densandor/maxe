@@ -66,8 +66,8 @@ class ConfigPanel:
                 shutil.copy2(item, runDir / item.name)
 
     def render(self):
-        imgui.set_next_window_position(0, 0, imgui.ALWAYS)
-        imgui.set_next_window_size(320, 720, imgui.ALWAYS)
+        imgui.set_next_window_position(0, 0, imgui.ONCE)
+        imgui.set_next_window_size(320, 720, imgui.ONCE)
 
         if imgui.begin("Configuration"):
             imgui.text("Generate Simulation")

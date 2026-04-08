@@ -46,8 +46,8 @@ class StatsPanel:
         self.statsData.sort(key=lambda x: x[key], reverse=not self.sortAscending)
 
     def render(self):
-        imgui.set_next_window_position(960, 720, imgui.ALWAYS)
-        imgui.set_next_window_size(960, 360, imgui.ALWAYS)
+        imgui.set_next_window_position(960, 720, imgui.ONCE)
+        imgui.set_next_window_size(960, 360, imgui.ONCE)
 
         if imgui.begin("Performance Statistics"):
             # Check if simulation just stopped

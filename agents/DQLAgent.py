@@ -39,12 +39,12 @@ class DQLAgent:
         self.volatility = 0.0 # Feature 4: Volatility
         self.oldPnl = 0.0
 
-        self.actionSpaceSize = 3 # Actions: Sell, Hold, Buy
+        self.actionSpaceSize = 5 # Actions: (0 = do nothing, 1 = buy 1 unit, 2 = buy 5 units, 3 = sell 1 unit, 4 = sell 5 units)
         
         # Initialise networks
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.qNetwork = Network(4, 3).to(self.device)
-        self.targetNetwork = Network(4, 3).to(self.device)
+        self.qNetwork = Network(4, 5).to(self.device)
+        self.targetNetwork = Network(4, 5).to(self.device)
         self.steps = 0
         self.lastState = None
         self.lastAction = None
@@ -205,22 +205,28 @@ class DQLAgent:
                 self._updateTargetNetwork()
                 self._decayEpsilon()
             
-            # Translate action to target position
-            positions = [-1, 0, 1]
-            targetPosition = positions[action]
-            
-            # Decide order direction and volume to move from current position to target
-            positionChange = targetPosition - self.position
-            if positionChange == 0:
+            # Translate action to order
+            if action == 0:
+                # Do nothing
                 return
-            
-            if positionChange > 0:
+            elif action == 1:
+                # Buy 1 unit
                 direction = OrderDirection.Buy
-            else:
+                volume = 1
+            elif action == 2:
+                # Buy 5 units
+                direction = OrderDirection.Buy
+                volume = 5
+            elif action == 3:
+                # Sell 1 unit
                 direction = OrderDirection.Sell
-            volume = abs(positionChange)
+                volume = 1
+            elif action == 4:
+                # Sell 5 units
+                direction = OrderDirection.Sell
+                volume = 5
             
-            # Place market order to change position
+            # Place market order
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_MARKET", PlaceOrderMarketPayload(direction, volume))
             return
         

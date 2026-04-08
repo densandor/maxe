@@ -87,8 +87,8 @@ class OrderBookPanel:
     def render(self):
         self._drainUpdates()
 
-        imgui.set_next_window_position(1600, 0, imgui.ALWAYS)
-        imgui.set_next_window_size(320, 720, imgui.ALWAYS)
+        imgui.set_next_window_position(1600, 0, imgui.ONCE)
+        imgui.set_next_window_size(320, 720, imgui.ONCE)
 
         if imgui.begin("Order Book"):
             nearestAsks = sorted(self.asks.items(), key=lambda x: x[0])[:15]
@@ -98,8 +98,8 @@ class OrderBookPanel:
             totalBidVolume = sum(self.bids.values())
 
             topH = 300
-            midH = 56
-            footerH = 24
+            midH = 50
+            footerH = 20
 
             imgui.begin_child("##asks", width=0, height=topH, border=True)
             self._drawRows(asks, "A")
@@ -121,10 +121,7 @@ class OrderBookPanel:
                 imgui.text("Waiting for trade price...")
             imgui.end_child()
 
-            remainingH = imgui.get_content_region_available().y
-            bidsH = max(80, remainingH - footerH)
-
-            imgui.begin_child("##bids", width=0, height=bidsH, border=True)
+            imgui.begin_child("##bids", width=0, height=topH, border=True)
             self._drawRows(bids, "B")
             imgui.end_child()
 

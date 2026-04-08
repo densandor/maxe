@@ -122,8 +122,8 @@ class MarketAnalysisPanel:
         imgui.image(self.chartTextureId, drawW, drawH)
 
     def render(self):
-        imgui.set_next_window_position(0, 720, imgui.ALWAYS)
-        imgui.set_next_window_size(960, 360, imgui.ALWAYS)
+        imgui.set_next_window_position(0, 720, imgui.ONCE)
+        imgui.set_next_window_size(960, 360, imgui.ONCE)
 
         if imgui.begin("Market Analysis"):
             # Check if simulation just stopped

@@ -56,8 +56,8 @@ class ChartPanel:
             self.candles[-1].update(price)
 
     def render(self):
-        imgui.set_next_window_position(320, 0, imgui.ALWAYS)
-        imgui.set_next_window_size(1280, 720, imgui.ALWAYS)
+        imgui.set_next_window_position(320, 0, imgui.ONCE)
+        imgui.set_next_window_size(1280, 720, imgui.ONCE)
 
         if imgui.begin("Price Chart"):
             while len(self.dataQueue) > 0:

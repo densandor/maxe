@@ -11,7 +11,7 @@ class RandomAgent:
         self.pTrade = float(params.get("pTrade", random.uniform(0.2, 0.4)))
 
         # RandomAgent-specific parameters
-        self.volume = int(params.get("volume", 1))
+        self.maxVolume = int(params.get("maxVolume", 5))
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
@@ -48,6 +48,8 @@ class RandomAgent:
             else:
                 plannedPrice = lastTradePrice * (1.0 - abs(delta))
 
+            volume  = random.randint(1, self.maxVolume)
+
             plannedPrice = max(plannedPrice, 0.01) # Ensure price is positive
-            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, self.volume, Money(plannedPrice)))
+            simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "PLACE_ORDER_LIMIT", PlaceOrderLimitPayload(direction, volume, Money(plannedPrice)))
             return
