@@ -29,22 +29,20 @@ class DQLAgent:
         self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
         self.batchSize = int(params.get("batchSize", 5))
         self.memoryCapacity = int(params.get("memoryCapacity", 60))
-        self.targetNetworkUpdateFrequency = int(params.get("targetNetworkUpdateFrequency", 100))
+        self.targetNetworkUpdateFrequency = int(params.get("targetNetworkUpdateFrequency", 50))
         
-        # State features
-        self.position = 0 # Feature 1: Current position (-1, 0, 1)
+        # State features: 20 normalized prices + position (21-D total)
+        self.position = 0
         self.priceHistory = collections.deque(maxlen=20)
-        self.normalisedPrice = 0.0 # Feature 2: Normalised price
-        self.priceTrend = 0.0 # Feature 3: Price trend
-        self.volatility = 0.0 # Feature 4: Volatility
+        self.normalisedPriceHistory = np.zeros(20, dtype=np.float32)
         self.oldPnl = 0.0
 
         self.actionSpaceSize = 5 # Actions: (0 = do nothing, 1 = buy 1 unit, 2 = buy 5 units, 3 = sell 1 unit, 4 = sell 5 units)
         
         # Initialise networks
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.qNetwork = Network(4, 5).to(self.device)
-        self.targetNetwork = Network(4, 5).to(self.device)
+        self.qNetwork = Network(21, 5).to(self.device)
+        self.targetNetwork = Network(21, 5).to(self.device)
         self.steps = 0
         self.lastState = None
         self.lastAction = None
@@ -62,23 +60,22 @@ class DQLAgent:
 
     def _updateState(self, newPrice):
         self.priceHistory.append(newPrice)
-        
-        # Normalized price (relative to first in window)
-        base = self.priceHistory[0]
-        self.normalisedPrice = np.log(newPrice / base)
-        self.normalisedPrice = np.clip(self.normalisedPrice, -1.0, 1.0)
-        self.normalisedPrice = round(self.normalisedPrice, 1)
-        
-        # Price trend
-        if len(self.priceHistory) >= 2:
-            ret = (self.priceHistory[-1] - self.priceHistory[-2]) / (self.priceHistory[-2] + 1e-8)
-            self.priceTrend = 1.0 if ret > 0.1 else (-1.0 if ret < -0.1 else 0.0)
-        
-        # Volatility
-        if len(self.priceHistory) >= 2:
-            returns = np.diff(np.log(np.array(self.priceHistory)))
-            self.volatility = float(np.std(returns)) if len(returns) > 0 else 0.0
-            self.volatility = round(self.volatility, 1)
+
+        prices = np.array(self.priceHistory, dtype=np.float32)
+        if len(prices) == 0:
+            self.normalisedPriceHistory = np.zeros(20, dtype=np.float32)
+            return
+
+        base = prices[0]
+        if base <= 0:
+            normalised = np.zeros(len(prices), dtype=np.float32)
+        else:
+            normalised = np.log(prices / base)
+            normalised = np.clip(normalised, -1.0, 1.0)
+
+        padded = np.zeros(20, dtype=np.float32)
+        padded[-len(normalised):] = normalised
+        self.normalisedPriceHistory = padded
 
     def _selectAction(self, state):
         if np.random.random() < self.epsilon:
@@ -182,8 +179,11 @@ class DQLAgent:
             reward = totalPnl - self.oldPnl
             self.oldPnl = totalPnl
             
-            # Get action from DQN
-            state = np.array([float(self.position), self.normalisedPrice, self.priceTrend,self.volatility], dtype=np.float32)
+            # Get action from DQN (20 normalized prices + position)
+            state = np.concatenate(
+                (self.normalisedPriceHistory, np.array([float(self.position)], dtype=np.float32)),
+                axis=0,
+            ).astype(np.float32)
             
             # Add previous transition to replay memory
             if self.lastAction is not None and self.lastState is not None:

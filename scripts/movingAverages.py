@@ -15,8 +15,8 @@ if __name__ == "__main__":
     plt.plot(df['time'], df['fastEma'], label='Fast EMA', linewidth=1)
     plt.plot(df['time'], df['slowEma'], label='Slow EMA', linewidth=1)
     
-    plt.xlabel('Time')
-    plt.ylabel('Value')
+    plt.xlabel('Simulation Steps')
+    plt.ylabel('Asset Price')
     plt.title('Price and Moving Averages')
     plt.legend()
     plt.grid(True, alpha=0.3)

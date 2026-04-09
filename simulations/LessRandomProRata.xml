@@ -2,7 +2,7 @@
 <Simulation start="0" duration="10000">
     <ExchangeAgent name="MARKET" algorithm="PureProRata" />
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000" />
-    <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="20" standardDeviation="5" mean="0.0" />
+    <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="20" standardDeviation="1" mean="0.0" />
     <MarketDataAgent name="MARKET_DATA_AGENT_SMALL" exchange="MARKET" outputFile="MarketDataLogSmall.csv" slowWindowSize="200" fastWindowSize="100" />
     <MarketDataAgent name="MARKET_DATA_AGENT_LARGE" exchange="MARKET" outputFile="MarketDataLogLarge.csv" slowWindowSize="400" fastWindowSize="200" />
     <L1LogAgent name="L1_LOGGER" exchange="MARKET" outputFile="L1Log.csv" />

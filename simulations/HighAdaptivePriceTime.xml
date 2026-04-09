@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Simulation start="0" duration="2500">
+<Simulation start="0" duration="10000">
     <ExchangeAgent name="MARKET" algorithm="PriceTime" />
     <SetupAgent name="SETUP_AGENT" exchange="MARKET" setupTime="0" bidVolume="1" askVolume="1" bidPrice="10000" askPrice="10000" />
     <NewsAgent name="NEWS_AGENT" offset="1" newsPoissonLambda="20" standardDeviation="5" mean="0.0" />
@@ -14,11 +14,6 @@
     <RandomAgent name="TRADER_RANDOM_02" exchange="MARKET" />
     <RandomAgent name="TRADER_RANDOM_03" exchange="MARKET" />
     <RandomAgent name="TRADER_RANDOM_04" exchange="MARKET" />
-    <RandomAgent name="TRADER_RANDOM_05" exchange="MARKET" />
-    <RandomAgent name="TRADER_RANDOM_06" exchange="MARKET" />
-    <RandomAgent name="TRADER_RANDOM_07" exchange="MARKET" />
-    <RandomAgent name="TRADER_RANDOM_08" exchange="MARKET" />
-    <RandomAgent name="TRADER_RANDOM_09" exchange="MARKET" />
     <FundamentalAgent name="TRADER_FUNDAMENTAL_00" exchange="MARKET" />
     <FundamentalAgent name="TRADER_FUNDAMENTAL_01" exchange="MARKET" />
     <FundamentalAgent name="TRADER_FUNDAMENTAL_02" exchange="MARKET" />
@@ -89,36 +84,6 @@
     <FundamentalAgent name="TRADER_FUNDAMENTAL_67" exchange="MARKET" />
     <FundamentalAgent name="TRADER_FUNDAMENTAL_68" exchange="MARKET" />
     <FundamentalAgent name="TRADER_FUNDAMENTAL_69" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_70" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_71" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_72" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_73" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_74" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_75" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_76" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_77" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_78" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_79" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_80" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_81" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_82" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_83" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_84" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_85" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_86" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_87" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_88" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_89" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_90" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_91" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_92" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_93" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_94" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_95" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_96" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_97" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_98" exchange="MARKET" />
-    <FundamentalAgent name="TRADER_FUNDAMENTAL_99" exchange="MARKET" />
     <MAOAgent name="TRADER_MAO_SMALL_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
     <MAOAgent name="TRADER_MAO_SMALL_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
     <MAOAgent name="TRADER_MAO_SMALL_02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
@@ -154,46 +119,6 @@
     <MAOAgent name="TRADER_MAO_SMALL_32" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
     <MAOAgent name="TRADER_MAO_SMALL_33" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
     <MAOAgent name="TRADER_MAO_SMALL_34" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_35" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_36" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_37" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_38" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_39" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_40" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_41" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_42" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_43" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_44" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_45" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_46" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_47" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_48" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_49" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_50" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_51" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_52" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_53" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_54" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_55" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_56" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_57" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_58" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_59" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_60" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_61" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_62" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_63" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_64" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_65" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_66" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_67" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_68" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_69" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_70" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_71" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_72" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_73" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
-    <MAOAgent name="TRADER_MAO_SMALL_74" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_SMALL" />
     <MAOAgent name="TRADER_MAO_LARGE_00" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
     <MAOAgent name="TRADER_MAO_LARGE_01" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
     <MAOAgent name="TRADER_MAO_LARGE_02" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
@@ -234,39 +159,84 @@
     <MAOAgent name="TRADER_MAO_LARGE_37" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
     <MAOAgent name="TRADER_MAO_LARGE_38" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
     <MAOAgent name="TRADER_MAO_LARGE_39" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_40" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_41" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_42" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_43" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_44" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_45" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_46" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_47" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_48" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_49" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_50" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_51" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_52" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_53" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_54" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_55" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_56" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_57" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_58" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_59" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_60" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_61" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_62" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_63" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_64" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_65" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_66" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_67" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_68" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_69" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_70" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_71" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_72" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_73" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
-    <MAOAgent name="TRADER_MAO_LARGE_74" exchange="MARKET" marketDataAgent="MARKET_DATA_AGENT_LARGE" />
+    <QLearningAgent name="TRADER_QL_00" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_01" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_02" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_03" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_04" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_05" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_06" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_07" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_08" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_09" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_10" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_11" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_12" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_13" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_14" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_15" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_16" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_17" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_18" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_19" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_20" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_21" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_22" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_23" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_24" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_25" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_26" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_27" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_28" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_29" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_30" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_31" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_32" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_33" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_34" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_35" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_36" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_37" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_38" exchange="MARKET" />
+    <QLearningAgent name="TRADER_QL_39" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_00" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_01" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_02" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_03" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_04" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_05" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_06" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_07" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_08" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_09" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_10" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_11" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_12" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_13" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_14" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_15" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_16" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_17" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_18" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_19" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_20" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_21" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_22" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_23" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_24" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_25" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_26" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_27" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_28" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_29" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_30" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_31" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_32" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_33" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_34" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_35" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_36" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_37" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_38" exchange="MARKET" />
+    <DQLAgent name="TRADER_DQL_39" exchange="MARKET" />
 </Simulation>

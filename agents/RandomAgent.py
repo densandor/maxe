@@ -11,7 +11,7 @@ class RandomAgent:
         self.pTrade = float(params.get("pTrade", random.uniform(0.2, 0.4)))
 
         # RandomAgent-specific parameters
-        self.maxVolume = int(params.get("maxVolume", 1))
+        self.maxVolume = int(params.get("maxVolume", 3))
 
     def receiveMessage(self, simulation, type, payload):
         currentTimestamp = simulation.currentTimestamp()
