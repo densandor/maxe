@@ -169,36 +169,6 @@
     <QLearningAgent name="TRADER_QL_07" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_08" exchange="MARKET" />
     <QLearningAgent name="TRADER_QL_09" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_10" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_11" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_12" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_13" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_14" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_15" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_16" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_17" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_18" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_19" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_20" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_21" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_22" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_23" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_24" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_25" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_26" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_27" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_28" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_29" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_30" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_31" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_32" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_33" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_34" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_35" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_36" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_37" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_38" exchange="MARKET" />
-    <QLearningAgent name="TRADER_QL_39" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_00" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_01" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_02" exchange="MARKET" />
@@ -209,34 +179,4 @@
     <DQLAgent name="TRADER_DQL_07" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_08" exchange="MARKET" />
     <DQLAgent name="TRADER_DQL_09" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_10" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_11" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_12" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_13" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_14" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_15" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_16" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_17" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_18" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_19" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_20" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_21" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_22" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_23" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_24" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_25" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_26" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_27" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_28" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_29" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_30" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_31" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_32" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_33" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_34" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_35" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_36" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_37" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_38" exchange="MARKET" />
-    <DQLAgent name="TRADER_DQL_39" exchange="MARKET" />
 </Simulation>

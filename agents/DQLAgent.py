@@ -4,7 +4,6 @@ from .dqn.ReplayMemory import ReplayMemory
 
 import numpy as np
 import collections
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -53,7 +52,6 @@ class DQLAgent:
         # Initialise optimiser and loss
         self.optimiser = optim.Adam(self.qNetwork.parameters(), lr=self.alpha)
         self.lossFunction = nn.SmoothL1Loss(beta=1.0)
-        self.losses = []
         
         # Initialise replay buffer
         self.memory = ReplayMemory(capacity=self.memoryCapacity)   
@@ -195,9 +193,7 @@ class DQLAgent:
             self.lastAction = action
             
             # Train on batch
-            loss = self._trainStep()
-            if loss is not None:
-                self.losses.append(loss)
+            self._trainStep()
             
             # Periodically update target network
             self.steps += 1
@@ -232,9 +228,4 @@ class DQLAgent:
         
         if type == "EVENT_SIMULATION_STOP":
             print(f"{self.name()} simulation stopped")
-            plt.plot(self.losses)
-            plt.title("DQL Agent Training Loss")
-            plt.xlabel("Training Steps")
-            plt.ylabel("Loss")
-            plt.show()
             return

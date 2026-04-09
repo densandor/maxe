@@ -40,6 +40,7 @@ class ConfigPanel:
 
     def _loadResultFolders(self):
         results = Path(__file__).parent.parent / "results"
+        results.mkdir(parents=True, exist_ok=True)
         self.resultFolders = sorted([f.name for f in results.glob("*/") if f.is_dir()])
 
     def _saveResults(self):
@@ -50,8 +51,16 @@ class ConfigPanel:
         if not logsFolder.exists():
             return
 
+        resultsRoot = Path(__file__).parent.parent / "results"
+        resultsRoot.mkdir(parents=True, exist_ok=True)
+
+        if not self.resultFolders:
+            defaultFolder = resultsRoot / "population1"
+            defaultFolder.mkdir(parents=True, exist_ok=True)
+            self._loadResultFolders()
+
         saveFolder = self.resultFolders[self.folderIndex]
-        savePath = Path(__file__).parent.parent / "results" / saveFolder
+        savePath = resultsRoot / saveFolder
         savePath.mkdir(parents=True, exist_ok=True)
 
         existingRuns = [int(p.name) for p in savePath.iterdir() if p.is_dir() and p.name.isdigit()]

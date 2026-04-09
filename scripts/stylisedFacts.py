@@ -8,7 +8,7 @@ def volatility(logReturns):
     return np.abs(logReturns)
 
 # Autocorrelation of returns (short-term memory)
-def returnAutocorrelation(logReturns, lags=[1, 10, 30, 90]):
+def returnAutocorrelation(logReturns, lags=[1, 10, 20, 50]):
     mean = np.mean(logReturns)
     centeredLogReturns = logReturns - mean
     variance = np.sum(centeredLogReturns ** 2)
@@ -25,7 +25,7 @@ def returnAutocorrelation(logReturns, lags=[1, 10, 30, 90]):
     return results
 
 # Autocorrelation of the volatility of returns (volatility clustering)
-def volatilityAutocorrelation(logReturns, lags=[1, 10, 30, 60, 120, 300, 600, 900]):
+def volatilityAutocorrelation(logReturns, lags=[1, 10, 20, 50]):
     vol = volatility(logReturns)
     
     n = len(vol)
@@ -61,12 +61,20 @@ def plotReturnsWithNormal(logReturns, bins=30, title="Log Returns (Normal Distri
 
     fig = plt.figure(figsize=(8, 5))
 
-    plt.hist(logReturns, bins=bins, density=True, alpha=0.5, color="red", label="Empirical returns", histtype="step")
+    plt.hist(
+        logReturns,
+        bins=bins,
+        density=True,
+        alpha=0.7,
+        color="blue",
+        edgecolor="black",
+        label="Empirical returns",
+    )
 
     if standardDeviation > 0:
         x = np.linspace(mean - 4 * standardDeviation, mean + 4 * standardDeviation, 500)
         normalPDF = (1.0 / (np.sqrt(2 * np.pi) * standardDeviation)) * np.exp(-0.5 * ((x - mean) / standardDeviation) ** 2)
-        plt.plot(x, normalPDF, "b-", linewidth=2)
+        plt.plot(x, normalPDF, color="red", linewidth=2)
 
     plt.xlabel("Log Return")
     plt.ylabel("Density")
@@ -86,14 +94,14 @@ if __name__ == "__main__":
     parser.add_argument("timeframe", nargs="?", default=10, type=int, help="The time (in seconds) that each candle should track.")
     args = parser.parse_args()
 
-    ohlc = generateCandles("logs/TradeLog.csv", timeframeSeconds=args.timeframe)
+    ohlc = generateCandles("logs/TradeLog.csv", timeframe=args.timeframe)
     closePrices = ohlc["close"].values
     logReturns = np.log(closePrices[1:] / closePrices[:-1])
 
     vol = volatility(logReturns)
     print("Mean Volatility of Returns: " + str(np.mean(vol)))
 
-    lagsToCalculate = [1, 6, 30]
+    lagsToCalculate = [1, 10, 20, 50]
 
     returnACF = returnAutocorrelation(logReturns, lags=lagsToCalculate)
     print("Autocorrelation Function of Returns:")

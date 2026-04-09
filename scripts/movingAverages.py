@@ -11,9 +11,9 @@ if __name__ == "__main__":
     df = pd.read_csv(args.input)
     
     plt.figure(figsize=(12, 6))
-    plt.plot(df['time'], df['price'], label='Price', linewidth=1)
-    plt.plot(df['time'], df['fastEma'], label='Fast EMA', linewidth=1)
-    plt.plot(df['time'], df['slowEma'], label='Slow EMA', linewidth=1)
+    plt.plot(df['time'], df['price'], label='Price', linewidth=1, color='blue', alpha=0.7)
+    plt.plot(df['time'], df['fastEma'], label='Fast EMA', linewidth=1, color='red', alpha=0.7)
+    plt.plot(df['time'], df['slowEma'], label='Slow EMA', linewidth=1, color='green', alpha=0.7)
     
     plt.xlabel('Simulation Steps')
     plt.ylabel('Asset Price')

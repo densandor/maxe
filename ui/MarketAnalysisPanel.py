@@ -20,7 +20,7 @@ class MarketAnalysisPanel:
         
         # Metrics
         self.volatilityAbs = 0.0
-        self.acfLags = [1, 6, 30, 90]
+        self.acfLags = [1, 10, 20, 50]
         self.retAcfValues = []
         self.volAcfValues = []
         self.excessKurtosis = 0.0
