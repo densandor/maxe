@@ -28,7 +28,7 @@ class DQLAgent:
         self.epsilonDecay = float(params.get("epsilonDecay", 0.995))
         self.batchSize = int(params.get("batchSize", 5))
         self.memoryCapacity = int(params.get("memoryCapacity", 60))
-        self.targetNetworkUpdateFrequency = int(params.get("targetNetworkUpdateFrequency", 50))
+        self.targetNetworkUpdateFrequency = int(params.get("targetNetworkUpdateFrequency", 25))
         
         # State features: 20 normalized prices + position (21-D total)
         self.position = 0
@@ -130,8 +130,6 @@ class DQLAgent:
         
         self.optimiser.step()
         
-        self.steps += 1
-        
         return loss.item()
     
     def _updateTargetNetwork(self):
@@ -148,7 +146,7 @@ class DQLAgent:
             return
         
         if type == "WAKE_UP":
-            simulation.dispatchMessage(currentTimestamp, self.offset, self.name(), self.name(), "WAKE_UP", EmptyPayload())
+            simulation.dispatchMessage(currentTimestamp, self.interval, self.name(), self.name(), "WAKE_UP", EmptyPayload())
             simulation.dispatchMessage(currentTimestamp, 0, self.name(), self.exchange, "RETRIEVE_L1", EmptyPayload())
             return
         
